@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "VANTIQ SYSTEMS — enterprise AI engineering & automation company website",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

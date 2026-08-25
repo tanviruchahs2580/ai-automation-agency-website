@@ -8,6 +8,7 @@ import {
   timelines,
   type ProjectBrief,
 } from "@/lib/validation";
+import { contact } from "@/data/site";
 import { AnalyticsEvent, track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
@@ -222,7 +223,7 @@ export function ProjectIntake() {
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <a
-            href="#meeting-link-placeholder"
+            href={contact.meetingLink}
             onClick={() => track(AnalyticsEvent.MeetingClick)}
             className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium text-white hover:bg-accent-strong"
           >
