@@ -70,6 +70,28 @@ describe("projectBriefSchema", () => {
     });
     expect(parsed.success).toBe(false);
   });
+
+  it("accepts ASCII hyphens in enum fields (API integration robustness)", () => {
+    const parsed = projectBriefSchema.safeParse({
+      ...validBrief,
+      companySize: "51 - 250",
+      budgetRange: "$25k - $75k",
+      timeline: "6 - 12 months",
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.companySize).toBe("51 – 250");
+      expect(parsed.data.budgetRange).toBe("$25k – $75k");
+    }
+  });
+
+  it("still rejects invalid strings inside enum fields after normalisation", () => {
+    const parsed = projectBriefSchema.safeParse({
+      ...validBrief,
+      companySize: "51 to 250",
+    });
+    expect(parsed.success).toBe(false);
+  });
 });
 
 describe("recommendedNextStep", () => {

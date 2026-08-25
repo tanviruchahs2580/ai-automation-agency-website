@@ -40,9 +40,18 @@ export const companySizes = [
   "5,000+",
 ] as const;
 
+/**
+ * Enum values use typographic en-dashes (e.g. "51 – 250"). Browser clients
+ * submit them verbatim, but API integrations commonly send ASCII hyphens.
+ * Normalise before validation so both forms are accepted without loosening
+ * the allowed value set.
+ */
+const normalizeDash = (value: unknown) =>
+  typeof value === "string" ? value.replace(/-/g, "\u2013").trim() : value;
+
 export const projectBriefSchema = z.object({
   companyName: cleanString(2, 120),
-  companySize: z.enum(companySizes),
+  companySize: z.preprocess(normalizeDash, z.enum(companySizes)),
   industry: cleanString(2, 80),
   country: cleanString(2, 80),
   contactName: cleanString(2, 120),
@@ -52,8 +61,8 @@ export const projectBriefSchema = z.object({
   currentWorkflow: cleanString(10, 4000),
   existingSoftware: cleanString(0, 500),
   desiredOutcome: cleanString(20, 2000),
-  budgetRange: z.enum(budgetRanges),
-  timeline: z.enum(timelines),
+  budgetRange: z.preprocess(normalizeDash, z.enum(budgetRanges)),
+  timeline: z.preprocess(normalizeDash, z.enum(timelines)),
   consent: z.literal(true),
   companyWebsite: z.string().max(0).optional(),
 });
