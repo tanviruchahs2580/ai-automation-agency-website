@@ -9,7 +9,7 @@
   --color-line-strong: rgba(244, 242, 236, 0.16);
   --color-ink: #f4f2ec;
   --color-muted: #a3a9b4;
-  --color-faint: #707684;
+  --color-faint: #7d8494; /* WCAG AA: >=4.5:1 on all surface tokens */
   --color-accent: #2e6bf6;
   --color-accent-strong: #5285ff;
   --color-ok: #34d399;

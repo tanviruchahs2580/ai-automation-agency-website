@@ -36,6 +36,20 @@ Copy `.env.example` to `.env` and set:
 - Briefs are validated and receipted but not persisted until a storage
   provider is connected (see `src/app/api/project-brief/route.ts`).
 
+## Testing
+
+```bash
+npm test           # unit tests (vitest)
+npm run test:e2e   # browser E2E + axe accessibility scans (Playwright, chromium)
+```
+
+E2E runs against the production build (`next start`) and covers navigation,
+mobile menu, ROI calculator, readiness assessment, the full intake wizard
+submission and WCAG 2.x A/AA axe scans on key pages.
+
 ## CI/CD
 
-GitHub Actions runs lint, typecheck, unit tests and production build on every push/PR to `main`.
+GitHub Actions runs two jobs on every push/PR to `main`:
+
+- `quality` — lint, unit tests, production build, typecheck
+- `e2e` — production build + full Playwright suite (failure artifacts uploaded)

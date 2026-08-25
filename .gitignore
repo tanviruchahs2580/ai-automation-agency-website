@@ -39,3 +39,7 @@ Thumbs.db
 # Local databases / dumps
 *.sqlite
 *.db
+
+# Playwright
+test-results/
+playwright-report/

@@ -276,7 +276,7 @@ export function ProjectIntake() {
 
         {(current.fields as readonly string[]).includes("companyName") && (
           <>
-            <Field label="Company name" error={errors.companyName}>
+            <Field label="Company name" htmlFor="f-companyName" error={errors.companyName}>
               <input
                 type="text"
                 id="f-companyName"
@@ -295,7 +295,7 @@ export function ProjectIntake() {
                 error={errors.companySize}
                 onChange={(v) => set("companySize", v)}
               />
-              <Field label="Industry" error={errors.industry}>
+              <Field label="Industry" htmlFor="f-industry" error={errors.industry}>
                 <input
                   type="text"
                   id="f-industry"
@@ -304,7 +304,7 @@ export function ProjectIntake() {
                   className={inputClass(!!errors.industry)}
                 />
               </Field>
-              <Field label="Country" error={errors.country}>
+              <Field label="Country" htmlFor="f-country" error={errors.country}>
                 <input
                   type="text"
                   id="f-country"
@@ -318,8 +318,9 @@ export function ProjectIntake() {
           </>
         )}
 
-        {"problem" in current.fields && (
+        {(current.fields as readonly string[]).includes("problem") && (
           <Field
+            htmlFor="f-problem"
             label="What problem are you trying to solve?"
             hint="The more concrete, the better our first response."
             error={errors.problem}
@@ -334,8 +335,9 @@ export function ProjectIntake() {
           </Field>
         )}
 
-        {"currentWorkflow" in current.fields && (
+        {(current.fields as readonly string[]).includes("currentWorkflow") && (
           <Field
+            htmlFor="f-currentWorkflow"
             label="How does this work get done today?"
             error={errors.currentWorkflow}
           >
@@ -349,8 +351,9 @@ export function ProjectIntake() {
           </Field>
         )}
 
-        {"existingSoftware" in current.fields && (
+        {(current.fields as readonly string[]).includes("existingSoftware") && (
           <Field
+            htmlFor="f-existingSoftware"
             label="Which systems are involved?"
             hint="ERP, CRM, ticketing, spreadsheets — comma separated. Optional."
             error={errors.existingSoftware}
@@ -365,8 +368,9 @@ export function ProjectIntake() {
           </Field>
         )}
 
-        {"desiredOutcome" in current.fields && (
+        {(current.fields as readonly string[]).includes("desiredOutcome") && (
           <Field
+            htmlFor="f-desiredOutcome"
             label="What does success look like?"
             error={errors.desiredOutcome}
           >
@@ -380,7 +384,7 @@ export function ProjectIntake() {
           </Field>
         )}
 
-        {"budgetRange" in current.fields && (
+        {(current.fields as readonly string[]).includes("budgetRange") && (
           <SelectField
             id="f-budgetRange"
             label="Indicative budget range"
@@ -391,7 +395,7 @@ export function ProjectIntake() {
           />
         )}
 
-        {"timeline" in current.fields && (
+        {(current.fields as readonly string[]).includes("timeline") && (
           <>
             <SelectField
               id="f-timeline"
@@ -402,7 +406,7 @@ export function ProjectIntake() {
               onChange={(v) => set("timeline", v)}
             />
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Your name" error={errors.contactName}>
+              <Field label="Your name" htmlFor="f-contactName" error={errors.contactName}>
                 <input
                   type="text"
                   id="f-contactName"
@@ -412,7 +416,7 @@ export function ProjectIntake() {
                   className={inputClass(!!errors.contactName)}
                 />
               </Field>
-              <Field label="Role" error={errors.contactRole}>
+              <Field label="Role" htmlFor="f-contactRole" error={errors.contactRole}>
                 <input
                   type="text"
                   id="f-contactRole"
@@ -422,7 +426,7 @@ export function ProjectIntake() {
                 />
               </Field>
             </div>
-            <Field label="Work email" error={errors.contactEmail}>
+            <Field label="Work email" htmlFor="f-contactEmail" error={errors.contactEmail}>
               <input
                 type="email"
                 id="f-contactEmail"
@@ -512,18 +516,20 @@ function inputClass(hasError: boolean): string {
 
 function Field({
   label,
+  htmlFor,
   children,
   error,
   hint,
 }: {
   label: string;
+  htmlFor?: string;
   children: React.ReactNode;
   error?: string;
   hint?: string;
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium">{label}</label>
+      <label htmlFor={htmlFor} className="block text-sm font-medium">{label}</label>
       {hint && <p className="mt-1 text-xs text-faint">{hint}</p>}
       <div className="mt-1.5">{children}</div>
       {error && (
@@ -551,7 +557,7 @@ function SelectField({
   error?: string;
 }) {
   return (
-    <Field label={label} error={error}>
+    <Field label={label} error={error} htmlFor={id}>
       <select
         id={id}
         value={value}
