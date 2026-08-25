@@ -1,7 +1,8 @@
-# Enterprise AI Engineering & Automation — Corporate Website
+# VANTIQ SYSTEMS — Enterprise AI Engineering & Automation Website
 
-Production website for an AI Engineering & Automation company: solutions, services,
-industries, interactive AI readiness assessment, ROI calculator and project intake.
+Production website for VANTIQ SYSTEMS, an AI Engineering & Automation company:
+solutions, services, industries, interactive AI readiness assessment, ROI
+calculator and project intake.
 
 ## Stack
 

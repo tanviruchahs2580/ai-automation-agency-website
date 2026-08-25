@@ -2,7 +2,7 @@
   "name": "ai-automation-agency-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Enterprise AI Engineering & Automation company website",
+  "description": "VANTIQ SYSTEMS — enterprise AI engineering & automation company website",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

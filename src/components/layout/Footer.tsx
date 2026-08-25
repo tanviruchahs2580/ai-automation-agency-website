@@ -9,14 +9,14 @@ export function Footer() {
       <div className="container-x py-14">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
-            <p className="text-lg font-bold tracking-tight">MERIDIAN</p>
-            <p className="mono-label mt-1 text-muted">AI ENGINEERING &amp; AUTOMATION</p>
+            <p className="text-lg font-bold tracking-tight">VANTIQ</p>
+            <p className="mono-label mt-1 text-muted">SYSTEMS — AI ENGINEERING &amp; AUTOMATION</p>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
               We design, build, deploy and operate intelligent systems that make
               businesses faster, safer and more autonomous.
             </p>
             <p className="mt-4 text-xs leading-relaxed text-faint">
-              Placeholder brand &amp; contact details — replace with verified
+              Contact details are placeholders — replace with verified
               company information before launch.
             </p>
           </div>
@@ -42,7 +42,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-line pt-6 md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-faint">
-            © {year} Meridian AI Engineering. All rights reserved.
+            © {year} VANTIQ SYSTEMS. All rights reserved.
           </p>
           <nav aria-label="Legal" className="flex flex-wrap gap-5">
             {legalLinks.map((link) => (

@@ -82,8 +82,8 @@ export const legalLinks: LinkItem[] = [
   { label: "Cookie Policy", href: "/cookie-policy" },
 ];
 
-/** PLACEHOLDER — replace with verified contact details. */
+/** PLACEHOLDER — replace with the verified VANTIQ SYSTEMS inbox before launch. */
 export const contact = {
-  email: "hello@meridian-ai.example",
+  email: "hello@vantiqsystems.example",
   meetingLink: "#meeting-link-placeholder",
 };

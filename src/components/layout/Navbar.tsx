@@ -53,11 +53,11 @@ export function Navbar() {
         <Link
           href="/"
           className="flex items-baseline gap-2"
-          aria-label="Meridian AI Engineering — home"
+          aria-label="VANTIQ SYSTEMS — home"
         >
-          <span className="text-lg font-bold tracking-tight">MERIDIAN</span>
+          <span className="text-lg font-bold tracking-tight">VANTIQ</span>
           <span className="mono-label hidden text-muted sm:inline">
-            AI ENGINEERING
+            SYSTEMS
           </span>
         </Link>
 

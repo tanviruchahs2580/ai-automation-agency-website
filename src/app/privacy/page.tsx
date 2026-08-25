@@ -4,7 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata = buildMetadata({
   title: "Privacy Policy",
   description:
-    "How Meridian AI Engineering handles personal data submitted through this website.",
+    "How VANTIQ SYSTEMS handles personal data submitted through this website.",
   path: "/privacy",
 });
 

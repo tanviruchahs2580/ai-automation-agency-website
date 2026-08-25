@@ -6,7 +6,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "Why most AI pilots never reach production",
     excerpt:
       "The gap between demo and production is architectural, not intellectual. Here are the five failure modes we see most often — and what closes each one.",
-    author: "Meridian Engineering Team", // PLACEHOLDER authorship
+    author: "VANTIQ Systems Engineering Team", // PLACEHOLDER authorship
     authorRole: "AI Engineering",
     category: "Enterprise AI",
     tags: ["production", "architecture", "evaluation"],
@@ -53,7 +53,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "Designing agent tools: least privilege in practice",
     excerpt:
       "An agent is only as safe as the tools it can reach. A practical framework for scoping, validating and monitoring tool access.",
-    author: "Meridian Engineering Team",
+    author: "VANTIQ Systems Engineering Team",
     authorRole: "AI Security",
     category: "Agentic Systems",
     tags: ["agents", "security", "tools"],
@@ -86,7 +86,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "RAG without the hype: what retrieval actually fixes",
     excerpt:
       "Retrieval-augmented generation grounds models in your content. It doesn't fix reasoning, freshness or permissions by itself. An honest breakdown.",
-    author: "Meridian Engineering Team",
+    author: "VANTIQ Systems Engineering Team",
     authorRole: "AI Engineering",
     category: "AI Engineering",
     tags: ["rag", "retrieval", "knowledge"],
@@ -119,7 +119,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "The economics of model routing",
     excerpt:
       "Sending every token to the most capable model is the most expensive way to run AI. Routing by task changes unit economics dramatically.",
-    author: "Meridian Engineering Team",
+    author: "VANTIQ Systems Engineering Team",
     authorRole: "AI Economics",
     category: "AI Economics",
     tags: ["cost", "routing", "models"],
@@ -152,7 +152,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "Prompt injection: honest threats, honest defences",
     excerpt:
       "You cannot fully prevent prompt injection today. You can architect systems where attempts fail safely. Here's our control hierarchy.",
-    author: "Meridian Engineering Team",
+    author: "VANTIQ Systems Engineering Team",
     authorRole: "AI Security",
     category: "AI Security",
     tags: ["security", "prompt-injection"],
@@ -185,7 +185,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "Choosing what to automate first",
     excerpt:
       "A sequencing method for automation roadmaps: volume × variance × verifiability. Why boring processes make the best first projects.",
-    author: "Meridian Engineering Team",
+    author: "VANTIQ Systems Engineering Team",
     authorRole: "Automation",
     category: "Automation",
     tags: ["roadmap", "strategy", "process"],

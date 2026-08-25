@@ -455,8 +455,8 @@ export function ProjectIntake() {
                   className="mt-1 h-4 w-4 accent-[color:var(--color-accent)]"
                 />
                 <span>
-                  I agree that Meridian may process this brief to respond to my
-                  enquiry, as described in the{" "}
+                  I agree that VANTIQ SYSTEMS may process this brief to respond
+                  to my enquiry, as described in the{" "}
                   <a href="/privacy" className="underline underline-offset-2">
                     privacy policy
                   </a>

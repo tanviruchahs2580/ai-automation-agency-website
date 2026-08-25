@@ -10,10 +10,10 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
 ).replace(/\/$/, "");
 
-/** PLACEHOLDER BRAND — replace with the verified legal entity name before launch. */
+/** Company brand — confirm registered legal entity form before launch. */
 export const siteConfig = {
-  name: "Meridian AI Engineering",
-  shortName: "MERIDIAN",
+  name: "VANTIQ SYSTEMS",
+  shortName: "VANTIQ",
   tagline: "AI Engineering & Automation for the Enterprise",
   description:
     "We design, engineer and operate intelligent automation systems that connect your people, software, data and workflows — from first architecture to production.",
