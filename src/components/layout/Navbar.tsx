@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";import { siteNav } from "@/data/site";
+import { useEffect, useRef, useState } from "react";
+import { siteNav } from "@/data/site";
 import { track, AnalyticsEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +11,7 @@ export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const firstMobileLinkRef = useRef<HTMLAnchorElement>(null);
 
@@ -27,6 +29,30 @@ export function Navbar() {
       if (e.key === "Escape") {
         setOpen(false);
         menuButtonRef.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      // Focus trap: while the overlay menu is open, keyboard focus cycles
+      // inside the header instead of escaping into the page behind it.
+      const container = headerRef.current;
+      if (!container) return;
+      const focusables = Array.from(
+        container.querySelectorAll<HTMLElement>(
+          "a[href], button:not([disabled])",
+        ),
+      ).filter((el) => el.getClientRects().length > 0);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      const inside = active instanceof Node && container.contains(active);
+      if (!inside || (e.shiftKey && active === first)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
       }
     };
     document.addEventListener("keydown", onKeyDown);
@@ -42,6 +68,7 @@ export function Navbar() {
 
   return (
     <header
+      ref={headerRef}
       className={cn(
         "sticky top-0 z-50 border-b transition-colors duration-200",
         scrolled || open

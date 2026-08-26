@@ -3,6 +3,10 @@
  *
  * Suitable for single-instance deployments. For horizontally scaled
  * production, back this with Redis — the call-site contract stays identical.
+ *
+ * Memory is bounded: once the bucket map crosses a size threshold, expired
+ * buckets are swept on the next check, so unique-IP bot traffic cannot grow
+ * the map without limit on long-running processes.
  */
 
 interface Bucket {
@@ -20,6 +24,8 @@ export interface RateLimiter {
   check(key: string): RateLimitResult;
 }
 
+const SWEEP_AT_ENTRIES = 4096;
+
 export function createRateLimiter(options: {
   windowMs: number;
   max: number;
@@ -32,6 +38,13 @@ export function createRateLimiter(options: {
   return {
     check(key: string): RateLimitResult {
       const t = now();
+
+      if (buckets.size >= SWEEP_AT_ENTRIES) {
+        for (const [k, bucket] of buckets) {
+          if (bucket.resetAt <= t) buckets.delete(k);
+        }
+      }
+
       const bucket = buckets.get(key);
 
       if (!bucket || bucket.resetAt <= t) {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import {
   budgetRanges,
   companySizes,
@@ -63,11 +64,19 @@ const steps = [
   { title: "Timeline & Contact", fields: ["timeline", "contactName", "contactEmail", "contactRole", "consent"] },
 ] as const;
 
+/**
+ * Draft persistence — the wizard restores an in-progress submission after an
+ * accidental refresh or navigation. Consent is intentionally never restored
+ * (must be re-affirmed) and the honeypot field is never persisted.
+ */
+const DRAFT_STORAGE_KEY = "vantiq:intake-draft:v1";
+
 type Status = "idle" | "submitting" | "error" | "success";
 
 export function ProjectIntake() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>(initialForm);
+  const [draftRestored, setDraftRestored] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [serverError, setServerError] = useState("");
@@ -75,6 +84,61 @@ export function ProjectIntake() {
     briefId: string;
     nextStep: string;
   } | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Signals to tests/automation that controlled inputs are live so typed
+  // values cannot race ahead of hydration on slow engines.
+  useEffect(() => {
+    rootRef.current?.setAttribute("data-hydrated", "true");
+  }, []);
+
+  // Hydrate the draft after mount so SSR markup and client markup agree.
+  // Deferred one frame: avoids synchronous setState-in-effect cascades while
+  // still landing before first paint.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      try {
+        const raw = window.localStorage.getItem(DRAFT_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw) as Partial<FormState>;
+        const merged: FormState = {
+          ...initialForm,
+          ...parsed,
+          consent: false,
+          companyWebsite: "",
+        };
+        const hasContent = Object.entries(merged).some(
+          ([key, value]) =>
+            key !== "consent" && typeof value === "string" && value.length > 0,
+        );
+        if (!hasContent) return;
+        setForm(merged);
+        setDraftRestored(true);
+      } catch {
+        /* corrupted or unavailable draft is ignored */
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        DRAFT_STORAGE_KEY,
+        JSON.stringify({ ...form, companyWebsite: "" }),
+      );
+    } catch {
+      /* storage unavailable — wizard still works without persistence */
+    }
+  }, [form]);
+
+  const clearDraft = () => {
+    try {
+      window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  };
 
   const started =
     Object.values(form).some((v) => typeof v === "string" && v.length > 0) ||
@@ -178,6 +242,7 @@ export function ProjectIntake() {
         throw new Error(data.error ?? "Submission failed");
       }
 
+      clearDraft();
       setStatus("success");
       track(AnalyticsEvent.IntakeComplete);
       setResult({
@@ -230,8 +295,8 @@ export function ProjectIntake() {
             Book a Discovery Call
           </a>
           <span className="text-xs leading-relaxed self-center text-faint">
-            Confirmation sent to {form.contactEmail}. (Placeholder booking link —
-            connect scheduling before launch.)
+            Save reference {result.briefId} — quoting it lets any follow-up
+            email or call pick up exactly where you left off.
           </span>
         </div>
       </div>
@@ -242,7 +307,11 @@ export function ProjectIntake() {
   const progress = ((step + 1) / steps.length) * 100;
 
   return (
-    <div className="card-surface mx-auto max-w-2xl p-6 md:p-10">
+    <div
+      ref={rootRef}
+      data-testid="intake-wizard"
+      className="card-surface mx-auto max-w-2xl p-6 md:p-10"
+    >
       {/* Step indicator */}
       <ol className="flex flex-wrap gap-x-4 gap-y-1" aria-label="Form steps">
         {steps.map((s, i) => (
@@ -271,6 +340,11 @@ export function ProjectIntake() {
           style={{ width: `${progress}%` }}
         />
       </div>
+      {draftRestored && (
+        <p className="mono-label mt-3 text-ok">
+          Draft restored — pick up where you left off.
+        </p>
+      )}
 
       <div className="mt-8 space-y-5">
         <h2 className="text-xl font-bold tracking-tight">{current.title}</h2>
@@ -462,9 +536,9 @@ export function ProjectIntake() {
                 <span>
                   I agree that VANTIQ SYSTEMS may process this brief to respond
                   to my enquiry, as described in the{" "}
-                  <a href="/privacy" className="underline underline-offset-2">
+                  <Link href="/privacy" className="underline underline-offset-2">
                     privacy policy
-                  </a>
+                  </Link>
                   .
                 </span>
               </label>
@@ -559,19 +633,35 @@ function SelectField({
 }) {
   return (
     <Field label={label} error={error} htmlFor={id}>
-      <select
-        id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={cn(inputClass(!!error), "appearance-none")}
-      >
-        <option value="">Select…</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={cn(inputClass(!!error), "appearance-none pr-9")}
+        >
+          <option value="">Select…</option>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 12 8"
+          fill="none"
+          className="pointer-events-none absolute right-3 top-1/2 h-2 w-3 -translate-y-1/2 text-faint"
+        >
+          <path
+            d="M1 1.5L6 6.5L11 1.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
     </Field>
   );
 }

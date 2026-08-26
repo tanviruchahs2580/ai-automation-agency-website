@@ -7,8 +7,6 @@ import { insights } from "@/data/insights";
 import { SITE_URL } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
-
   const staticRoutes: MetadataRoute.Sitemap = [
     "",
     "/solutions",
@@ -28,12 +26,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/cookie-policy",
   ].map((path) => ({
     url: `${SITE_URL}${path}`,
-    lastModified: now,
     changeFrequency: path === "" ? "weekly" : "monthly",
     priority: path === "" ? 1 : 0.7,
   }));
 
-  const dynamicRoutes: MetadataRoute.Sitemap = [
+  // lastModified is only emitted where a real date exists (insight
+  // publish dates). Build-time timestamps are intentionally omitted —
+  // claiming every page changed on every deploy is noise for crawlers.
+  type DynamicEntry = { path: string; priority: number; lastModified?: Date };
+
+  const dynamicEntries: DynamicEntry[] = [
     ...solutions.map((s) => ({ path: `/solutions/${s.slug}`, priority: 0.8 })),
     ...services.map((s) => ({ path: `/services/${s.slug}`, priority: 0.8 })),
     ...industries.map((i) => ({ path: `/industries/${i.slug}`, priority: 0.6 })),
@@ -43,10 +45,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
       lastModified: new Date(i.publishedAt),
     })),
-  ].map<MetadataRoute.Sitemap[number]>((entry) => ({
+  ];
+
+  const dynamicRoutes: MetadataRoute.Sitemap = dynamicEntries.map((entry) => ({
     url: `${SITE_URL}${entry.path}`,
-    lastModified:
-      "lastModified" in entry ? (entry.lastModified as Date) : now,
+    ...(entry.lastModified ? { lastModified: entry.lastModified } : {}),
     changeFrequency: "monthly",
     priority: entry.priority,
   }));

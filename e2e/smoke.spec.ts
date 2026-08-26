@@ -12,12 +12,20 @@ test.describe("smoke: core journeys", () => {
 
   test("no console errors on homepage", async ({ page }) => {
     const errors: string[] = [];
+    // Known-benign engine notices that are not page defects:
+    const ignoredPatterns = [
+      // Observation-phase CSP ships without a reporting endpoint by design
+      // (no collector wired yet); WebKit logs this at error level.
+      /Content Security Policy .*report-only mode/i,
+    ];
     page.on("console", (msg) => {
       if (msg.type() === "error") errors.push(msg.text());
     });
     page.on("pageerror", (err) => errors.push(err.message));
     await page.goto("/", { waitUntil: "networkidle" });
-    expect(errors).toEqual([]);
+    expect(
+      errors.filter((text) => !ignoredPatterns.some((p) => p.test(text))),
+    ).toEqual([]);
   });
 
   test("desktop nav navigates to Solutions", async ({ page }) => {

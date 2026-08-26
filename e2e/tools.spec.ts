@@ -41,7 +41,7 @@ test.describe("interactive tools", () => {
     page,
   }, testInfo) => {
     test.setTimeout(90_000);
-    await page.goto("/start-a-project");
+    await openHydratedWizard(page);
 
     // Step 1 — Business
     await page.locator("#f-companyName").fill(`E2E Verify Co ${Date.now()}`);
@@ -92,8 +92,21 @@ test.describe("interactive tools", () => {
   });
 
   test("intake wizard blocks invalid step with inline errors", async ({ page }) => {
-    await page.goto("/start-a-project");
+    await openHydratedWizard(page);
     await page.getByRole("button", { name: /Continue/ }).click();
     await expect(page.getByText("Company name is required.")).toBeVisible();
   });
 });
+
+/**
+ * The wizard's inputs are React-controlled; on slower engines a fill can
+ * land before hydration re-attaches state (value silently resets). Wait for
+ * the explicit hydration marker instead of racing the framework.
+ */
+async function openHydratedWizard(page: import("@playwright/test").Page) {
+  await page.goto("/start-a-project");
+  await expect(page.getByTestId("intake-wizard")).toHaveAttribute(
+    "data-hydrated",
+    "true",
+  );
+}

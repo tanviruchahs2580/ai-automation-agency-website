@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { computeRoi } from "@/lib/roi";
 import { formatCurrency, formatNumber } from "@/lib/utils";
@@ -45,6 +46,17 @@ export function ROICalculator() {
     }));
   };
 
+  // Free typing while editing; out-of-range values snap to the field's
+  // documented min/max when the user leaves the input.
+  const clampOnBlur = (key: keyof typeof defaults, raw: number) => {
+    const field = fields.find((f) => f.key === key);
+    if (!field || !Number.isFinite(raw)) return;
+    const clamped = Math.min(Math.max(raw, field.min), field.max);
+    setInputs((prev) =>
+      prev[key] === clamped ? prev : { ...prev, [key]: clamped },
+    );
+  };
+
   return (
     <div className="grid gap-8 lg:grid-cols-12">
       <form className="card-surface p-6 md:p-8 lg:col-span-6" onSubmit={(e) => e.preventDefault()}>
@@ -71,6 +83,7 @@ export function ROICalculator() {
                   step={field.step}
                   value={inputs[field.key]}
                   onChange={(e) => update(field.key)(e.target.value)}
+                  onBlur={(e) => clampOnBlur(field.key, Number(e.target.value))}
                   className="w-full rounded-md border border-line bg-surface2 px-3 py-2 font-mono text-sm tabular-nums focus:border-accent focus:outline-none"
                 />
                 {(field.suffix === "%" || field.suffix === "h") && (
@@ -146,7 +159,7 @@ export function ROICalculator() {
             above and are not a commitment of savings, ROI or payback.
           </p>
 
-          <a
+          <Link
             href="/start-a-project"
             onClick={() =>
               track(AnalyticsEvent.CtaClick, { location: "roi-calculator" })
@@ -154,7 +167,7 @@ export function ROICalculator() {
             className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong sm:w-auto"
           >
             Validate These Numbers With An Engineer
-          </a>
+          </Link>
         </div>
       </div>
     </div>

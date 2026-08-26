@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
       - name: Lint
         run: npm run lint
 
@@ -61,8 +64,8 @@ jobs:
       - name: Production build
         run: npm run build
 
-      - name: Install Playwright browser
-        run: npx playwright install chromium --with-deps
+      - name: Install Playwright browsers
+        run: npx playwright install chromium firefox webkit --with-deps
 
       - name: Run E2E tests
         run: npx playwright test
