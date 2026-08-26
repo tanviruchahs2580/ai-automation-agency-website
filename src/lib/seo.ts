@@ -1,14 +1,43 @@
 import type { Metadata } from "next";
 
+const FALLBACK_SITE_URL = "http://localhost:3000";
+
 /**
  * Production domain is injected via NEXT_PUBLIC_SITE_URL.
  * Until it is configured, canonical URLs resolve to localhost — intentional
  * placeholder behaviour so nothing is published against a domain we do not
  * control yet.
+ *
+ * Resolution is defensive because this runs at module evaluation during
+ * builds where a crash takes the whole deploy down:
+ * - unset OR empty/whitespace values are treated as unset (hosting panels
+ *   happily save an env var with an empty value)
+ * - protocol-less domains get https:// prepended ("vantiqsystems.com" works)
+ * - localhost-style hosts keep http://
+ * - anything unparseable falls back instead of throwing
+ * The result is normalized to a bare origin (no path/query/trailing slash).
  */
-export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-).replace(/\/$/, "");
+export const SITE_URL = (() => {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
+  if (!raw) return FALLBACK_SITE_URL;
+  const candidate = /^https?:\/\//i.test(raw)
+    ? raw
+    : /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(raw)
+      ? `http://${raw}`
+      : `https://${raw}`;
+  try {
+    const url = new URL(candidate);
+    // The WHATWG parser accepts some single-label junk ("https://ht!tp"
+    // parses!). Require a loopback host or a dotted domain before trusting
+    // the result; anything else falls back.
+    const okHost =
+      /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(url.hostname) ||
+      /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(url.hostname);
+    return okHost ? url.origin : FALLBACK_SITE_URL;
+  } catch {
+    return FALLBACK_SITE_URL;
+  }
+})();
 
 /** Company brand — confirm registered legal entity form before launch. */
 export const siteConfig = {

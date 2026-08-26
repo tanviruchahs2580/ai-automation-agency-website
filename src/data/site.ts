@@ -84,8 +84,9 @@ export const legalLinks: LinkItem[] = [
   { label: "Cookie Policy", href: "/cookie-policy" },
 ];
 
-/** PLACEHOLDER fallbacks — override via NEXT_PUBLIC_* env vars before launch. */
+/** PLACEHOLDER fallbacks — override via NEXT_PUBLIC_* env vars before launch.
+ * Uses || (not ??) so an env var saved with an empty value still falls back. */
 export const contact = {
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "hello@vantiqsystems.example",
-  meetingLink: process.env.NEXT_PUBLIC_MEETING_LINK ?? "#meeting-link-placeholder",
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hello@vantiqsystems.example",
+  meetingLink: process.env.NEXT_PUBLIC_MEETING_LINK || "#meeting-link-placeholder",
 };
