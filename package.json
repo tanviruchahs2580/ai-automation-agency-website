@@ -34,7 +34,7 @@
     "eslint-config-next": "^16.3.2",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.8.0",
-    "vitest": "^3.2.0"
+    "vitest": "^4.1.11"
   },
   "allowScripts": {
     "esbuild@0.28.2": true,
