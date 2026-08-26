@@ -33,8 +33,15 @@ Copy `.env.example` to `.env` and set:
 - The intake endpoint `POST /api/project-brief` rate limits per client IP read
   from `x-forwarded-for`. Deploy behind a proxy or platform that overwrites
   this header (Vercel, Nginx, Cloudflare) so it cannot be spoofed.
-- Briefs are validated and receipted but not persisted until a storage
-  provider is connected (see `src/app/api/project-brief/route.ts`).
+- Brief delivery is configuration-gated: set `RESEND_API_KEY` and
+  `BRIEF_NOTIFICATION_EMAIL` in the host environment and accepted briefs are
+  emailed automatically (`src/lib/brief-notification.ts`, plain fetch, no SDK).
+  Notification failure never blocks the visitor's receipt. For database/CRM
+  storage, persist at the marked integration point in
+  `src/app/api/project-brief/route.ts`.
+- Public contact details are env-driven (`NEXT_PUBLIC_CONTACT_EMAIL`,
+  `NEXT_PUBLIC_MEETING_LINK`) — build-time inlined, so changing them requires
+  a redeploy. See `.env.example`.
 
 ## Testing
 

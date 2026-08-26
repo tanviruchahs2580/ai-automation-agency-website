@@ -18,6 +18,9 @@ decisions and verified company data.
 - [x] Sitemap emits `lastModified` only where a real date exists
 - [x] CI runs `npm audit --omit=dev --audit-level=high`; Dependabot weekly
 - [x] Playwright suite covers chromium, firefox, webkit + mobile chromium
+- [x] Contact email/meeting link are env-driven (`NEXT_PUBLIC_*`)
+- [x] Optional brief email delivery wired (Resend via fetch, env-gated,
+      unit-tested; failure never blocks the visitor's receipt)
 
 ## 1. Business wiring (blocks public launch)
 
@@ -26,10 +29,14 @@ decisions and verified company data.
 | 1 | Import repo to Vercel, deploy | vercel.com |
 | 2 | Domain + DNS (A/CNAME) | registrar → Vercel Domains |
 | 3 | Set `NEXT_PUBLIC_SITE_URL=https://<domain>` env var | Vercel → Settings → Environment Variables |
-| 4 | Verified inbox: replace `hello@vantiqsystems.example`; set SPF/DKIM/DMARC | src/data/site.ts:87 |
-| 5 | Meeting link: replace `#meeting-link-placeholder` (intake picks it up automatically) | src/data/site.ts:88 |
-| 6 | Brief storage: connect Resend/SendGrid email or Postgres insert at the marked integration point | src/app/api/project-brief/route.ts (STORAGE INTEGRATION POINT) |
+| 4 | Verified inbox: set `NEXT_PUBLIC_CONTACT_EMAIL` env var (+ SPF/DKIM/DMARC at your DNS) | Vercel env vars — no code change needed |
+| 5 | Meeting link: set `NEXT_PUBLIC_MEETING_LINK` env var (intake picks it up automatically) | Vercel env vars — no code change needed |
+| 6 | Brief delivery: set `RESEND_API_KEY` + `BRIEF_NOTIFICATION_EMAIL` (+ `BRIEF_NOTIFICATION_FROM` after verifying a sender domain in Resend). For DB/CRM storage instead, persist at the marked integration point | Vercel env vars / src/app/api/project-brief/route.ts |
 | 7 | Legal review of Privacy / Terms / Cookie / Security, then remove their draft warnings | src/app/privacy, terms, cookie-policy, security |
+
+Note: tasks 4–6 are now environment-configuration only. Values are
+build-time-inlined (`NEXT_PUBLIC_*`) or read server-side (notification vars);
+changing them later requires a redeploy of the affected type.
 
 ## 2. Placeholder sweep — remove before flipping DNS
 

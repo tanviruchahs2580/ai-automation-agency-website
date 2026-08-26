@@ -2,8 +2,10 @@ import type { LinkItem } from "@/types/content";
 
 /**
  * PLACEHOLDER BRAND & CONTACT DATA.
- * Every contact detail below must be replaced with verified company
- * information before launch. No social profiles are listed until they exist.
+ * Contact details below are env-driven so launch configuration never
+ * requires a code change: set NEXT_PUBLIC_CONTACT_EMAIL and
+ * NEXT_PUBLIC_MEETING_LINK at deploy time (build-time inlined).
+ * Fallbacks are intentional placeholders until those vars exist.
  */
 
 export const siteNav: LinkItem[] = [
@@ -82,8 +84,8 @@ export const legalLinks: LinkItem[] = [
   { label: "Cookie Policy", href: "/cookie-policy" },
 ];
 
-/** PLACEHOLDER — replace with the verified VANTIQ SYSTEMS inbox before launch. */
+/** PLACEHOLDER fallbacks — override via NEXT_PUBLIC_* env vars before launch. */
 export const contact = {
-  email: "hello@vantiqsystems.example",
-  meetingLink: "#meeting-link-placeholder",
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "hello@vantiqsystems.example",
+  meetingLink: process.env.NEXT_PUBLIC_MEETING_LINK ?? "#meeting-link-placeholder",
 };

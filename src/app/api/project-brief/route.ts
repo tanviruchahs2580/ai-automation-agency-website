@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { createRateLimiter } from "@/lib/rate-limit";
 import {
+  isNotificationConfigured,
+  sendBriefNotification,
+} from "@/lib/brief-notification";
+import {
   projectBriefSchema,
   recommendedNextStep,
   type ProjectBrief,
@@ -12,6 +16,10 @@ import {
  * Security measures: Zod schema validation, per-IP rate limiting, honeypot
  * rejection, input sanitisation (schema-level), no secret exposure, minimal
  * data retention until a storage provider is connected.
+ *
+ * Delivery: when RESEND_API_KEY + BRIEF_NOTIFICATION_EMAIL are set in the
+ * host environment, every accepted brief is emailed to that inbox. Without
+ * them the endpoint receipts only — see src/lib/brief-notification.ts.
  */
 
 const limiter = createRateLimiter({ windowMs: 60_000, max: 5 });
@@ -64,12 +72,21 @@ export async function POST(request: Request) {
 
   /**
    * STORAGE INTEGRATION POINT
-   * Persist `brief` (validated & sanitised) to PostgreSQL / CRM / email here.
-   * Until connected, nothing is stored; only a receipt ID is returned.
+   * Email delivery is active when RESEND_API_KEY + BRIEF_NOTIFICATION_EMAIL
+   * are configured (see brief-notification.ts). For database/CRM storage,
+   * persist `brief` (validated & sanitised) here — notification failures
+   * must never block the receipt below.
    */
+  const notification = await sendBriefNotification(briefId, brief);
+
   if (process.env.NODE_ENV !== "production") {
-    // Never log brief content — only the receipt marker.
-    console.log(`[project-brief] accepted ${briefId}`);
+    // Never log brief content — only the receipt marker and delivery mode.
+    const mode = isNotificationConfigured()
+      ? notification.sent
+        ? "emailed"
+        : `email-failed:${notification.reason}`
+      : "receipt-only";
+    console.log(`[project-brief] accepted ${briefId} (${mode})`);
   }
 
   return NextResponse.json({
