@@ -15,10 +15,12 @@ export function Footer() {
               We design, build, deploy and operate intelligent systems that make
               businesses faster, safer and more autonomous.
             </p>
-            <p className="mt-4 text-xs leading-relaxed text-faint">
-              Contact details are placeholders — replace with verified
-              company information before launch.
-            </p>
+            <a
+              href={`mailto:${contact.email}`}
+              className="mt-4 block text-xs text-muted transition-colors hover:text-ink"
+            >
+              {contact.email}
+            </a>
           </div>
 
           {footerColumns.map((column) => (
@@ -56,7 +58,6 @@ export function Footer() {
             ))}
           </nav>
           <p className="text-xs text-muted">
-            {/* PLACEHOLDER contact */}
             <a href={`mailto:${contact.email}`} className="hover:text-ink">
               {contact.email}
             </a>

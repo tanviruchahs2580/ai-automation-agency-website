@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { BackToTop } from "@/components/ui/BackToTop";
+import { CookieConsent } from "@/components/ui/CookieConsent";
 import { JsonLd } from "@/components/ui/Accordion";
 import {
   SITE_URL,
@@ -42,6 +44,8 @@ export default function RootLayout({
         <Navbar />
         <main id="main">{children}</main>
         <Footer />
+        <BackToTop />
+        <CookieConsent />
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
       </body>

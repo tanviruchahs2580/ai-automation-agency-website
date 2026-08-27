@@ -15,6 +15,7 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3117",
     trace: "retain-on-failure",
+    colorScheme: "dark",
   },
   projects: [
     { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] } },

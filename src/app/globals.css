@@ -21,10 +21,30 @@
     "Liberation Mono", monospace;
 }
 
+/* ---------- Light theme tokens ---------- */
+[data-theme="light"] {
+  --color-canvas: #ffffff;
+  --color-surface: #f8f9fa;
+  --color-surface2: #e9ecef;
+  --color-line: rgba(0, 0, 0, 0.08);
+  --color-line-strong: rgba(0, 0, 0, 0.15);
+  --color-ink: #111827;
+  --color-muted: #374151;
+  --color-faint: #374151;
+  --color-accent: #2563eb;
+  --color-accent-strong: #1d4ed8;
+  --color-ok: #047857;
+  --color-warn: #92400e;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     color-scheme: dark;
+  }
+
+  [data-theme="light"] {
+    color-scheme: light;
   }
 
   body {
@@ -132,10 +152,17 @@
   background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-radius: 0.65rem;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .card-surface:hover {
   border-color: var(--color-line-strong);
+}
+
+a.card-surface:hover,
+[role="link"].card-surface:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
 .panel-grid {

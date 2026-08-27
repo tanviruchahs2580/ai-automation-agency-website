@@ -185,7 +185,7 @@ function Metric({
 }) {
   return (
     <div
-      className={`rounded-md border p-4 ${
+      className={`rounded-md border p-4 transition-colors duration-300 ${
         highlight ? "border-ok/40 bg-ok/5" : "border-line bg-surface2"
       }`}
     >

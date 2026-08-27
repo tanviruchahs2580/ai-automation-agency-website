@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { JsonLd } from "@/components/ui/Accordion";
+import { ReadingProgress } from "@/components/ui/ReadingProgress";
 import { getInsight, insights, readingTimeMinutes } from "@/data/insights";
 import { articleJsonLd, buildMetadata } from "@/lib/seo";
 
@@ -48,6 +49,7 @@ export default async function InsightPage({
 
   return (
     <>
+      <ReadingProgress />
       <JsonLd
         data={articleJsonLd({
           title: insight.title,

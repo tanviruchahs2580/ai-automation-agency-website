@@ -72,11 +72,6 @@ export default function StartAProjectPage() {
                   <li>· Only fields you enter are stored — nothing inferred or tracked.</li>
                   <li>· Retained only as long as needed to process your enquiry (see privacy policy).</li>
                 </ul>
-                <p className="mt-4 text-xs text-faint">
-                  Note: live submission storage is being connected — until then
-                  briefs are confirmed with a reference ID and handled manually.
-                  Booking link is a placeholder pending scheduling integration.
-                </p>
               </div>
             </Reveal>
           </aside>
