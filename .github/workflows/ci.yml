@@ -79,7 +79,7 @@ jobs:
         run: echo "version=$(npx playwright --version | sed 's/[^0-9.]//g')" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: pw-${{ runner.os }}-${{ steps.pw.outputs.version }}
