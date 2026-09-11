@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { getIndustry, industries } from "@/data/industries";
 import { caseStudies } from "@/data/case-studies";
@@ -53,12 +54,7 @@ export default async function IndustryPage({
           { name: industry.title, path: `/industries/${industry.slug}` },
         ]}
         actions={
-          <Link
-            href="/start-a-project"
-            className="inline-flex min-h-11 items-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-strong"
-          >
-            Discuss Your Sector
-          </Link>
+          <Button href="/start-a-project">Discuss Your Sector</Button>
         }
       />
 

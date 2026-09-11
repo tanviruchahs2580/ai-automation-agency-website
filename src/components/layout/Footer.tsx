@@ -46,6 +46,9 @@ export function Footer() {
           <p className="text-xs text-faint">
             © {year} VANTIQ SYSTEMS. All rights reserved.
           </p>
+          <p className="mono-label text-faint">
+            Architecture first · Vendors second
+          </p>
           <nav aria-label="Legal" className="flex flex-wrap gap-5">
             {legalLinks.map((link) => (
               <Link
@@ -57,11 +60,6 @@ export function Footer() {
               </Link>
             ))}
           </nav>
-          <p className="text-xs text-muted">
-            <a href={`mailto:${contact.email}`} className="hover:text-ink">
-              {contact.email}
-            </a>
-          </p>
         </div>
       </div>
     </footer>

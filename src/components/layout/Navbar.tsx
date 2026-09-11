@@ -27,7 +27,27 @@ function Dropdown({ label, href, isActive, children }: {
     timeoutRef.current = setTimeout(() => setOpen(false), 120);
   };
 
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setOpen(false);
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      setOpen((v) => !v);
+    }
+  };
+
   useEffect(() => () => clearTimeout(timeoutRef.current), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open ]);
 
   return (
     <div
@@ -35,10 +55,19 @@ function Dropdown({ label, href, isActive, children }: {
       className="relative"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
+      onFocus={onEnter}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setOpen(false);
+        }
+      }}
+      onKeyDown={onKeyDown}
     >
       <Link
         href={href}
         aria-current={isActive ? "page" : undefined}
+        aria-haspopup="menu"
+        aria-expanded={open}
         className={cn(
           "flex items-center gap-1 rounded px-3 py-2 text-sm transition-colors",
           isActive ? "text-accent-strong" : "text-muted hover:text-ink",
@@ -154,21 +183,13 @@ export function Navbar() {
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
-{navDropdowns.map((dropdown) => (
+          {navDropdowns.map((dropdown) => (
             <Dropdown
               key={dropdown.href}
               label={dropdown.label}
               href={dropdown.href}
               isActive={isActive(dropdown.href)}
             >
-              <Link
-                href={dropdown.href}
-                className="block rounded px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface2"
-                role="menuitem"
-              >
-                {dropdown.label} Overview
-              </Link>
-              <div className="my-1 border-t border-line" />
               {dropdown.children.map((child) => (
                 <Link
                   key={child.href}
@@ -259,20 +280,19 @@ export function Navbar() {
         className="border-t border-line bg-canvas lg:hidden"
       >
         <nav aria-label="Mobile" className="container-x flex flex-col py-4">
-          {navDropdowns.map((dropdown) => (
+          {navDropdowns.map((dropdown, di) => (
             <MobileDropdownSection
               key={dropdown.href}
               dropdown={dropdown}
               isActive={isActive}
               onNavigate={() => setOpen(false)}
-              firstRef={undefined}
+              firstRef={di === 0 ? firstMobileLinkRef : undefined}
             />
           ))}
-          {simpleItems.map((item, i) => (
+          {simpleItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              ref={i === 0 ? firstMobileLinkRef : undefined}
               onClick={() => setOpen(false)}
               className={cn(
                 "rounded px-3 py-3 text-base",

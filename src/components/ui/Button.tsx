@@ -5,14 +5,14 @@ import { cn } from "@/lib/utils";
 type Variant = "primary" | "secondary" | "ghost";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-md font-medium text-sm transition-colors duration-150 px-5 py-2.5 min-h-11";
+  "inline-flex items-center justify-center gap-2 rounded-md font-medium text-sm transition-colors duration-150 px-5 py-2.5 min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-accent text-white hover:bg-accent-strong disabled:opacity-50",
+    "bg-accent text-white hover:bg-accent-strong active:bg-accent-strong disabled:opacity-50 disabled:pointer-events-none",
   secondary:
-    "border border-line-strong text-ink hover:border-accent hover:text-accent-strong",
-  ghost: "text-muted hover:text-ink",
+    "border border-line-strong text-ink hover:border-accent hover:text-accent-strong active:border-accent",
+  ghost: "text-muted hover:text-ink active:text-ink",
 };
 
 interface ButtonProps {

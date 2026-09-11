@@ -30,7 +30,7 @@ export function CaseStudiesPreview() {
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
                   {study.challenge.slice(0, 150)}…
                 </p>
-                <span className="mono-label mt-5 text-accent-strong opacity-80 group-hover:opacity-100">
+                <span className="mono-label mt-5 text-accent-strong">
                   Read the architecture →
                 </span>
               </Link>

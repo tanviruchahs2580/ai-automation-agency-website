@@ -25,7 +25,7 @@ export function WhatWeSolve() {
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
                   {solution.summary}
                 </p>
-                <span className="mono-label mt-5 text-accent-strong opacity-80 transition-opacity group-hover:opacity-100">
+                <span className="mono-label mt-5 text-accent-strong">
                   Explore solution →
                 </span>
               </Link>
@@ -37,7 +37,7 @@ export function WhatWeSolve() {
           <div className="flex flex-col items-start justify-between gap-4 rounded-lg border border-line bg-surface px-6 py-5 md:flex-row md:items-center">
             <p className="max-w-xl text-sm text-muted">
               Need engineering capacity rather than a packaged solution? Our{" "}
-              <Link href="/services" className="text-accent-strong underline-offset-4 hover:underline">
+              <Link href="/services" className="text-accent-strong underline underline-offset-4 hover:text-ink">
                 services
               </Link>{" "}
               cover strategy through operations — including embedded work with

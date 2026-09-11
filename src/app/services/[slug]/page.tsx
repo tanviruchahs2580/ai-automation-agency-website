@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { Accordion, JsonLd } from "@/components/ui/Accordion";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { getService, services } from "@/data/services";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
@@ -52,12 +52,7 @@ export default async function ServiceDetailPage({
           { name: service.title, path: `/services/${service.slug}` },
         ]}
         actions={
-          <Link
-            href="/start-a-project"
-            className="inline-flex min-h-11 items-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-strong"
-          >
-            Discuss This Engagement
-          </Link>
+          <Button href="/start-a-project">Discuss This Engagement</Button>
         }
       />
 
@@ -65,9 +60,7 @@ export default async function ServiceDetailPage({
         <div className="container-x grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-5">
             <p className="eyebrow mb-3">Why it exists</p>
-            <h2 id="problem-heading" className="text-2xl font-bold leading-snug tracking-tight">
-              {service.problem}
-            </h2>
+            <h2 id="problem-heading" className="h-section">{service.problem}</h2>
           </Reveal>
           <div className="lg:col-span-7">
             <p className="eyebrow mb-4">Deliverables</p>

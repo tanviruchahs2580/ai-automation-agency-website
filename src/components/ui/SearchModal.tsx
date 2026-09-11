@@ -87,24 +87,37 @@ export function SearchModal() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]">
-      <div className="fixed inset-0 bg-canvas/80 backdrop-blur-sm" onClick={() => setOpen(false)} />
-      <div className="relative z-10 w-full max-w-lg rounded-xl border border-line bg-canvas shadow-2xl">
+      <div className="fixed inset-0 bg-canvas/80 backdrop-blur-sm" onClick={() => setOpen(false)} aria-hidden="true" />
+      <div
+        className="relative z-10 w-full max-w-lg rounded-xl border border-line bg-canvas shadow-2xl"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Site search"
+      >
         <div className="flex items-center gap-3 border-b border-line px-4">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="text-faint">
             <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" />
             <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
+          <label htmlFor="site-search-input" className="sr-only">
+            Search solutions, services, industries
+          </label>
           <input
+            id="site-search-input"
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search solutions, services, industries..."
             className="h-12 flex-1 bg-transparent text-sm text-ink placeholder:text-faint focus:outline-none"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="site-search-results"
+            aria-autocomplete="list"
           />
           <kbd className="hidden rounded border border-line px-1.5 py-0.5 font-mono text-[10px] text-faint sm:inline">ESC</kbd>
         </div>
-        <ul className="max-h-72 overflow-y-auto p-2" role="listbox">
+        <ul id="site-search-results" className="max-h-72 overflow-y-auto p-2" role="listbox" aria-label="Search results">
           {filtered.length === 0 && (
             <li className="px-3 py-6 text-center text-sm text-faint">No results found.</li>
           )}

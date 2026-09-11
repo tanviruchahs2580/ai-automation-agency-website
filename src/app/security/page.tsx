@@ -97,7 +97,7 @@ export default function SecurityPage() {
           </Reveal>
           <p className="mt-8 text-sm text-muted">
             Questions about security?{" "}
-            <Link href="/start-a-project" className="text-accent-strong underline-offset-4 hover:underline">
+            <Link href="/start-a-project" className="text-accent-strong underline underline-offset-4 hover:text-ink">
               Ask an engineer directly →
             </Link>
           </p>

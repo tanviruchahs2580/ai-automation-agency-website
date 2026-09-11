@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { Accordion, JsonLd } from "@/components/ui/Accordion";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { getSolution, solutions } from "@/data/solutions";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
@@ -52,12 +52,7 @@ export default async function SolutionPage({
           { name: solution.title, path: `/solutions/${solution.slug}` },
         ]}
         actions={
-          <Link
-            href="/start-a-project"
-            className="inline-flex min-h-11 items-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-strong"
-          >
-            Discuss This Solution
-          </Link>
+          <Button href="/start-a-project">Discuss This Solution</Button>
         }
       />
 
@@ -126,9 +121,12 @@ export default async function SolutionPage({
         <div className="container-x">
           <SectionHeader eyebrow="Workflow" title="How work flows through the system." id="workflow-heading" />
           <ol className="mt-10 grid gap-px overflow-hidden rounded-lg border border-line bg-[color:var(--color-line)] md:grid-cols-2 lg:grid-cols-3">
-            {solution.workflow.map((step) => (
+            {solution.workflow.map((step, i) => (
               <li key={step.step} className="bg-canvas p-6">
-                <p className="mono-label text-accent-strong">{step.step}</p>
+                <p className="mono-label text-faint">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <p className="mono-label mt-2 text-accent-strong">{step.step}</p>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{step.detail}</p>
               </li>
             ))}

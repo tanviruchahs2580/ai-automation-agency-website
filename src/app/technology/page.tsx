@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { TechnologyMap } from "@/components/home/TechnologyMap";
 import { OpsControlVisual } from "@/components/home/OpsControlVisual";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { buildMetadata } from "@/lib/seo";
 
@@ -36,12 +36,7 @@ export default function TechnologyPage() {
           { name: "Technology", path: "/technology" },
         ]}
         actions={
-          <Link
-            href="/start-a-project"
-            className="inline-flex min-h-11 items-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-strong"
-          >
-            Talk to an AI Engineer
-          </Link>
+          <Button href="/start-a-project">Talk to an AI Engineer</Button>
         }
       />
 
