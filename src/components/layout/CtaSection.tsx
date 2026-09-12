@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { GridLines } from "@/components/ui/GridLines";
+import { Magnetic } from "@/components/ui/Magnetic";
 import { Reveal } from "@/components/ui/Reveal";
 
 interface CtaSectionProps {
@@ -28,8 +29,12 @@ export function CtaSection({
   return (
     <section className="section-y" aria-labelledby="cta-heading">
       <div className="container-x">
-        <Reveal className="card-surface relative overflow-hidden px-6 py-14 text-center md:px-16 md:py-20">
+        <Reveal className="card-surface grain relative overflow-hidden px-6 py-14 text-center md:px-16 md:py-20">
           <GridLines opacity={0.4} />
+          <div
+            className="aurora-bleed pointer-events-none absolute inset-0"
+            aria-hidden="true"
+          />
           <div className="relative">
             <p className="eyebrow mb-4">{eyebrow}</p>
             <h2 id="cta-heading" className="h-section mx-auto max-w-2xl">
@@ -37,13 +42,15 @@ export function CtaSection({
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{lead}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button
-                href={primaryHref}
-                className="w-full sm:w-auto"
-                dataCtaId={primaryCtaId}
-              >
-                {primaryLabel}
-              </Button>
+              <Magnetic>
+                <Button
+                  href={primaryHref}
+                  className="w-full sm:w-auto"
+                  dataCtaId={primaryCtaId}
+                >
+                  {primaryLabel}
+                </Button>
+              </Magnetic>
               <Button
                 href={secondaryHref}
                 variant="quiet"

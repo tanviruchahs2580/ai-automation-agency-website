@@ -1,8 +1,15 @@
-# VANTIQ Systems — Design System ("Operator's Console")
+# VANTIQ Systems — Design System ("Operator's Console" → "Mission Control")
 
-Version 2.0 · Status: active · Owner: frontend team.
+Version 3.0 · Status: active · Owner: frontend team.
 Single source of truth for tokens, components, motion, and usage rules.
-Companion: `BRAND-GUIDE.md` (voice, positioning, copy rules).
+Companion: `BRAND-GUIDE.md` (voice, positioning, copy rules — unchanged).
+
+> v3 ("Mission Control") is an evolution, not a replacement: same graphite
+> base and instrument-panel soul, plus light, depth, and life — aurora
+> atmosphere, film grain, glass instruments with cursor spotlight, semantic
+> icon chips, diagram thumbnails, gradient display text, magnetic CTAs,
+> scroll-linked scenes, and count-ups. Every addition is a token or utility;
+> no one-off magic numbers in components. Budgets unchanged (§7).
 
 > Design language in three sentences: **"Operator's Console" treats the site
 > like a precision instrument panel — calm, dense where it matters, empty
@@ -43,6 +50,21 @@ Signature additions:
 
 Light theme re-maps every token (see `globals.css`); contrast re-verified in
 `src/lib/a11y-matrix.md`.
+
+### v3 atmosphere tokens & utilities (`globals.css`)
+
+| Utility | What | Rule |
+|---|---|---|
+| `.aurora-bleed` | Accent + signal radial mesh, masked vignette | Ambient only, ≤8% perceptual; light theme dims further |
+| `.grain` / `::after` | 2–3% `feTurbulence` data-URI noise | Kills flat-digital feel; never over text-heavy prose |
+| `.spotlight` + `--mx/--my` | Cursor-following radial glow (`<Spotlight />` sets vars) | Interactive cards only; touch + reduced-motion skip |
+| `.text-gradient` | Accent → signal `background-clip` text | Display phrases only; darker stops in light theme |
+| `.chip` + `data-hue` | 44px icon chip, `accent/signal/brass/sky/amber` | Hues semantic per `Chip.tsx` map, never random |
+| `.marquee` / `.marquee-track` | 36s edge-masked loop, pause on hover | Reduced-motion static (explicit gate + global gate) |
+| `.diagram-live-path` | Signal dash-flow on one SVG path | Decorative paths only; explicit reduced-motion gate |
+| `.text-hero` | `clamp(3rem, 7vw + .5rem, 6rem)` display | Landing hero H1 only |
+| `.gauge-track` / `.gauge-band` | Range-band bars for illustrative metrics | Bands show ranges, never single animated numbers |
+| `.field-shake` | 220ms inline validation shake | Errors only, with `critical` color pairing |
 
 ## 3. Typography
 
@@ -89,10 +111,13 @@ arrow translating 2px on hover). 44px min target, 180ms `ease-out-soft`,
 icon+text primary. (`secondary`/`ghost` props remain as deprecated aliases
 of `quiet`/`link` so existing call sites keep working.)
 
-**Card** — three anatomies: capability (eyebrow/title/3-line/mono footer),
-case-study (eyebrow/industry/title/before-after row/mono footer), insight
-(eyebrow/title/2-line dek/byline+read time). 1px `grid-line-strong` border,
-16px radius, 24px padding; hover lifts 2px, border → accent, 8% glow halo.
+**Card** — three anatomies: capability (chip / eyebrow / title / 3-line /
+mono footer), case-study (diagram / eyebrow / industry / title /
+before-after row / mono footer), insight (cover pattern / eyebrow / serif
+title / 2-line dek / byline + read time). v3 surface: top-lit gradient
+hairline + inner highlight (pure CSS, all call sites upgraded untouched);
+interactive cards add `<Spotlight />` cursor glow. 16px radius, 24px
+padding; hover lifts 2px, border → accent, 8% glow halo.
 
 **Icon** (`Icon.tsx`) — unified set, 24×24 grid, 1.5px stroke, round
 caps/joins, `currentColor`, `outline` default + `filled` for status only.
@@ -101,7 +126,18 @@ Never emojis, never third-party sets.
 **Tag / StatusDot** — mono uppercase labels; `signal` tone reserved for
 live states (maps to `--color-signal`).
 
-**SectionHeader** — eyebrow + H2 + lead, `aria-labelledby` wiring via `id`.
+**SectionHeader** — eyebrow + H2 + lead, `aria-labelledby` wiring via `id`,
+optional `index` (`02 /` in accent-bright + hairline rule, v3).
+
+**PageHero v3** — breadcrumb trail whose final crumb absorbs a duplicative
+eyebrow, compact rhythm (content inside first viewport), aurora bleed +
+deterministic schematic strip. JSON-LD + `aria-label="Breadcrumb"` kept.
+
+**Motion v2 inventory** — `Reveal`/`RevealStagger` (unchanged contracts),
+scroll-linked `ArchitectureLandscape` (manual hover/tap takes over 4s),
+`<CountUp />` (once, tabular, SR text equivalent), marquee, spotlight,
+`<Magnetic />` (≤4px, hero/final CTAs, touch + reduced-motion skip),
+≤6px hero parallax, SVG dash-flow. Transform/opacity only; route fade ≤240ms.
 
 **RevealStagger** — children reveal with 60ms stagger, 8px y, 260ms
 `ease-out-soft`, fires once. (`Reveal` kept for single elements.)

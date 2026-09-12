@@ -33,7 +33,20 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/*
+          Blocking theme script — runs before first paint so the server'd
+          dark markup never flashes for light-theme visitors. Single source
+          of truth shared with ThemeToggle: localStorage["vantiq-theme"],
+          else OS preference, else dark.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("vantiq-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}})();`,
+          }}
+        />
+      </head>
       <body className="min-h-screen antialiased">
         <a
           href="#main"

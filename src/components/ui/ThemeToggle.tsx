@@ -1,32 +1,38 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 
 type Theme = "light" | "dark";
 
-function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
-  const stored = localStorage.getItem("vantiq-theme") as Theme | null;
-  if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-}
-
+/**
+ * Theme toggle — reads the blocking pre-paint script's decision from the DOM
+ * after mount (same SSR-safe rAF gate as Reveal: no hydration mismatch, no
+ * theme flash). Writes go back to the same source of truth the script reads.
+ */
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("dark");
-  const initialRef = useRef(true);
 
   useEffect(() => {
-    if (initialRef.current) {
-      initialRef.current = false;
-      setTheme(getStoredTheme());
-      return;
-    }
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("vantiq-theme", theme);
-  }, [theme]);
+    const raf = requestAnimationFrame(() => {
+      const current = document.documentElement.getAttribute("data-theme");
+      if (current === "light" || current === "dark") setTheme(current);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
-  const toggle = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  const toggle = () => {
+    setTheme((t) => {
+      const next = t === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      try {
+        localStorage.setItem("vantiq-theme", next);
+      } catch {
+        /* private mode — theme simply won't persist */
+      }
+      return next;
+    });
+  };
 
   return (
     <button

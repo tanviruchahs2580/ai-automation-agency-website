@@ -79,7 +79,7 @@ export default function TechnologyPage() {
             <ol className="space-y-px overflow-hidden rounded-lg border border-line">
               {aiStackLayers.map((layer, i) => (
                 <li key={layer.name} className="flex items-baseline gap-4 bg-surface px-5 py-4">
-                  <span className="mono-label w-7 shrink-0 text-accent-strong">
+                  <span className="mono-label w-7 shrink-0 text-accent-bright">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <span>

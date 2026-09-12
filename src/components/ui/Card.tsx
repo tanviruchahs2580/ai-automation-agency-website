@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { Chip, type ChipHue } from "@/components/ui/Chip";
+import type { IconName } from "@/components/ui/Icon";
+import { DiagramThumb } from "@/components/ui/DiagramThumb";
 
 const shell =
   "card-surface card-pad flex h-full flex-col transition-[border-color,transform,box-shadow]";
@@ -17,7 +20,7 @@ function Meta({ children }: { children: ReactNode }) {
   );
 }
 
-/** Capability card — eyebrow / title / 3-line description / mono footer. */
+/** Capability card — chip / eyebrow / title / 3-line description / mono footer. */
 export function CapabilityCard({
   eyebrow,
   title,
@@ -25,6 +28,8 @@ export function CapabilityCard({
   meta,
   href,
   index,
+  icon,
+  hue = "accent",
 }: {
   eyebrow: string;
   title: string;
@@ -32,17 +37,28 @@ export function CapabilityCard({
   meta?: ReactNode;
   href?: string;
   index?: string;
+  icon?: IconName;
+  hue?: ChipHue;
 }) {
   const body = (
     <>
-      <div className="flex items-baseline justify-between gap-3">
-        <Eyebrow>{eyebrow}</Eyebrow>
+      <div className="flex items-start justify-between gap-3">
+        {icon ? (
+          <Chip icon={icon} hue={hue} />
+        ) : (
+          <Eyebrow>{eyebrow}</Eyebrow>
+        )}
         {index && (
           <span className="mono-label text-accent-bright" aria-hidden="true">
             {index}
           </span>
         )}
       </div>
+      {icon && (
+        <div className="mt-4">
+          <Eyebrow>{eyebrow}</Eyebrow>
+        </div>
+      )}
       <h3 className="h-card mt-3">{title}</h3>
       <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-muted">
         {description}
@@ -60,7 +76,7 @@ export function CapabilityCard({
   );
 }
 
-/** Case study card — eyebrow / industry / title / before-after row / footer. */
+/** Case study card — diagram / eyebrow / industry / title / before-after / footer. */
 export function CaseStudyCard({
   eyebrow,
   industry,
@@ -69,6 +85,7 @@ export function CaseStudyCard({
   after,
   meta,
   href,
+  diagramSeed,
 }: {
   eyebrow: string;
   industry: string;
@@ -77,9 +94,15 @@ export function CaseStudyCard({
   after: string;
   meta?: ReactNode;
   href: string;
+  diagramSeed?: string;
 }) {
   return (
     <Link href={href} className={cn(shell, "group p-6")}>
+      {diagramSeed && (
+        <div className="mb-5">
+          <DiagramThumb seed={diagramSeed} />
+        </div>
+      )}
       <div className="flex items-baseline justify-between gap-3">
         <Eyebrow>{eyebrow}</Eyebrow>
         <span className="mono-label text-faint">{industry}</span>
@@ -100,7 +123,7 @@ export function CaseStudyCard({
   );
 }
 
-/** Insight card — eyebrow / title / 2-line dek / byline + read time. */
+/** Insight card — cover pattern / eyebrow / serif title / 2-line dek / byline. */
 export function InsightCard({
   eyebrow,
   title,
@@ -108,6 +131,8 @@ export function InsightCard({
   byline,
   readTime,
   href,
+  patternSeed,
+  patternHue = "brass",
 }: {
   eyebrow: string;
   title: string;
@@ -115,17 +140,63 @@ export function InsightCard({
   byline: string;
   readTime: string;
   href: string;
+  patternSeed?: string;
+  patternHue?: ChipHue;
 }) {
   return (
-    <Link href={href} className={cn(shell, "group p-6")}>
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <h3 className="h-card mt-3">{title}</h3>
-      <p className="mt-3 line-clamp-2 flex-1 text-sm leading-relaxed text-muted">
-        {dek}
-      </p>
-      <p className="mono-label mt-5 border-t border-line pt-4 text-faint">
-        {byline} · {readTime}
-      </p>
+    <Link href={href} className={cn(shell, "group overflow-hidden p-0")}>
+      {patternSeed && <CoverPattern seed={patternSeed} hue={patternHue} />}
+      <div className="flex flex-1 flex-col p-6 pt-5">
+        <Eyebrow>{eyebrow}</Eyebrow>
+        <h3 className="h-card mt-3 font-editorial text-xl">{title}</h3>
+        <p className="mt-3 line-clamp-2 flex-1 text-sm leading-relaxed text-muted">
+          {dek}
+        </p>
+        <p className="mono-label mt-5 border-t border-line pt-4 text-faint">
+          {byline} · {readTime}
+        </p>
+      </div>
     </Link>
+  );
+}
+
+/** Thin deterministic cover band keyed by tag — decorative, hue-semantic. */
+function CoverPattern({ seed, hue }: { seed: string; hue: ChipHue }) {
+  const hash = [...seed].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 13);
+  const bars = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => ({
+    x: 6 + i * 25,
+    h: 10 + ((hash >> (i * 2)) % 22),
+    hot: (hash + i) % 4 === 0,
+  }));
+  const hueVar =
+    hue === "signal"
+      ? "var(--color-signal)"
+      : hue === "brass"
+        ? "var(--color-brass)"
+        : hue === "sky"
+          ? "var(--color-info)"
+          : hue === "amber"
+            ? "var(--color-warn)"
+            : "var(--color-accent)";
+  return (
+    <svg
+      viewBox="0 0 200 40"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+      className="h-10 w-full border-b border-line"
+    >
+      {bars.map((b, i) => (
+        <rect
+          key={i}
+          x={b.x}
+          y={40 - b.h}
+          width={9}
+          height={b.h}
+          rx={2}
+          fill={b.hot ? hueVar : "var(--color-line-strong)"}
+          opacity={b.hot ? 0.9 : 0.7}
+        />
+      ))}
+    </svg>
   );
 }

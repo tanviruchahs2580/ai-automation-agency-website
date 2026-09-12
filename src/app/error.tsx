@@ -28,7 +28,7 @@ export default function GlobalError({
   return (
     <section className="section-y" role="alert">
       <div className="container-x py-10">
-        <div className="mx-auto max-w-2xl rounded-xl border border-line bg-surface p-6 font-mono text-sm sm:p-8">
+        <div className="grain mx-auto max-w-2xl rounded-xl border border-line bg-surface p-6 font-mono text-sm sm:p-8">
           <p className="text-critical">$ vantiq serve --status</p>
           <p className="mt-3 text-faint">
             <span className="text-critical">500</span> — server error.

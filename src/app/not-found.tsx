@@ -11,7 +11,7 @@ export default function NotFound() {
     <section className="section-y relative overflow-hidden">
       <GridLines opacity={0.4} />
       <div className="container-x relative py-10">
-        <div className="mx-auto max-w-2xl rounded-xl border border-line bg-surface p-6 font-mono text-sm sm:p-8">
+        <div className="grain mx-auto max-w-2xl rounded-xl border border-line bg-surface p-6 font-mono text-sm sm:p-8">
           <p className="text-critical">$ vantiq route --resolve</p>
           <p className="mt-3 text-faint">
             <span className="text-critical">404</span> — route not found.

@@ -2,6 +2,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { Reveal } from "@/components/ui/Reveal";
 import { CaseStudyCard } from "@/components/ui/Card";
+import { Spotlight } from "@/components/ui/Spotlight";
 import {
   RevealStagger,
   RevealStaggerItem,
@@ -34,15 +35,18 @@ export default function WorkPage() {
           <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {caseStudies.map((study) => (
               <RevealStaggerItem key={study.slug}>
-                <CaseStudyCard
-                  eyebrow="Example architecture"
-                  industry={study.industry}
-                  title={study.title}
-                  before={study.before[0] ?? "Manual process"}
-                  after={study.after[0] ?? "Engineered system"}
-                  meta={`${study.architecture.length} layers · ${study.security.length} controls`}
-                  href={`/work/${study.slug}`}
-                />
+                <Spotlight className="h-full">
+                  <CaseStudyCard
+                    eyebrow="Example architecture"
+                    industry={study.industry}
+                    title={study.title}
+                    before={study.before[0] ?? "Manual process"}
+                    after={study.after[0] ?? "Engineered system"}
+                    meta={`${study.architecture.length} layers · ${study.security.length} controls`}
+                    href={`/work/${study.slug}`}
+                    diagramSeed={study.slug}
+                  />
+                </Spotlight>
               </RevealStaggerItem>
             ))}
           </RevealStagger>

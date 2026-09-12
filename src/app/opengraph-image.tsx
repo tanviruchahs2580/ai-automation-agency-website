@@ -15,9 +15,12 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           backgroundColor: "#0a0b0e",
+          backgroundImage:
+            "radial-gradient(700px 340px at 12% -10%, rgba(46,107,246,0.22), transparent 65%), radial-gradient(560px 300px at 92% 12%, rgba(0,229,168,0.12), transparent 60%)",
           color: "#f4f2ec",
           padding: 72,
           fontFamily: "sans-serif",
+          position: "relative",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
@@ -40,6 +43,16 @@ export default function OpengraphImage() {
           <div style={{ display: "flex", fontSize: 30, fontWeight: 700, letterSpacing: 10 }}>
             VANTIQ SYSTEMS
           </div>
+          <div
+            style={{
+              display: "flex",
+              width: 12,
+              height: 12,
+              borderRadius: 6,
+              backgroundColor: "#00e5a8",
+              marginLeft: 4,
+            }}
+          />
         </div>
 
         <div

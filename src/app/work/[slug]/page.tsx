@@ -102,15 +102,29 @@ export default async function CaseStudyPage({
           <Reveal>
             <section>
               <h2 className="mono-label uppercase text-faint">System architecture</h2>
-              <ol className="mt-4 space-y-px overflow-hidden rounded-lg border border-line">
-                {study.architecture.map((layer, i) => (
-                  <li key={layer} className="flex items-center gap-4 bg-surface px-5 py-3.5">
-                    <span className="mono-label w-8 shrink-0 text-accent-strong">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-sm">{layer}</span>
-                  </li>
-                ))}
+              <ol className="mt-6 space-y-0">
+                {study.architecture.map((layer, i) => {
+                  const isLast = i === study.architecture.length - 1;
+                  return (
+                    <li key={layer} className="flex gap-4">
+                      <span aria-hidden="true" className="flex flex-col items-center">
+                        <span
+                          className={`flex h-8 w-8 items-center justify-center rounded-lg border font-mono text-xs tabular-nums ${
+                            isLast
+                              ? "border-signal/50 bg-signal/10 text-signal"
+                              : "border-line bg-surface2 text-accent-bright"
+                          }`}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        {!isLast && (
+                          <span className="w-px flex-1 bg-[color:var(--color-line-strong)]" />
+                        )}
+                      </span>
+                      <span className="pb-6 pt-1 text-sm">{layer}</span>
+                    </li>
+                  );
+                })}
               </ol>
             </section>
           </Reveal>

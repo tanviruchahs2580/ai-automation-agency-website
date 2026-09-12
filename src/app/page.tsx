@@ -1,22 +1,17 @@
-import Link from "next/link";
-import dynamic from "next/dynamic";
 import { Hero } from "@/components/home/Hero";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { WhatWeSolve } from "@/components/home/WhatWeSolve";
+import { ServiceRows } from "@/components/home/ServiceRows";
 import { MetricsPulse } from "@/components/scenes/MetricsPulse";
 import { IndustriesGrid } from "@/components/home/IndustriesGrid";
 import { CaseStudiesPreview } from "@/components/home/CaseStudiesPreview";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { CapabilityCard } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import {
-  RevealStagger,
-  RevealStaggerItem,
-} from "@/components/ui/RevealStagger";
+import { Magnetic } from "@/components/ui/Magnetic";
 import { ScrollDepthTracker } from "@/components/ui/ScrollDepthTracker";
-import { services } from "@/data/services";
 import { buildMetadata } from "@/lib/seo";
+import dynamic from "next/dynamic";
 
 export const metadata = buildMetadata({
   title: "AI Engineering & Automation for the Enterprise",
@@ -25,10 +20,15 @@ export const metadata = buildMetadata({
   path: "/",
 });
 
+/**
+ * Illustrative ranges stay static text: count-up on a range endpoint would
+ * misrepresent the number (honesty wins over motion). The gauge bands carry
+ * the visual momentum instead.
+ */
 const roiTeaserMetrics = [
-  { value: "60–80%", label: "Manual triage reduction in 90 days" },
-  { value: "40–60%", label: "Incident MTTR cut within one quarter" },
-  { value: "3–6×", label: "Typical first-year return on automated hours" },
+  { value: "60–80%", label: "Manual triage reduction in 90 days", lo: 60, hi: 80 },
+  { value: "40–60%", label: "Incident MTTR cut within one quarter", lo: 40, hi: 60 },
+  { value: "3–6×", label: "Typical first-year return on automated hours", lo: 37, hi: 75 },
 ];
 
 /** Below-the-fold scene — code-split per the performance budget (§10). */
@@ -75,6 +75,7 @@ export default function HomePage() {
             title="We don't just add AI. We engineer the system around it."
             lead="Models change monthly. A well-architected system keeps working regardless. Select any layer to see what it guarantees."
             id="arch-heading"
+            index="03"
           />
           <div className="mt-12">
             <ArchitectureLandscape />
@@ -82,51 +83,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 05 · SERVICES / CAPABILITIES */}
-      <section
-        className="section-y border-t border-line bg-surface/30"
-        aria-labelledby="services-heading"
-      >
-        <div className="container-x">
-          <SectionHeader
-            eyebrow="Capabilities"
-            title="Seven services, one accountable team."
-            lead="Engage us for a single deliverable or the full lifecycle — the same engineers stay accountable throughout."
-            id="services-heading"
-          />
-          <RevealStagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service, i) => (
-              <RevealStaggerItem key={service.slug}>
-                <CapabilityCard
-                  eyebrow="Service"
-                  index={String(i + 1).padStart(2, "0")}
-                  title={service.title}
-                  description={service.summary}
-                  meta="Fixed scope · Senior engineers"
-                  href={`/services/${service.slug}`}
-                />
-              </RevealStaggerItem>
-            ))}
-            <RevealStaggerItem>
-              <Link
-                href="/services"
-                className="card-surface group flex h-full min-h-44 flex-col justify-center p-6"
-              >
-                <span className="eyebrow">Overview</span>
-                <span className="h-card mt-3">
-                  Compare all seven services
-                  <span
-                    aria-hidden="true"
-                    className="ml-2 inline-block font-mono transition-transform duration-150 group-hover:translate-x-0.5"
-                  >
-                    →
-                  </span>
-                </span>
-              </Link>
-            </RevealStaggerItem>
-          </RevealStagger>
-        </div>
-      </section>
+      {/* 05 · SERVICES — interactive rows */}
+      <ServiceRows />
 
       {/* 06 · INDUSTRIES */}
       <IndustriesGrid compact />
@@ -134,7 +92,7 @@ export default function HomePage() {
       {/* 07 · CASE STUDIES */}
       <CaseStudiesPreview />
 
-      {/* 08 · ROI TEASER — signature moment: live-pulsed estimate ranges */}
+      {/* 08 · ROI TEASER — gauge bands + live-pulsed estimate ranges */}
       <section
         className="section-y border-t border-line bg-surface/30"
         aria-labelledby="roi-heading"
@@ -146,6 +104,7 @@ export default function HomePage() {
               title="Estimate what manual work really costs you."
               lead="Built on your numbers — not our marketing. Every output is labelled an estimate because it is one."
               id="roi-heading"
+              index="07"
             />
             <dl className="mt-8 grid gap-4 sm:grid-cols-3">
               {roiTeaserMetrics.map((metric) => (
@@ -153,12 +112,22 @@ export default function HomePage() {
                   key={metric.label}
                   className="rounded-lg border border-line bg-canvas p-4"
                 >
-                  <dd className="font-display text-2xl font-bold tracking-tight">
-                    <MetricsPulse>{metric.value}</MetricsPulse>
-                  </dd>
-                  <dt className="mt-1 text-xs leading-snug text-muted">
+                  <dt className="text-xs leading-snug text-muted">
                     {metric.label}
                   </dt>
+                  <dd className="font-display mt-1 text-2xl font-bold tracking-tight">
+                    <MetricsPulse>{metric.value}</MetricsPulse>
+                    <div
+                      className="gauge-track mt-3"
+                      role="img"
+                      aria-label={`${metric.label}: illustrative band ${metric.value}`}
+                    >
+                      <div
+                        className="gauge-band"
+                        style={{ left: `${metric.lo}%`, width: `${metric.hi - metric.lo}%` }}
+                      />
+                    </div>
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -167,15 +136,17 @@ export default function HomePage() {
             </p>
           </div>
           <div className="lg:col-span-5">
-            <div className="card-surface p-8 text-center">
+            <div className="card-surface grain p-8 text-center">
               <p className="eyebrow">Three inputs · One minute</p>
               <p className="mt-3 text-lg font-medium">
                 Start with industry, team size, and hours lost to manual ops.
               </p>
-              <div className="mt-6">
-                <Button href="/roi-calculator" dataCtaId="home-roi-primary-a">
-                  Calculate My Estimate
-                </Button>
+              <div className="mt-6 inline-flex">
+                <Magnetic>
+                  <Button href="/roi-calculator" dataCtaId="home-roi-primary-a">
+                    Calculate My Estimate
+                  </Button>
+                </Magnetic>
               </div>
             </div>
           </div>

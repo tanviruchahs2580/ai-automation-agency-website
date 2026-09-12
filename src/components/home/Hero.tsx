@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { HeroInstrument } from "@/components/scenes/HeroInstrument";
 import { GridLines } from "@/components/ui/GridLines";
+import { Magnetic } from "@/components/ui/Magnetic";
 import { Reveal } from "@/components/ui/Reveal";
 import { StatusDot } from "@/components/ui/Tag";
 
@@ -9,15 +10,19 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-line">
       <GridLines opacity={0.6} />
+      <div
+        className="aurora-bleed pointer-events-none absolute inset-0"
+        aria-hidden="true"
+      />
       <div className="container-x section-y relative grid items-center gap-14 lg:grid-cols-12">
         <Reveal className="lg:col-span-7">
           <p className="eyebrow mb-5 flex flex-wrap items-center gap-2.5">
             <StatusDot tone="signal" />
             <span>AI Engineering &amp; Automation — Architecture first</span>
           </p>
-          <h1 className="h-display">
-            The autonomous operations layer for enterprises that cannot afford
-            guesswork.
+          <h1 className="text-hero">
+            The autonomous operations layer for enterprises that{" "}
+            <span className="text-gradient">cannot afford guesswork.</span>
           </h1>
           <p className="lead mt-6">
             VANTIQ Systems designs, engineers, and operates the systems that
@@ -25,9 +30,11 @@ export function Hero() {
             architecture to production, with governance built in.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button href="/start-a-project" dataCtaId="home-hero-primary-a">
-              Start a Project
-            </Button>
+            <Magnetic>
+              <Button href="/start-a-project" dataCtaId="home-hero-primary-a">
+                Start a Project
+              </Button>
+            </Magnetic>
             <Button
               href="/solutions"
               variant="quiet"

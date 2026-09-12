@@ -5,6 +5,7 @@ import { useState } from "react";
 import { readinessQuestions } from "@/data/readiness-questions";
 import { answerScale, scoreReadiness } from "@/lib/readiness";
 import { AnalyticsEvent, track } from "@/lib/analytics";
+import { CountUp } from "@/components/ui/CountUp";
 import { cn } from "@/lib/utils";
 
 export function ReadinessAssessment() {
@@ -66,8 +67,9 @@ export function ReadinessAssessment() {
       <div className="card-surface mx-auto max-w-2xl p-6 md:p-10" aria-live="polite">
         <p className="mono-label uppercase text-faint">AI readiness score</p>
         <div className="mt-3 flex items-end gap-3">
-          <span className="font-mono text-6xl font-bold tabular-nums tracking-tight">
-            {result.overall}
+          <span className="sr-only">{result.overall} out of 100</span>
+          <span aria-hidden="true" className="font-mono text-6xl font-bold tabular-nums tracking-tight">
+            <CountUp value={result.overall} />
           </span>
           <span className="pb-2 text-muted">/ 100</span>
         </div>
