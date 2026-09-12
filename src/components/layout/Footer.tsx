@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { footerColumns, legalLinks, contact } from "@/data/site";
+import { Wordmark } from "@/components/layout/Wordmark";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -9,8 +10,7 @@ export function Footer() {
       <div className="container-x py-14">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
-            <p className="text-lg font-bold tracking-tight">VANTIQ</p>
-            <p className="mono-label mt-1 text-muted">SYSTEMS — AI ENGINEERING &amp; AUTOMATION</p>
+            <Wordmark />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
               We design, build, deploy and operate intelligent systems that make
               businesses faster, safer and more autonomous.

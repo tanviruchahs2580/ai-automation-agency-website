@@ -1,7 +1,9 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { ROICalculator } from "@/components/calculators/ROICalculator";
-import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/ui/Accordion";
+import { buildMetadata, softwareJsonLd } from "@/lib/seo";
+import { Suspense } from "react";
 
 export const metadata = buildMetadata({
   title: "ROI Calculator",
@@ -13,6 +15,14 @@ export const metadata = buildMetadata({
 export default function RoiCalculatorPage() {
   return (
     <>
+      <JsonLd
+        data={softwareJsonLd({
+          name: "VANTIQ ROI Calculator",
+          description:
+            "Estimate the annual cost of manual processes and the potential return from automation.",
+          path: "/roi-calculator",
+        })}
+      />
       <PageHero
         eyebrow="ROI calculator"
         title="What is manual work actually costing you?"
@@ -25,10 +35,27 @@ export default function RoiCalculatorPage() {
 
       <section className="section-y">
         <div className="container-x">
-          <ROICalculator />
+          <Suspense
+            fallback={
+              <div
+                className="card-surface flex min-h-72 items-center justify-center p-12"
+                aria-hidden="true"
+              >
+                <span className="signal-loader">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+              </div>
+            }
+          >
+            <ROICalculator />
+          </Suspense>
 
-          <div className="mx-auto mt-14 max-w-3xl rounded-lg border border-line bg-surface p-7">
-            <h2 className="font-semibold">How the model works</h2>
+          <details className="mx-auto mt-14 max-w-3xl rounded-lg border border-line bg-surface p-7">
+            <summary className="cursor-pointer font-semibold">
+              Methodology &amp; assumptions
+            </summary>
             <ul className="mt-4 space-y-2 text-sm leading-relaxed text-muted">
               <li>
                 Weekly labour hours = employees × tasks/week × hours/task;
@@ -52,7 +79,7 @@ export default function RoiCalculatorPage() {
               not a financial guarantee. Real business cases require process-level
               measurement — which is part of every discovery we run.
             </p>
-          </div>
+          </details>
         </div>
       </section>
 

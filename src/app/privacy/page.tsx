@@ -1,4 +1,5 @@
 import { PageHero } from "@/components/layout/PageHero";
+import { DraftBanner } from "@/components/ui/DraftBanner";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -21,7 +22,8 @@ export default function PrivacyPage() {
         ]}
       />
       <article className="container-x section-y max-w-3xl prose-body">
-        <div className="space-y-10 text-muted">
+        <DraftBanner document="privacy policy" />
+        <div className="mt-10 space-y-10 text-muted">
           <section>
             <h2 className="text-lg font-semibold text-ink">1. Data we collect</h2>
             <p className="mt-3">
@@ -57,7 +59,7 @@ export default function PrivacyPage() {
           </section>
           <section>
             <h2 className="text-lg font-semibold text-warn">
-              ⚠ Placeholder notice
+              Placeholder notice
             </h2>
             <p className="mt-3">
               This policy is structural placeholder content. A compliant privacy

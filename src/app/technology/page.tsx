@@ -1,11 +1,35 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { TechnologyMap } from "@/components/home/TechnologyMap";
-import { OpsControlVisual } from "@/components/home/OpsControlVisual";
+import { HeroInstrument } from "@/components/scenes/HeroInstrument";
+import { AgentWorkflow } from "@/components/home/AgentWorkflow";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { buildMetadata } from "@/lib/seo";
+import dynamic from "next/dynamic";
+
+/** Below-the-fold scene — code-split per the performance budget (§10). */
+const ArchitectureLandscape = dynamic(
+  () =>
+    import("@/components/scenes/ArchitectureLandscape").then(
+      (mod) => mod.ArchitectureLandscape,
+    ),
+  {
+    loading: () => (
+      <div
+        className="card-surface flex min-h-72 items-center justify-center p-12"
+        aria-hidden="true"
+      >
+        <span className="signal-loader">
+          <span />
+          <span />
+          <span />
+        </span>
+      </div>
+    ),
+  },
+);
 
 export const metadata = buildMetadata({
   title: "Technology & Platform",
@@ -69,6 +93,20 @@ export default function TechnologyPage() {
         </div>
       </section>
 
+      <section className="section-y" aria-labelledby="landscape-heading">
+        <div className="container-x">
+          <SectionHeader
+            eyebrow="Architecture landscape"
+            title="One stack, twelve layers, zero lock-in."
+            lead="Select any layer to see what it guarantees. Models change monthly — this structure keeps working regardless."
+            id="landscape-heading"
+          />
+          <div className="mt-12">
+            <ArchitectureLandscape />
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-line bg-surface/30" aria-labelledby="demo-heading">
         <div className="container-x py-14 lg:py-20">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
@@ -89,13 +127,15 @@ export default function TechnologyPage() {
               </p>
             </div>
             <div className="lg:col-span-7">
-              <OpsControlVisual />
+              <HeroInstrument />
             </div>
           </div>
         </div>
       </section>
 
       <TechnologyMap />
+
+      <AgentWorkflow />
 
       <CtaSection />
     </>

@@ -2,18 +2,25 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost";
+/** Three variants only (§7.2). `secondary`/`ghost` are deprecated aliases. */
+type Variant = "primary" | "quiet" | "link" | "secondary" | "ghost";
+
+const resolved: Record<Variant, "primary" | "quiet" | "link"> = {
+  primary: "primary",
+  quiet: "quiet",
+  link: "link",
+  secondary: "quiet",
+  ghost: "link",
+};
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-md font-medium text-sm transition-colors duration-150 px-5 py-2.5 min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px";
+  "btn focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px disabled:opacity-50 disabled:pointer-events-none";
 
-const variants: Record<Variant, string> = {
-  primary:
-    "bg-accent text-white hover:bg-accent-strong active:bg-accent-strong disabled:opacity-50 disabled:pointer-events-none",
-  secondary:
-    "border border-line-strong text-ink hover:border-accent hover:text-accent-strong active:border-accent",
-  ghost: "text-muted hover:text-ink active:text-ink",
-};
+const variants = {
+  primary: "btn-primary",
+  quiet: "btn-quiet",
+  link: "btn-link",
+} as const;
 
 interface ButtonProps {
   children: ReactNode;
@@ -25,6 +32,8 @@ interface ButtonProps {
   disabled?: boolean;
   ariaLabel?: string;
   external?: boolean;
+  /** A/B-testing hook: every primary home CTA carries one (§14). */
+  dataCtaId?: string;
 }
 
 export function Button({
@@ -37,8 +46,21 @@ export function Button({
   disabled,
   ariaLabel,
   external,
+  dataCtaId,
 }: ButtonProps) {
-  const classes = cn(base, variants[variant], className);
+  const kind = resolved[variant];
+  const classes = cn(base, variants[kind], className);
+  const content =
+    kind === "link" ? (
+      <>
+        <span>{children}</span>
+        <span className="btn-arrow" aria-hidden="true">
+          →
+        </span>
+      </>
+    ) : (
+      children
+    );
 
   if (href && !disabled) {
     if (external || href.startsWith("http")) {
@@ -50,14 +72,21 @@ export function Button({
           target="_blank"
           rel="noopener noreferrer"
           onClick={onClick}
+          data-cta-id={dataCtaId}
         >
-          {children}
+          {content}
         </a>
       );
     }
     return (
-      <Link href={href} className={classes} aria-label={ariaLabel} onClick={onClick}>
-        {children}
+      <Link
+        href={href}
+        className={classes}
+        aria-label={ariaLabel}
+        onClick={onClick}
+        data-cta-id={dataCtaId}
+      >
+        {content}
       </Link>
     );
   }
@@ -69,8 +98,9 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
+      data-cta-id={dataCtaId}
     >
-      {children}
+      {content}
     </button>
   );
 }

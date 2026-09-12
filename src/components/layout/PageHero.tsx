@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { JsonLd } from "@/components/ui/Accordion";
+import { GridLines } from "@/components/ui/GridLines";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import { Reveal } from "@/components/ui/Reveal";
 
@@ -21,7 +22,7 @@ export function PageHero({
 }: PageHeroProps) {
   return (
     <section className="relative overflow-hidden border-b border-line">
-      <div className="panel-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
+      <GridLines opacity={0.5} />
       <div className="container-x section-y relative">
         <JsonLd data={breadcrumbJsonLd(breadcrumbs)} />
         <nav aria-label="Breadcrumb" className="mb-6">

@@ -8,6 +8,8 @@ import { track, AnalyticsEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { SearchModal } from "@/components/ui/SearchModal";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { Wordmark } from "@/components/layout/Wordmark";
+import { Icon } from "@/components/ui/Icon";
 
 function Dropdown({ label, href, isActive, children }: {
   label: string;
@@ -68,23 +70,24 @@ function Dropdown({ label, href, isActive, children }: {
         aria-current={isActive ? "page" : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
-        className={cn(
-          "flex items-center gap-1 rounded px-3 py-2 text-sm transition-colors",
-          isActive ? "text-accent-strong" : "text-muted hover:text-ink",
-        )}
-      >
-        {label}
-        <svg
-          width="10"
-          height="6"
-          viewBox="0 0 10 6"
-          fill="none"
-          aria-hidden="true"
-          className={cn("transition-transform duration-200", open && "rotate-180")}
+          className={cn(
+            "relative flex items-center gap-1 rounded px-3 py-2 text-sm transition-colors duration-150",
+            isActive ? "text-accent-strong" : "text-muted hover:text-ink",
+          )}
         >
-          <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </Link>
+          {label}
+          <Icon
+            name="chevron-down"
+            size={10}
+            className={cn("transition-transform duration-200", open && "rotate-180")}
+          />
+          {isActive && (
+            <span
+              className="absolute inset-x-3 bottom-0.5 h-0.5 rounded bg-accent transition-all duration-200"
+              aria-hidden="true"
+            />
+          )}
+        </Link>
 
       {open && (
         <div
@@ -176,11 +179,13 @@ export function Navbar() {
           : "border-transparent bg-transparent",
       )}
     >
-      <div className="container-x flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="flex items-baseline gap-2" aria-label="VANTIQ SYSTEMS — home">
-          <span className="text-lg font-bold tracking-tight">VANTIQ</span>
-          <span className="mono-label hidden text-muted sm:inline">SYSTEMS</span>
-        </Link>
+      <div
+        className={cn(
+          "container-x flex items-center justify-between gap-4 transition-all duration-200",
+          scrolled ? "h-16" : "h-24",
+        )}
+      >
+        <Wordmark compact={scrolled} />
 
         <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
           {navDropdowns.map((dropdown) => (
@@ -208,11 +213,17 @@ export function Navbar() {
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
               className={cn(
-                "rounded px-3 py-2 text-sm transition-colors",
+                "relative rounded px-3 py-2 text-sm transition-colors duration-150",
                 isActive(item.href) ? "text-accent-strong" : "text-muted hover:text-ink",
               )}
             >
               {item.label}
+              {isActive(item.href) && (
+                <span
+                  className="absolute inset-x-3 bottom-0.5 h-0.5 rounded bg-accent"
+                  aria-hidden="true"
+                />
+              )}
             </Link>
           ))}
         </nav>
@@ -221,13 +232,10 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}
-            className="flex items-center gap-2 rounded-md border border-line-strong px-3 py-2 text-sm text-muted transition-colors hover:border-accent hover:text-accent-strong"
+            className="flex min-h-11 items-center gap-2 rounded-md border border-line-strong px-3 py-2 text-sm text-muted transition-colors duration-150 hover:border-accent hover:text-accent-strong"
             aria-label="Search (Ctrl+K)"
           >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <Icon name="search" size={14} />
             <span className="hidden xl:inline">Search</span>
             <kbd className="hidden rounded border border-line px-1 py-0.5 font-mono text-[10px] text-faint xl:inline">⌘K</kbd>
           </button>
@@ -260,24 +268,14 @@ export function Navbar() {
             track(AnalyticsEvent.NavToggle);
           }}
         >
-          <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
-            {open ? (
-              <g stroke="currentColor" strokeWidth="2">
-                <path d="M1 1l16 12M17 1L1 13" />
-              </g>
-            ) : (
-              <g stroke="currentColor" strokeWidth="2">
-                <path d="M0 1h18M0 7h18M0 13h18" />
-              </g>
-            )}
-          </svg>
+          <Icon name={open ? "close" : "menu"} size={20} />
         </button>
       </div>
 
       <div
         id="mobile-menu"
         hidden={!open}
-        className="border-t border-line bg-canvas lg:hidden"
+        className="mobile-menu-spring border-t border-line bg-canvas/95 backdrop-blur-md lg:hidden"
       >
         <nav aria-label="Mobile" className="container-x flex flex-col py-4">
           {navDropdowns.map((dropdown, di) => (
@@ -366,15 +364,11 @@ function MobileDropdownSection({
           aria-expanded={expanded}
           aria-label={`Show ${dropdown.label} options`}
         >
-          <svg
-            width="12"
-            height="8"
-            viewBox="0 0 12 8"
-            fill="none"
+          <Icon
+            name="chevron-down"
+            size={12}
             className={cn("transition-transform duration-200", expanded && "rotate-180")}
-          >
-            <path d="M1 1l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          />
         </button>
       </div>
       {expanded && (

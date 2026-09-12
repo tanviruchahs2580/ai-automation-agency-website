@@ -18,6 +18,7 @@ export const AnalyticsEvent = {
   IntakeComplete: "intake_complete",
   MeetingClick: "meeting_click",
   NavToggle: "nav_toggle",
+  ScrollDepth: "scroll_depth",
 } as const;
 
 export type AnalyticsEventName =

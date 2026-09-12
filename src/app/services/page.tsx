@@ -1,7 +1,10 @@
-import Link from "next/link";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
-import { Reveal } from "@/components/ui/Reveal";
+import { CapabilityCard } from "@/components/ui/Card";
+import {
+  RevealStagger,
+  RevealStaggerItem,
+} from "@/components/ui/RevealStagger";
 import { services } from "@/data/services";
 import { buildMetadata } from "@/lib/seo";
 
@@ -26,33 +29,21 @@ export default function ServicesPage() {
       />
 
       <section className="section-y">
-        <div className="container-x grid gap-5 md:grid-cols-2">
-          {services.map((service, i) => (
-            <Reveal key={service.slug} delay={(i % 2) * 0.06}>
-              <Link
-                href={`/services/${service.slug}`}
-                className="card-surface group flex h-full flex-col p-7 transition-colors hover:border-accent/40"
-              >
-                <span className="mono-label text-accent-strong">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h2 className="h-card mt-3">{service.title}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-muted">
-                  {service.summary}
-                </p>
-                <ul className="mt-5 flex flex-wrap gap-1.5">
-                  {service.capabilities.slice(0, 3).map((capability) => (
-                    <li
-                      key={capability}
-                      className="mono-label rounded border border-line px-2 py-1 text-faint"
-                    >
-                      {capability}
-                    </li>
-                  ))}
-                </ul>
-              </Link>
-            </Reveal>
-          ))}
+        <div className="container-x">
+          <RevealStagger className="grid gap-5 md:grid-cols-2">
+            {services.map((service, i) => (
+              <RevealStaggerItem key={service.slug}>
+                <CapabilityCard
+                  eyebrow="Service"
+                  index={String(i + 1).padStart(2, "0")}
+                  title={service.title}
+                  description={service.summary}
+                  meta={service.capabilities.slice(0, 3).join(" · ")}
+                  href={`/services/${service.slug}`}
+                />
+              </RevealStaggerItem>
+            ))}
+          </RevealStagger>
         </div>
       </section>
 

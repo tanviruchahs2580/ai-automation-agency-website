@@ -1,8 +1,13 @@
-import Link from "next/link";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { Reveal } from "@/components/ui/Reveal";
+import { InsightCard } from "@/components/ui/Card";
+import {
+  RevealStagger,
+  RevealStaggerItem,
+} from "@/components/ui/RevealStagger";
 import { insightCategories, insights, readingTimeMinutes } from "@/data/insights";
+import { formatDate } from "@/lib/i18n";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -38,37 +43,25 @@ export default function InsightsPage() {
             ))}
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {insights.map((insight, i) => (
-              <Reveal key={insight.slug} delay={(i % 3) * 0.05}>
-                <Link
+          <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {insights.map((insight) => (
+              <RevealStaggerItem key={insight.slug}>
+                <InsightCard
+                  eyebrow={insight.category}
+                  title={insight.title}
+                  dek={insight.excerpt}
+                  byline={insight.author}
+                  readTime={`${formatDate(insight.publishedAt, "en-US", { year: "numeric", month: "short", day: "numeric" })} · ${readingTimeMinutes(insight)} min read`}
                   href={`/insights/${insight.slug}`}
-                  className="card-surface group flex h-full flex-col p-6 transition-colors hover:border-accent/40"
-                >
-                  <p className="mono-label uppercase text-faint">{insight.category}</p>
-                  <h2 className="h-card mt-3">{insight.title}</h2>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
-                    {insight.excerpt}
-                  </p>
-                  <p className="mono-label mt-6 flex items-center justify-between text-faint">
-                    <time dateTime={insight.publishedAt}>
-                      {new Date(insight.publishedAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </time>
-                    <span>{readingTimeMinutes(insight)} min read</span>
-                  </p>
-                </Link>
-              </Reveal>
+                />
+              </RevealStaggerItem>
             ))}
-          </div>
+          </RevealStagger>
 
           <Reveal className="mt-12 rounded-lg border border-dashed border-line p-5 text-xs leading-relaxed text-faint">
             Authorship shown as the engineering team pending verified individual
-            profiles. Articles will move to MDX/CMS with named authors as
-            publication ramps up.
+            profiles. Articles will move to named authors as publication ramps
+            up — see <a href="/team" className="underline underline-offset-4 hover:text-ink">the team page</a>.
           </Reveal>
         </div>
       </section>

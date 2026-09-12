@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/technology",
     "/insights",
     "/about",
+    "/team",
     "/ai-readiness",
     "/roi-calculator",
     "/start-a-project",

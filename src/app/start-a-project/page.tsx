@@ -1,5 +1,6 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { ProjectIntake } from "@/components/forms/ProjectIntake";
+import { ExitIntentSave } from "@/components/forms/ExitIntentSave";
 import { Reveal } from "@/components/ui/Reveal";
 import { buildMetadata } from "@/lib/seo";
 
@@ -45,6 +46,7 @@ export default function StartAProjectPage() {
         <div className="container-x grid gap-12 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-7">
             <ProjectIntake />
+            <ExitIntentSave />
           </div>
           <aside className="lg:col-span-5">
             <Reveal className="card-surface p-7">

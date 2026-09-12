@@ -4,6 +4,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { ExampleBadge } from "@/components/ui/Accordion";
 import { Reveal } from "@/components/ui/Reveal";
+import { QuoteRail } from "@/components/scenes/QuoteRail";
 import { caseStudies, getCaseStudy } from "@/data/case-studies";
 import { buildMetadata } from "@/lib/seo";
 
@@ -91,6 +92,11 @@ export default async function CaseStudyPage({
         <div className="divider-top mt-16 pt-16">
           <Block heading="Intervention" items={study.intervention} />
         </div>
+
+        <QuoteRail
+          quote={study.intervention[0] ?? study.challenge}
+          attribution="VANTIQ engineering notes"
+        />
 
         <div className="divider-top mt-16 pt-16">
           <Reveal>

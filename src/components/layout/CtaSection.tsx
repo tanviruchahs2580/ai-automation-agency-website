@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { GridLines } from "@/components/ui/GridLines";
 import { Reveal } from "@/components/ui/Reveal";
 
 interface CtaSectionProps {
@@ -9,6 +10,8 @@ interface CtaSectionProps {
   primaryHref?: string;
   secondaryLabel?: string;
   secondaryHref?: string;
+  primaryCtaId?: string;
+  secondaryCtaId?: string;
 }
 
 export function CtaSection({
@@ -19,15 +22,14 @@ export function CtaSection({
   primaryHref = "/start-a-project",
   secondaryLabel = "Assess My AI Opportunity",
   secondaryHref = "/ai-readiness",
+  primaryCtaId,
+  secondaryCtaId,
 }: CtaSectionProps) {
   return (
     <section className="section-y" aria-labelledby="cta-heading">
       <div className="container-x">
         <Reveal className="card-surface relative overflow-hidden px-6 py-14 text-center md:px-16 md:py-20">
-          <div
-            className="panel-grid pointer-events-none absolute inset-0 opacity-20"
-            aria-hidden="true"
-          />
+          <GridLines opacity={0.4} />
           <div className="relative">
             <p className="eyebrow mb-4">{eyebrow}</p>
             <h2 id="cta-heading" className="h-section mx-auto max-w-2xl">
@@ -35,13 +37,18 @@ export function CtaSection({
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{lead}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button href={primaryHref} className="w-full sm:w-auto">
+              <Button
+                href={primaryHref}
+                className="w-full sm:w-auto"
+                dataCtaId={primaryCtaId}
+              >
                 {primaryLabel}
               </Button>
               <Button
                 href={secondaryHref}
-                variant="secondary"
+                variant="quiet"
                 className="w-full sm:w-auto"
+                dataCtaId={secondaryCtaId}
               >
                 {secondaryLabel}
               </Button>

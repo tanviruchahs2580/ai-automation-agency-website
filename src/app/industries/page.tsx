@@ -1,6 +1,10 @@
-import Link from "next/link";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
+import { CapabilityCard } from "@/components/ui/Card";
+import {
+  RevealStagger,
+  RevealStaggerItem,
+} from "@/components/ui/RevealStagger";
 import { industries } from "@/data/industries";
 import { buildMetadata } from "@/lib/seo";
 
@@ -25,25 +29,21 @@ export default function IndustriesPage() {
       />
 
       <section className="section-y">
-        <div className="container-x grid gap-px overflow-hidden rounded-lg border border-line bg-[color:var(--color-line)] md:grid-cols-2 lg:grid-cols-3">
-          {industries.map((industry, i) => (
-            <Link
-              key={industry.slug}
-              href={`/industries/${industry.slug}`}
-              className="group flex flex-col bg-canvas p-7 transition-colors hover:bg-surface"
-            >
-              <span className="mono-label text-faint">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <h2 className="mt-2 font-semibold">{industry.title}</h2>
-              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
-                {industry.summary}
-              </p>
-              <span className="mono-label mt-5 text-faint group-hover:text-accent-strong">
-                View sector playbook →
-              </span>
-            </Link>
-          ))}
+        <div className="container-x">
+          <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {industries.map((industry, i) => (
+              <RevealStaggerItem key={industry.slug}>
+                <CapabilityCard
+                  eyebrow="Industry"
+                  index={String(i + 1).padStart(2, "0")}
+                  title={industry.title}
+                  description={industry.summary}
+                  meta={`${industry.useCases.length + industry.opportunities.length} use cases documented`}
+                  href={`/industries/${industry.slug}`}
+                />
+              </RevealStaggerItem>
+            ))}
+          </RevealStagger>
         </div>
       </section>
 
