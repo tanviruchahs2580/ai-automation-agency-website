@@ -1,0 +1,32 @@
+{
+  "$comment": "English message catalogue (i18n scaffold). Keys mirror src/data content IDs so a future [locale] segment can swap catalogues without redesign. Only `en` ships today.",
+  "site": {
+    "name": "VANTIQ SYSTEMS",
+    "shortName": "VANTIQ",
+    "tagline": "AI Engineering & Automation for the Enterprise"
+  },
+  "nav": {
+    "solutions": "Solutions",
+    "services": "Services",
+    "industries": "Industries",
+    "work": "Work",
+    "approach": "Approach",
+    "technology": "Technology",
+    "insights": "Insights",
+    "about": "About",
+    "startProject": "Start a Project",
+    "assessOpportunity": "Assess My AI Opportunity",
+    "search": "Search"
+  },
+  "cta": {
+    "startProject": "Start a Project",
+    "calculateEstimate": "Calculate My Estimate",
+    "refineEstimate": "Refine this estimate",
+    "readinessScore": "Get My AI Readiness Score"
+  },
+  "disclaimers": {
+    "estimate": "Estimate based on your inputs. Not a guarantee.",
+    "exampleArchitecture": "Example architecture — illustrative, not a client system.",
+    "simulation": "All figures simulated for illustration. No client data is shown."
+  }
+}

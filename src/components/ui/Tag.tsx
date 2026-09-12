@@ -28,7 +28,7 @@ export function StatusDot({
   tone = "ok",
   pulse = true,
 }: {
-  tone?: "ok" | "warn" | "accent" | "critical" | "info";
+  tone?: "ok" | "warn" | "accent" | "critical" | "info" | "signal" | "brass";
   pulse?: boolean;
 }) {
   const color =
@@ -40,7 +40,11 @@ export function StatusDot({
           ? "bg-critical"
           : tone === "info"
             ? "bg-info"
-            : "bg-accent";
+            : tone === "signal"
+              ? "bg-signal"
+              : tone === "brass"
+                ? "bg-brass"
+                : "bg-accent";
   return (
     <span className="relative inline-flex h-2 w-2" aria-hidden="true">
       <span className={cn("h-2 w-2 rounded-full", color)} />

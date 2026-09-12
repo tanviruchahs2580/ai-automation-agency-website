@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Icon } from "@/components/ui/Icon";
 
 interface SearchItem {
   title: string;
@@ -40,9 +41,36 @@ const searchItems: SearchItem[] = [
   { title: "Technology", href: "/technology", description: "Our technology ecosystem.", category: "Company" },
 ];
 
+const popularHrefs = [
+  "/roi-calculator",
+  "/ai-readiness",
+  "/solutions/ai-agents",
+  "/start-a-project",
+];
+
+const popularItems: SearchItem[] = popularHrefs
+  .map((href) => searchItems.find((item) => item.href === href))
+  .filter((item): item is SearchItem => Boolean(item));
+
+const RECENT_KEY = "vantiq-recent-searches";
+
+function readRecent(): SearchItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]") as string[];
+    return raw
+      .map((href) => searchItems.find((item) => item.href === href))
+      .filter((item): item is SearchItem => Boolean(item))
+      .slice(0, 4);
+  } catch {
+    return [];
+  }
+}
+
 export function SearchModal() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [recent, setRecent] = useState<SearchItem[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filtered = query.trim()
@@ -52,7 +80,18 @@ export function SearchModal() {
           item.description.toLowerCase().includes(query.toLowerCase()) ||
           item.category.toLowerCase().includes(query.toLowerCase()),
       )
-    : searchItems.slice(0, 8);
+    : [];
+
+  const remember = useCallback((item: SearchItem) => {
+    setOpen(false);
+    try {
+      const raw = JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]") as string[];
+      const next = [item.href, ...raw.filter((h) => h !== item.href)].slice(0, 4);
+      localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+    } catch {
+      /* recent history is best-effort */
+    }
+  }, []);
 
   const onOpen = useCallback(() => {
     setOpen(true);
@@ -71,7 +110,10 @@ export function SearchModal() {
   }, [onOpen]);
 
   useEffect(() => {
-    if (open) inputRef.current?.focus();
+    if (!open) return;
+    inputRef.current?.focus();
+    const raf = requestAnimationFrame(() => setRecent(readRecent()));
+    return () => cancelAnimationFrame(raf);
   }, [open]);
 
   useEffect(() => {
@@ -95,10 +137,7 @@ export function SearchModal() {
         aria-label="Site search"
       >
         <div className="flex items-center gap-3 border-b border-line px-4">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="text-faint">
-            <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
+          <Icon name="search" size={16} className="text-faint" />
           <label htmlFor="site-search-input" className="sr-only">
             Search solutions, services, industries
           </label>
@@ -117,6 +156,45 @@ export function SearchModal() {
           />
           <kbd className="hidden rounded border border-line px-1.5 py-0.5 font-mono text-[10px] text-faint sm:inline">ESC</kbd>
         </div>
+        {!query.trim() ? (
+          <div className="max-h-72 overflow-y-auto p-2">
+            {recent.length > 0 && (
+              <div className="px-3 pb-1 pt-2">
+                <p className="mono-label uppercase text-faint">Recent</p>
+                <ul className="mt-1 space-y-0.5">
+                  {recent.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={() => remember(item)}
+                        className="block rounded-lg px-2 py-1.5 text-sm text-muted transition-colors hover:bg-surface2 hover:text-ink"
+                      >
+                        {item.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="px-3 pb-1 pt-2">
+              <p className="mono-label uppercase text-faint">Popular</p>
+              <ul className="mt-1 space-y-0.5">
+                {popularItems.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => remember(item)}
+                      className="flex flex-col rounded-lg px-2 py-1.5 transition-colors hover:bg-surface2"
+                    >
+                      <span className="text-xs text-faint">{item.category}</span>
+                      <span className="text-sm font-medium text-ink">{item.title}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ) : (
         <ul id="site-search-results" className="max-h-72 overflow-y-auto p-2" role="listbox" aria-label="Search results">
           {filtered.length === 0 && (
             <li className="px-3 py-6 text-center text-sm text-faint">No results found.</li>
@@ -125,7 +203,7 @@ export function SearchModal() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                onClick={() => setOpen(false)}
+                onClick={() => remember(item)}
                 className="flex flex-col rounded-lg px-3 py-2.5 transition-colors hover:bg-surface2"
                 role="option"
               >
@@ -136,6 +214,7 @@ export function SearchModal() {
             </li>
           ))}
         </ul>
+        )}
         <div className="border-t border-line px-4 py-2 text-[11px] text-faint">
           Press <kbd className="rounded border border-line px-1 py-0.5 font-mono">Cmd+K</kbd> to open search anywhere.
         </div>

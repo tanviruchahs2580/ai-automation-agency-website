@@ -1,38 +1,39 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { OpsControlVisual } from "@/components/home/OpsControlVisual";
+import { HeroInstrument } from "@/components/scenes/HeroInstrument";
+import { GridLines } from "@/components/ui/GridLines";
 import { Reveal } from "@/components/ui/Reveal";
 import { StatusDot } from "@/components/ui/Tag";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-line">
-      <div
-        className="panel-grid pointer-events-none absolute inset-0 opacity-30"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-line-strong to-transparent"
-        aria-hidden="true"
-      />
+      <GridLines opacity={0.6} />
       <div className="container-x section-y relative grid items-center gap-14 lg:grid-cols-12">
         <Reveal className="lg:col-span-7">
           <p className="eyebrow mb-5 flex flex-wrap items-center gap-2.5">
-            <StatusDot tone="ok" />
+            <StatusDot tone="signal" />
             <span>AI Engineering &amp; Automation — Architecture first</span>
           </p>
           <h1 className="h-display">
-            Build the AI systems your business actually needs.
+            The autonomous operations layer for enterprises that cannot afford
+            guesswork.
           </h1>
           <p className="lead mt-6">
-            We design, engineer and operate intelligent automation systems that
-            connect your people, software, data and workflows — from first
+            VANTIQ Systems designs, engineers, and operates the systems that
+            make AI trustworthy enough to run your operations — from first
             architecture to production, with governance built in.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button href="/start-a-project">Start a Project</Button>
-            <Button href="/solutions" variant="secondary">
-              Explore What We Can Automate
+            <Button href="/start-a-project" dataCtaId="home-hero-primary-a">
+              Start a Project
+            </Button>
+            <Button
+              href="/solutions"
+              variant="quiet"
+              dataCtaId="home-hero-secondary-a"
+            >
+              Explore Solutions
             </Button>
           </div>
           <p className="mt-4 text-sm">
@@ -57,7 +58,7 @@ export function Hero() {
         </Reveal>
 
         <Reveal delay={0.15} className="lg:col-span-5">
-          <OpsControlVisual />
+          <HeroInstrument />
         </Reveal>
       </div>
     </section>

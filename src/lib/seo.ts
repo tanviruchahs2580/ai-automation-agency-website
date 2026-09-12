@@ -165,8 +165,7 @@ export function faqJsonLd(
   };
 }
 
-export function articleJsonLd(input: {
-  title: string;
+export function articleJsonLd(input: {  title: string;
   description: string;
   path: string;
   author: string;
@@ -181,5 +180,28 @@ export function articleJsonLd(input: {
     datePublished: input.publishedAt,
     publisher: { "@type": "Organization", name: siteConfig.name },
     mainEntityOfPage: `${SITE_URL}${input.path}`,
+  };
+}
+
+/** Interactive tools (ROI calculator, readiness assessment) as products. */
+export function softwareJsonLd(input: {
+  name: string;
+  description: string;
+  path: string;
+}): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: input.name,
+    description: input.description,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    offers: { "@type": "Offer", price: "0" },
+    provider: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: SITE_URL,
+    },
+    url: `${SITE_URL}${input.path}`,
   };
 }

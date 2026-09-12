@@ -1,6 +1,7 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { ProcessTimeline } from "@/components/home/ProcessTimeline";
+import { BeforeAfter } from "@/components/home/BeforeAfter";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
 import { engineeringPrinciples } from "@/data/architecture";
@@ -76,6 +77,23 @@ export default function ApproachPage() {
 
       {/* Delivery process */}
       <ProcessTimeline />
+
+      <section
+        className="section-y border-t border-line bg-surface/30"
+        aria-labelledby="beforeafter-heading"
+      >
+        <div className="container-x max-w-4xl">
+          <SectionHeader
+            eyebrow="Before → After"
+            title="What actually changes."
+            lead="A typical process transformation we engineer — compare the states directly."
+            id="beforeafter-heading"
+          />
+          <div className="mt-10">
+            <BeforeAfter />
+          </div>
+        </div>
+      </section>
 
       <section className="section-y border-t border-line bg-surface/30" aria-labelledby="standards-heading">
         <div className="container-x">

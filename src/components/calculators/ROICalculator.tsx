@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { computeRoi } from "@/lib/roi";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { AnalyticsEvent, track } from "@/lib/analytics";
+import { MetricsPulse } from "@/components/scenes/MetricsPulse";
+
+/**
+ * ROI calculator with progressive disclosure (§14):
+ * 3 inputs first (industry / headcount / manual hours per week) → a
+ * preliminary estimate on conservative assumptions → "Refine this estimate"
+ * reveals the remaining 7 inputs and tightens the range.
+ */
 
 const defaults = {
   employees: 12,
@@ -17,8 +26,17 @@ const defaults = {
   estimatedAnnualInvestment: 48000,
 };
 
-const fields = [
-  { key: "employees", label: "Employees doing this work", min: 1, max: 50000, step: 1, suffix: "" },
+/** Conservative automation presets per industry — documented, not folklore. */
+const industryPresets = [
+  { value: "financial-services", label: "Financial services", automationRate: 55 },
+  { value: "healthcare", label: "Healthcare", automationRate: 45 },
+  { value: "manufacturing", label: "Manufacturing", automationRate: 60 },
+  { value: "retail", label: "Retail", automationRate: 55 },
+  { value: "logistics", label: "Logistics", automationRate: 60 },
+  { value: "saas-technology", label: "SaaS & technology", automationRate: 60 },
+] as const;
+
+const refinedFields = [
   { key: "averageSalary", label: "Average annual salary", min: 1000, max: 1000000, step: 1000, suffix: "$" },
   { key: "hoursPerTask", label: "Hours per task (manual)", min: 0.05, max: 40, step: 0.05, suffix: "h" },
   { key: "tasksPerWeek", label: "Tasks per employee / week", min: 1, max: 2000, step: 1, suffix: "" },
@@ -28,17 +46,45 @@ const fields = [
   { key: "estimatedAnnualInvestment", label: "Expected solution investment / yr", min: 0, max: 5000000, step: 1000, suffix: "$" },
 ] as const;
 
+type NumericKey = keyof typeof defaults;
+
 export function ROICalculator() {
   const [inputs, setInputs] = useState(defaults);
+  const [industry, setIndustry] = useState<string>(industryPresets[5].value);
+  const [weeklyHours, setWeeklyHours] = useState(20);
+  const [refined, setRefined] = useState(false);
   const [touched, setTouched] = useState(false);
+  const params = useSearchParams();
+  const prefilled = useRef(false);
+
+  // ?industry=<slug> pre-fill (e.g. from an industry page): applied once
+  // after mount so SSR markup and the first client paint agree. Unknown
+  // slugs fall back to the default preset — never an error state.
+  useEffect(() => {
+    if (prefilled.current) return;
+    prefilled.current = true;
+    const raf = requestAnimationFrame(() => {
+      const slug = params.get("industry");
+      if (!slug) return;
+      const preset = industryPresets.find((p) => p.value === slug);
+      if (!preset) return;
+      setIndustry(preset.value);
+      setInputs((prev) => ({ ...prev, automationRatePercent: preset.automationRate }));
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [params]);
 
   const results = useMemo(() => computeRoi(inputs), [inputs]);
 
-  const update = (key: keyof typeof defaults) => (raw: string) => {
+  const markUsed = () => {
     if (!touched) {
       setTouched(true);
       track(AnalyticsEvent.CalculatorUse);
     }
+  };
+
+  const update = (key: NumericKey) => (raw: string) => {
+    markUsed();
     const value = Number(raw);
     setInputs((prev) => ({
       ...prev,
@@ -48,53 +94,133 @@ export function ROICalculator() {
 
   // Free typing while editing; out-of-range values snap to the field's
   // documented min/max when the user leaves the input.
-  const clampOnBlur = (key: keyof typeof defaults, raw: number) => {
-    const field = fields.find((f) => f.key === key);
-    if (!field || !Number.isFinite(raw)) return;
-    const clamped = Math.min(Math.max(raw, field.min), field.max);
+  const clampOnBlur = (key: NumericKey, raw: number, min: number, max: number) => {
+    if (!Number.isFinite(raw)) return;
+    const clamped = Math.min(Math.max(raw, min), max);
     setInputs((prev) =>
       prev[key] === clamped ? prev : { ...prev, [key]: clamped },
     );
   };
 
+  const onIndustryChange = (value: string) => {
+    markUsed();
+    setIndustry(value);
+    const preset = industryPresets.find((p) => p.value === value);
+    if (preset) {
+      setInputs((prev) => ({ ...prev, automationRatePercent: preset.automationRate }));
+    }
+  };
+
+  /** Weekly-hours shortcut: re-expresses as tasks/week at the default 0.5h task. */
+  const onWeeklyHours = (raw: string) => {
+    markUsed();
+    const value = Number(raw);
+    if (!Number.isFinite(value)) return;
+    const clamped = Math.min(Math.max(value, 1), 80);
+    setWeeklyHours(clamped);
+    setInputs((prev) => ({
+      ...prev,
+      tasksPerWeek: Math.min(Math.max(Math.round(clamped / 0.5), 1), 2000),
+    }));
+  };
+
   return (
     <div className="grid gap-8 lg:grid-cols-12">
-      <form className="card-surface p-6 md:p-8 lg:col-span-6" onSubmit={(e) => e.preventDefault()}>
-        <p className="mono-label uppercase text-faint">Your assumptions</p>
+      <form
+        className="card-surface p-6 md:p-8 lg:col-span-6"
+        onSubmit={(e) => e.preventDefault()}
+      >
+        <p className="mono-label uppercase text-faint">
+          Step 01 — Your situation
+        </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          {fields.map((field) => (
-            <div key={field.key}>
-              <label
-                htmlFor={`roi-${field.key}`}
-                className="block text-xs font-medium leading-snug"
-              >
-                {field.label}
-              </label>
-              <div className="relative mt-1.5">
-                {field.suffix === "$" && (
-                  <span aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-faint">$</span>
-                )}
-                <input
-                  id={`roi-${field.key}`}
-                  type="number"
-                  inputMode="decimal"
-                  min={field.min}
-                  max={field.max}
-                  step={field.step}
-                  value={inputs[field.key]}
-                  onChange={(e) => update(field.key)(e.target.value)}
-                  onBlur={(e) => clampOnBlur(field.key, Number(e.target.value))}
-                  className="w-full rounded-md border border-line bg-surface2 px-3 py-2 font-mono text-sm tabular-nums focus:border-accent focus:outline-none"
-                />
-                {(field.suffix === "%" || field.suffix === "h") && (
-                  <span aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-faint">
-                    {field.suffix}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
+          <div className="sm:col-span-2">
+            <label htmlFor="roi-industry" className="block text-xs font-medium leading-snug">
+              Industry
+            </label>
+            <select
+              id="roi-industry"
+              value={industry}
+              onChange={(e) => onIndustryChange(e.target.value)}
+              className="mt-1.5 min-h-11 w-full rounded-md border border-line bg-surface2 px-3 py-2 text-sm focus:border-accent focus:outline-none"
+            >
+              {industryPresets.map((preset) => (
+                <option key={preset.value} value={preset.value}>
+                  {preset.label} — assumes {preset.automationRate}% automation
+                </option>
+              ))}
+            </select>
+          </div>
+          <NumberField
+            id="roi-employees"
+            label="Current headcount on manual ops"
+            value={inputs.employees}
+            min={1}
+            max={50000}
+            step={1}
+            onChange={update("employees")}
+            onBlur={(v) => clampOnBlur("employees", v, 1, 50000)}
+          />
+          <NumberField
+            id="roi-weekly-hours"
+            label="Manual hours / person / week"
+            value={weeklyHours}
+            min={1}
+            max={80}
+            step={1}
+            suffix="h"
+            onChange={onWeeklyHours}
+            onBlur={(v) => {
+              if (Number.isFinite(v)) setWeeklyHours(Math.min(Math.max(v, 1), 80));
+            }}
+          />
         </div>
+
+        <div className="mt-6 border-t border-line pt-5">
+          <button
+            type="button"
+            aria-expanded={refined}
+            aria-controls="roi-refined-fields"
+            onClick={() => {
+              setRefined((v) => !v);
+              markUsed();
+            }}
+            className="btn-quiet btn w-full sm:w-auto"
+          >
+            {refined ? "Hide advanced inputs" : "Refine this estimate"}
+            <span aria-hidden="true" className="font-mono">
+              {refined ? "−" : "+"}
+            </span>
+          </button>
+          <p className="mt-2 text-[11px] leading-relaxed text-faint">
+            Preliminary numbers use conservative {inputs.automationRatePercent}%
+            automation for {industryPresets.find((p) => p.value === industry)?.label}.
+            Refining tightens the range.
+          </p>
+        </div>
+
+        {refined && (
+          <div id="roi-refined-fields" className="mt-5 grid gap-4 sm:grid-cols-2">
+            <p className="mono-label uppercase text-faint sm:col-span-2">
+              Step 02 — Refine the assumptions
+            </p>
+            {refinedFields.map((field) => (
+              <NumberField
+                key={field.key}
+                id={`roi-${field.key}`}
+                label={field.label}
+                value={inputs[field.key]}
+                min={field.min}
+                max={field.max}
+                step={field.step}
+                suffix={field.suffix}
+                onChange={update(field.key)}
+                onBlur={(v) => clampOnBlur(field.key, v, field.min, field.max)}
+              />
+            ))}
+          </div>
+        )}
+
         <p className="mt-5 border-t border-line pt-4 text-[11px] leading-relaxed text-faint">
           This calculator provides an indicative estimate based entirely on your
           inputs. It is not a financial guarantee. Assumptions: 48 working weeks,
@@ -152,6 +278,12 @@ export function ROICalculator() {
               <dt>Implied hourly labour cost</dt>
               <dd className="font-mono tabular-nums">${results.hourlyCost.toFixed(2)}</dd>
             </div>
+            <div className="flex justify-between">
+              <dt>Estimate status</dt>
+              <dd>
+                <MetricsPulse>{refined ? "Refined" : "Preliminary"}</MetricsPulse>
+              </dd>
+            </div>
           </dl>
 
           <p className="mt-6 rounded border border-warn/30 bg-warn/5 px-4 py-3 text-xs leading-relaxed text-warn/90">
@@ -164,11 +296,63 @@ export function ROICalculator() {
             onClick={() =>
               track(AnalyticsEvent.CtaClick, { location: "roi-calculator" })
             }
-            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong sm:w-auto"
+            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-strong sm:w-auto"
           >
             Validate These Numbers With An Engineer
           </Link>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function NumberField({
+  id,
+  label,
+  value,
+  min,
+  max,
+  step,
+  suffix,
+  onChange,
+  onBlur,
+}: {
+  id: string;
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  suffix?: string;
+  onChange: (raw: string) => void;
+  onBlur: (value: number) => void;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-medium leading-snug">
+        {label}
+      </label>
+      <div className="relative mt-1.5">
+        {suffix === "$" && (
+          <span aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-faint">$</span>
+        )}
+        <input
+          id={id}
+          type="number"
+          inputMode="decimal"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={(e) => onBlur(Number(e.target.value))}
+          className="min-h-11 w-full rounded-md border border-line bg-surface2 px-3 py-2 font-mono text-sm tabular-nums focus:border-accent focus:outline-none"
+        />
+        {(suffix === "%" || suffix === "h") && (
+          <span aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-faint">
+            {suffix}
+          </span>
+        )}
       </div>
     </div>
   );

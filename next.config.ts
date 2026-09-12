@@ -36,6 +36,10 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  experimental: {
+    // Trim Framer Motion to the imported modules (§10 budget enforcement).
+    optimizePackageImports: ["framer-motion"],
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

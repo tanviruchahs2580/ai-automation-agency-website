@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   budgetRanges,
   companySizes,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/validation";
 import { contact } from "@/data/site";
 import { AnalyticsEvent, track } from "@/lib/analytics";
+import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 
 /**
@@ -80,11 +82,13 @@ export function ProjectIntake() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [serverError, setServerError] = useState("");
+  const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
   const [result, setResult] = useState<{
     briefId: string;
     nextStep: string;
   } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
 
   // Signals to tests/automation that controlled inputs are live so typed
   // values cannot race ahead of hydration on slow engines.
@@ -100,7 +104,9 @@ export function ProjectIntake() {
       try {
         const raw = window.localStorage.getItem(DRAFT_STORAGE_KEY);
         if (!raw) return;
-        const parsed = JSON.parse(raw) as Partial<FormState>;
+        const parsed = JSON.parse(raw) as Partial<FormState> & {
+          savedAt?: unknown;
+        };
         const merged: FormState = {
           ...initialForm,
           ...parsed,
@@ -114,6 +120,7 @@ export function ProjectIntake() {
         if (!hasContent) return;
         setForm(merged);
         setDraftRestored(true);
+        if (typeof parsed.savedAt === "number") setDraftSavedAt(parsed.savedAt);
       } catch {
         /* corrupted or unavailable draft is ignored */
       }
@@ -125,12 +132,20 @@ export function ProjectIntake() {
     try {
       window.localStorage.setItem(
         DRAFT_STORAGE_KEY,
-        JSON.stringify({ ...form, companyWebsite: "" }),
+        JSON.stringify({ ...form, companyWebsite: "", savedAt: Date.now() }),
       );
     } catch {
       /* storage unavailable — wizard still works without persistence */
     }
   }, [form]);
+
+  const startFresh = () => {
+    clearDraft();
+    setForm(initialForm);
+    setErrors({});
+    setStep(0);
+    setDraftRestored(false);
+  };
 
   const clearDraft = () => {
     try {
@@ -261,9 +276,33 @@ export function ProjectIntake() {
   }
 
   if (status === "success" && result) {
+    const briefText = [
+      `VANTIQ SYSTEMS — project brief ${result.briefId}`,
+      ``,
+      `Company: ${form.companyName} (${form.companySize}, ${form.industry}, ${form.country})`,
+      `Contact: ${form.contactName}, ${form.contactRole}, ${form.contactEmail}`,
+      `Problem: ${form.problem}`,
+      `Current workflow: ${form.currentWorkflow}`,
+      `Systems: ${form.existingSoftware || "—"}`,
+      `Desired outcome: ${form.desiredOutcome}`,
+      `Budget: ${form.budgetRange} · Timeline: ${form.timeline}`,
+      ``,
+      `Recommended next step: ${result.nextStep}`,
+    ].join("\n");
+    const downloadBrief = () => {
+      const blob = new Blob([briefText], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `vantiq-brief-${result.briefId}.txt`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    };
     return (
-      <div className="card-surface mx-auto max-w-2xl p-8 md:p-10 text-center" aria-live="polite">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-ok/50 bg-ok/10 text-xl text-ok">
+      <div className="card-surface mx-auto max-w-2xl p-8 text-center md:p-10" aria-live="polite">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-signal/50 bg-signal/10 text-2xl text-signal" aria-hidden="true">
           ✓
         </span>
         <h2 className="mt-5 text-2xl font-bold tracking-tight">
@@ -286,19 +325,32 @@ export function ProjectIntake() {
           <p className="mt-1 text-sm">{result.nextStep}</p>
         </div>
 
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <div className="mt-7 grid gap-3 sm:grid-cols-3">
           <a
             href={contact.meetingLink}
             onClick={() => track(AnalyticsEvent.MeetingClick)}
-            className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium text-white hover:bg-accent-strong"
+            className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-strong"
           >
-            Book a Discovery Call
+            Book a Call
           </a>
-          <span className="text-xs leading-relaxed self-center text-faint">
-            Save reference {result.briefId} — quoting it lets any follow-up
-            email or call pick up exactly where you left off.
-          </span>
+          <button
+            type="button"
+            onClick={downloadBrief}
+            className="btn-quiet btn"
+          >
+            Download Brief
+          </button>
+          <a
+            href={`mailto:?subject=${encodeURIComponent(`Project brief ${result.briefId}`)}&body=${encodeURIComponent(`${briefText}\n\nQuoting reference ${result.briefId} lets any follow-up pick up where we left off.`)}`}
+            className="btn-quiet btn"
+          >
+            Share With Team
+          </a>
         </div>
+        <p className="mt-4 text-xs leading-relaxed text-faint">
+          Save reference {result.briefId} — quoting it lets any follow-up
+          email or call pick up exactly where you left off.
+        </p>
       </div>
     );
   }
@@ -313,7 +365,13 @@ export function ProjectIntake() {
       className="card-surface mx-auto max-w-2xl p-6 md:p-10"
     >
       {/* Step indicator */}
-      <ol className="flex flex-wrap gap-x-4 gap-y-1" aria-label="Form steps">
+      <div className="flex items-baseline justify-between gap-4">
+        <p className="mono-label tabular text-faint" aria-hidden="true">
+          {String(step + 1).padStart(2, "0")} / {String(steps.length).padStart(2, "0")}
+        </p>
+        <p className="mono-label uppercase text-faint">{current.title}</p>
+      </div>
+      <ol className="mt-2 flex flex-wrap gap-x-4 gap-y-1" aria-label="Form steps">
         {steps.map((s, i) => (
           <li key={s.title} aria-current={i === step ? "step" : undefined}>
             <span
@@ -341,12 +399,41 @@ export function ProjectIntake() {
         />
       </div>
       {draftRestored && (
-        <p className="mono-label mt-3 text-ok">
-          Draft restored — pick up where you left off.
-        </p>
+        <div
+          role="status"
+          className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-line bg-surface2 px-4 py-3"
+        >
+          <p className="mono-label flex-1 text-muted">
+            Restored draft
+            {draftSavedAt
+              ? ` from ${new Date(draftSavedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+              : ""}
+          </p>
+          <button
+            type="button"
+            onClick={() => setDraftRestored(false)}
+            className="mono-label uppercase text-accent-strong hover:underline"
+          >
+            Continue
+          </button>
+          <button
+            type="button"
+            onClick={startFresh}
+            className="mono-label uppercase text-faint hover:text-ink hover:underline"
+          >
+            Start fresh
+          </button>
+        </div>
       )}
 
-      <div className="mt-8 space-y-5">
+      <motion.div
+        key={step}
+        initial={reduceMotion ? false : { opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+        aria-live="polite"
+        className="mt-8 space-y-5"
+      >
         <h2 className="text-xl font-bold tracking-tight">{current.title}</h2>
 
         {(current.fields as readonly string[]).includes("companyName") && (
@@ -543,12 +630,12 @@ export function ProjectIntake() {
                 </span>
               </label>
               {errors.consent && (
-                <p role="alert" className="mt-1 text-xs text-warn">{errors.consent}</p>
+                <p role="alert" className="mt-1 text-xs text-critical">{errors.consent}</p>
               )}
             </div>
           </>
         )}
-      </div>
+      </motion.div>
 
       {status === "error" && (
         <p role="alert" className="mt-6 rounded border border-warn/40 bg-warn/10 px-4 py-3 text-sm text-warn">
@@ -584,8 +671,8 @@ export function ProjectIntake() {
 
 function inputClass(hasError: boolean): string {
   return cn(
-    "w-full rounded-md border bg-surface2 px-3 py-2.5 text-sm focus:border-accent focus:outline-none",
-    hasError ? "border-warn" : "border-line",
+    "min-h-11 w-full rounded-md border bg-surface2 px-3 py-2.5 text-sm transition-colors duration-150 focus:border-accent focus:outline-none",
+    hasError ? "border-critical" : "border-line",
   );
 }
 
@@ -608,7 +695,7 @@ function Field({
       {hint && <p className="mt-1 text-xs text-faint">{hint}</p>}
       <div className="mt-1.5">{children}</div>
       {error && (
-        <p role="alert" className="mt-1 text-xs text-warn">
+        <p key={error} role="alert" className="field-shake mt-1 text-xs text-critical">
           {error}
         </p>
       )}
@@ -647,20 +734,11 @@ function SelectField({
             </option>
           ))}
         </select>
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 12 8"
-          fill="none"
-          className="pointer-events-none absolute right-3 top-1/2 h-2 w-3 -translate-y-1/2 text-faint"
-        >
-          <path
-            d="M1 1.5L6 6.5L11 1.5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <Icon
+          name="chevron-down"
+          size={12}
+          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-faint"
+        />
       </div>
     </Field>
   );

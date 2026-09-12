@@ -61,6 +61,7 @@ export const footerColumns: Array<{ heading: string; links: LinkItem[] }> = [
     heading: "Company",
     links: [
       { label: "About", href: "/about" },
+      { label: "Team", href: "/team" },
       { label: "Approach", href: "/approach" },
       { label: "Work", href: "/work" },
       { label: "Insights", href: "/insights" },

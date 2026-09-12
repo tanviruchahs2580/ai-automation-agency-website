@@ -1,7 +1,12 @@
-import Link from "next/link";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
-import { Reveal } from "@/components/ui/Reveal";
+import { CapabilityCard } from "@/components/ui/Card";
+import {
+  RevealStagger,
+  RevealStaggerItem,
+} from "@/components/ui/RevealStagger";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { OpportunityFinder } from "@/components/home/OpportunityFinder";
 import { solutions } from "@/data/solutions";
 import { buildMetadata } from "@/lib/seo";
 
@@ -26,26 +31,38 @@ export default function SolutionsPage() {
       />
 
       <section className="section-y">
-        <div className="container-x grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {solutions.map((solution, i) => (
-            <Reveal key={solution.slug} delay={i * 0.05}>
-              <Link
-                href={`/solutions/${solution.slug}`}
-                className="card-surface group flex h-full flex-col p-7 transition-colors hover:border-accent/40"
-              >
-                <span className="mono-label text-accent-strong">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h2 className="h-card mt-3">{solution.title}</h2>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
-                  {solution.summary}
-                </p>
-                <span className="mono-label mt-6 text-faint group-hover:text-accent-strong">
-                  Architecture · Workflow · Security →
-                </span>
-              </Link>
-            </Reveal>
-          ))}
+        <div className="container-x">
+          <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {solutions.map((solution, i) => (
+              <RevealStaggerItem key={solution.slug}>
+                <CapabilityCard
+                  eyebrow="Solution"
+                  index={String(i + 1).padStart(2, "0")}
+                  title={solution.title}
+                  description={solution.summary}
+                  meta="Architecture · Workflow · Security"
+                  href={`/solutions/${solution.slug}`}
+                />
+              </RevealStaggerItem>
+            ))}
+          </RevealStagger>
+        </div>
+      </section>
+
+      <section
+        className="section-y border-t border-line bg-surface/30"
+        aria-labelledby="finder-heading"
+      >
+        <div className="container-x">
+          <SectionHeader
+            eyebrow="AI opportunity finder"
+            title="What are you trying to improve?"
+            lead="Pick a goal and see the system we would engineer for it — architecture included, buzzwords excluded."
+            id="finder-heading"
+          />
+          <div className="mt-12">
+            <OpportunityFinder />
+          </div>
         </div>
       </section>
 

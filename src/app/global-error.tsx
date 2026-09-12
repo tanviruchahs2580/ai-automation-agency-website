@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 /**
  * Root-level crash boundary (errors escaping all segment boundaries).
  * Renders its own <html>/<body> because the root layout is not mounted;
@@ -12,6 +14,11 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // Contact is env-driven at build time; fallback matches src/data/site.ts
+  // until NEXT_PUBLIC_CONTACT_EMAIL is configured (launch checklist §1).
+  const contactEmail =
+    process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hello@vantiqsystems.example";
+  const [timestamp] = useState(() => new Date().toISOString());
   return (
     <html lang="en">
       <body
@@ -42,12 +49,27 @@ export default function GlobalError({
             Something went wrong on our side.
           </h1>
           <p style={{ color: "#a3a9b4", lineHeight: 1.65, margin: 0 }}>
+            <span style={{ fontFamily: "monospace", fontSize: 13, color: "#f87171" }}>
+              500 — server error.
+            </span>
+            <br />
             An unexpected error occurred while loading this page. Please try
             again — if it keeps happening, email{" "}
-            <a href="mailto:hello@vantiqsystems.example" style={{ color: "#2e6bf6" }}>
-              hello@vantiqsystems.example
+            <a href={`mailto:${contactEmail}`} style={{ color: "#2e6bf6" }}>
+              {contactEmail}
             </a>{" "}
             and we will follow up directly.
+          </p>
+          <p
+            style={{
+              marginTop: "1.2rem",
+              fontSize: 12,
+              color: "#7d8494",
+              fontFamily: "monospace",
+            }}
+          >
+            request_id: {error.digest ?? "n/a"}
+            {timestamp ? ` · time: ${timestamp}` : ""}
           </p>
           {error.digest ? (
             <p

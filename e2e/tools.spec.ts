@@ -3,7 +3,9 @@ import { expect, test } from "@playwright/test";
 test.describe("interactive tools", () => {
   test("ROI calculator computes estimated savings from inputs", async ({ page }) => {
     await page.goto("/roi-calculator");
-    await page.getByLabel("Employees doing this work").fill("50");
+    await page.getByLabel("Current headcount on manual ops").fill("50");
+    // Progressive disclosure: advanced inputs sit behind "Refine this estimate".
+    await page.getByRole("button", { name: /refine this estimate/i }).click();
     await page.getByLabel("Average annual salary").fill("60000");
     await page.getByLabel("Hours per task (manual)").fill("1");
     await page.getByLabel("Tasks per employee / week").fill("10");

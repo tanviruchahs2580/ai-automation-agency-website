@@ -2,9 +2,10 @@ import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { ReadinessAssessment } from "@/components/calculators/ReadinessAssessment";
 import { Reveal } from "@/components/ui/Reveal";
+import { JsonLd } from "@/components/ui/Accordion";
 import { readinessCategories } from "@/lib/readiness";
 import { readinessQuestions } from "@/data/readiness-questions";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, softwareJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
   title: "AI Readiness Assessment",
@@ -16,6 +17,14 @@ export const metadata = buildMetadata({
 export default function AiReadinessPage() {
   return (
     <>
+      <JsonLd
+        data={softwareJsonLd({
+          name: "VANTIQ AI Readiness Assessment",
+          description:
+            "Ten-question assessment scoring process, data, infrastructure, opportunity and governance readiness for AI.",
+          path: "/ai-readiness",
+        })}
+      />
       <PageHero
         eyebrow="AI readiness"
         title="Get your AI readiness score."

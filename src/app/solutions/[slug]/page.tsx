@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { Accordion, JsonLd } from "@/components/ui/Accordion";
+import { DetailLayout, IncludesCard } from "@/components/layout/DetailLayout";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
@@ -27,6 +28,14 @@ export async function generateMetadata({
     path: `/solutions/${solution.slug}`,
   });
 }
+
+const nav = [
+  { href: "#problem", label: "Problem" },
+  { href: "#architecture", label: "Architecture" },
+  { href: "#workflow", label: "Workflow" },
+  { href: "#details", label: "Details" },
+  { href: "#faq", label: "FAQ" },
+];
 
 export default async function SolutionPage({
   params,
@@ -56,130 +65,148 @@ export default async function SolutionPage({
         }
       />
 
-      {/* Problem */}
-      <section className="section-y" aria-labelledby="problem-heading">
-        <div className="container-x grid gap-10 lg:grid-cols-12">
-          <Reveal className="lg:col-span-5">
-            <p className="eyebrow mb-3">The problem</p>
-            <h2 id="problem-heading" className="h-section">{solution.problem}</h2>
-          </Reveal>
-          <div className="lg:col-span-7">
-            <p className="eyebrow mb-4">Business impact</p>
-            <ul className="space-y-3">
-              {solution.businessImpact.map((impact) => (
-                <li key={impact} className="flex gap-3 text-muted">
-                  <span aria-hidden="true" className="mt-1 text-ok">✓</span>
-                  <span className="leading-relaxed">{impact}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Approach + Architecture */}
-      <section className="section-y border-t border-line bg-surface/30" aria-labelledby="architecture-heading">
-        <div className="container-x">
-          <SectionHeader
-            eyebrow="How we build it"
-            title="Architecture before code."
-            id="architecture-heading"
-          />
-          <div className="mt-10 grid gap-10 lg:grid-cols-2">
+      <section className="section-y">
+        <DetailLayout
+          nav={nav}
+          sidebar={
+            <>
+              <IncludesCard
+                title="What this includes"
+                items={[
+                  `${solution.architecture.length}-layer reference architecture`,
+                  `${solution.workflow.length}-step delivery workflow`,
+                  `${solution.implementation.length}-phase implementation plan`,
+                  "Security controls + technology choices",
+                ]}
+                action={
+                  <div className="flex flex-col gap-2">
+                    <Button href="/roi-calculator" variant="quiet">
+                      Estimate ROI for this
+                    </Button>
+                    <Button href="/start-a-project" variant="link">
+                      Scope it with us
+                    </Button>
+                  </div>
+                }
+              />
+            </>
+          }
+        >
+          <div className="space-y-16">
             <Reveal>
-              <h3 className="mono-label uppercase text-faint">Engineering approach</h3>
-              <ol className="mt-4 space-y-3">
-                {solution.approach.map((item, i) => (
-                  <li key={item} className="flex gap-4">
-                    <span className="font-mono text-sm text-accent-strong">
+              <section id="problem" className="scroll-mt-28">
+                <p className="eyebrow mb-3">The problem</p>
+                <h2 className="h-section">{solution.problem}</h2>
+                <p className="eyebrow mb-4 mt-8">Business impact</p>
+                <ul className="space-y-3">
+                  {solution.businessImpact.map((impact) => (
+                    <li key={impact} className="flex gap-3 text-muted">
+                      <span aria-hidden="true" className="mt-1 text-ok">✓</span>
+                      <span className="leading-relaxed">{impact}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </Reveal>
+
+            <Reveal>
+              <section id="architecture" className="scroll-mt-28">
+                <p className="eyebrow mb-3">How we build it</p>
+                <h2 className="h-section">Architecture before code.</h2>
+                <h3 className="mono-label mt-8 uppercase text-faint">
+                  Engineering approach
+                </h3>
+                <ol className="mt-4 space-y-3">
+                  {solution.approach.map((item, i) => (
+                    <li key={item} className="flex gap-4">
+                      <span className="font-mono text-sm text-accent-bright">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="text-sm leading-relaxed text-muted">{item}</span>
+                    </li>
+                  ))}
+                </ol>
+                <h3 className="mono-label mt-8 uppercase text-faint">
+                  Reference architecture
+                </h3>
+                <ol className="mt-4 space-y-px overflow-hidden rounded-lg border border-line">
+                  {solution.architecture.map((layer, i) => (
+                    <li key={layer} className="flex items-center gap-3 bg-surface px-4 py-3">
+                      <span className="mono-label w-8 shrink-0 text-faint">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="text-sm">{layer}</span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            </Reveal>
+
+            <section id="workflow" className="scroll-mt-28">
+              <SectionHeader
+                eyebrow="Workflow"
+                title="How work flows through the system."
+              />
+              <ol className="mt-8 grid gap-px overflow-hidden rounded-lg border border-line bg-[color:var(--color-line)] md:grid-cols-2">
+                {solution.workflow.map((step, i) => (
+                  <li key={step.step} className="bg-canvas p-6">
+                    <p className="mono-label text-faint">
                       {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-sm leading-relaxed text-muted">{item}</span>
+                    </p>
+                    <p className="mono-label mt-2 text-accent-strong">{step.step}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">{step.detail}</p>
                   </li>
                 ))}
               </ol>
+            </section>
+
+            <Reveal>
+              <section id="details" className="scroll-mt-28">
+                <div className="grid gap-8 md:grid-cols-3">
+                  <div>
+                    <h3 className="mono-label uppercase text-faint">Technology</h3>
+                    <ul className="mt-4 space-y-2 font-mono text-sm text-muted">
+                      {solution.technologies.map((tech) => (
+                        <li key={tech}>{tech}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="mono-label uppercase text-faint">Security</h3>
+                    <ul className="mt-4 space-y-2 text-sm leading-relaxed text-muted">
+                      {solution.security.map((sec) => (
+                        <li key={sec} className="flex gap-2">
+                          <span aria-hidden="true" className="text-accent-strong">·</span>
+                          {sec}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="mono-label uppercase text-faint">Implementation</h3>
+                    <ol className="mt-4 space-y-2 text-sm leading-relaxed text-muted">
+                      {solution.implementation.map((phase, i) => (
+                        <li key={phase} className="flex gap-3">
+                          <span className="font-mono text-xs text-faint">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          {phase}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+              </section>
             </Reveal>
-            <Reveal delay={0.08}>
-              <h3 className="mono-label uppercase text-faint">Reference architecture</h3>
-              <ol className="mt-4 space-y-px overflow-hidden rounded-lg border border-line">
-                {solution.architecture.map((layer, i) => (
-                  <li key={layer} className="flex items-center gap-3 bg-surface px-4 py-3">
-                    <span className="mono-label w-8 shrink-0 text-faint">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-sm">{layer}</span>
-                  </li>
-                ))}
-              </ol>
-            </Reveal>
+
+            <section id="faq" className="scroll-mt-28">
+              <SectionHeader eyebrow="FAQ" title="Common questions, answered directly." />
+              <div className="mt-8">
+                <Accordion items={solution.faq} />
+              </div>
+            </section>
           </div>
-        </div>
-      </section>
-
-      {/* Workflow */}
-      <section className="section-y" aria-labelledby="workflow-heading">
-        <div className="container-x">
-          <SectionHeader eyebrow="Workflow" title="How work flows through the system." id="workflow-heading" />
-          <ol className="mt-10 grid gap-px overflow-hidden rounded-lg border border-line bg-[color:var(--color-line)] md:grid-cols-2 lg:grid-cols-3">
-            {solution.workflow.map((step, i) => (
-              <li key={step.step} className="bg-canvas p-6">
-                <p className="mono-label text-faint">
-                  {String(i + 1).padStart(2, "0")}
-                </p>
-                <p className="mono-label mt-2 text-accent-strong">{step.step}</p>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{step.detail}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* Tech + Security + Implementation */}
-      <section className="section-y border-t border-line bg-surface/30">
-        <div className="container-x grid gap-10 lg:grid-cols-3">
-          <Reveal>
-            <h3 className="mono-label uppercase text-faint">Technology</h3>
-            <ul className="mt-4 space-y-2 font-mono text-sm text-muted">
-              {solution.technologies.map((tech) => (
-                <li key={tech}>{tech}</li>
-              ))}
-            </ul>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <h3 className="mono-label uppercase text-faint">Security</h3>
-            <ul className="mt-4 space-y-2 text-sm leading-relaxed text-muted">
-              {solution.security.map((sec) => (
-                <li key={sec} className="flex gap-2">
-                  <span aria-hidden="true" className="text-accent-strong">·</span>
-                  {sec}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <h3 className="mono-label uppercase text-faint">Implementation phases</h3>
-            <ol className="mt-4 space-y-2 text-sm leading-relaxed text-muted">
-              {solution.implementation.map((phase, i) => (
-                <li key={phase} className="flex gap-3">
-                  <span className="font-mono text-xs text-faint">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  {phase}
-                </li>
-              ))}
-            </ol>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="section-y border-t border-line" aria-labelledby="faq-heading">
-        <div className="container-x max-w-3xl">
-          <SectionHeader eyebrow="FAQ" title="Common questions, answered directly." id="faq-heading" />
-          <div className="mt-8">
-            <Accordion items={solution.faq} />
-          </div>
-        </div>
+        </DetailLayout>
       </section>
 
       <CtaSection

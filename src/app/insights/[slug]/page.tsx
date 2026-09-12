@@ -5,6 +5,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { JsonLd } from "@/components/ui/Accordion";
 import { ReadingProgress } from "@/components/ui/ReadingProgress";
+import { QuoteRail } from "@/components/scenes/QuoteRail";
 import { getInsight, insights, readingTimeMinutes } from "@/data/insights";
 import { articleJsonLd, buildMetadata } from "@/lib/seo";
 
@@ -71,10 +72,16 @@ export default async function InsightPage({
         ]}
       />
 
-      <article className="container-x section-y max-w-3xl">
+      <article className="container-x section-y max-prose">
         <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line pb-8 text-sm text-muted">
           <span>
-            By <strong className="font-medium text-ink">{insight.author}</strong>
+            By{" "}
+            <Link
+              href="/team"
+              className="font-medium text-ink underline decoration-line-strong underline-offset-4 hover:text-accent-strong"
+            >
+              {insight.author}
+            </Link>
           </span>
           <span aria-hidden="true">·</span>
           <time dateTime={insight.publishedAt}>
@@ -105,14 +112,20 @@ export default async function InsightPage({
         <div className="mt-10 space-y-12">
           {insight.sections.map((section, i) => (
             <section key={section.heading} id={`s-${i + 1}`} className="scroll-mt-24">
-              <h2 className="text-xl font-bold tracking-tight md:text-2xl">
+              <h2 className="font-display text-xl font-bold tracking-tight md:text-2xl">
                 {section.heading}
               </h2>
-              <div className="prose-body mt-4 space-y-4 leading-relaxed text-muted">
+              <div className="prose-editorial mt-4 space-y-4 text-muted">
                 {section.paragraphs.map((paragraph, j) => (
                   <p key={j}>{paragraph}</p>
                 ))}
               </div>
+              {i === 1 && section.paragraphs[0] && (
+                <QuoteRail
+                  quote={section.paragraphs[0].split(". ")[0] + "."}
+                  attribution={`${insight.author} — ${insight.category}`}
+                />
+              )}
             </section>
           ))}
         </div>

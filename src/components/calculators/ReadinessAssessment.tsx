@@ -72,6 +72,13 @@ export function ReadinessAssessment() {
           <span className="pb-2 text-muted">/ 100</span>
         </div>
 
+        <ReadinessRadar
+          categories={result.categories.map((c) => ({
+            label: c.label,
+            score: c.score,
+          }))}
+        />
+
         <dl className="mt-8 space-y-4">
           {result.categories.map((category) => (
             <div key={category.key}>
@@ -138,8 +145,7 @@ export function ReadinessAssessment() {
       <div className="flex items-center justify-between">
         <p className="mono-label uppercase text-faint">
           Question {index + 1} / {total}
-        </p>
-        <div
+        </p>        <div
           role="progressbar"
           aria-valuenow={index}
           aria-valuemin={0}
@@ -189,5 +195,91 @@ export function ReadinessAssessment() {
         </button>
       )}
     </div>
+  );
+}
+
+/**
+ * ReadinessRadar — category scores as a radar chart, not just bars (§15).
+ * Static SVG (no motion to reduce), full text equivalent via role="img"
+ * label; the bar list below remains the precise representation.
+ */
+function ReadinessRadar({
+  categories,
+}: {
+  categories: Array<{ label: string; score: number }>;
+}) {
+  const size = 260;
+  const center = size / 2;
+  const radius = 92;
+  const n = categories.length;
+
+  const point = (i: number, fraction: number) => {
+    const angle = (-90 + (i * 360) / n) * (Math.PI / 180);
+    const r = Math.max(0, Math.min(1, fraction)) * radius;
+    return `${(center + r * Math.cos(angle)).toFixed(1)},${(center + r * Math.sin(angle)).toFixed(1)}`;
+  };
+
+  const ring = (fraction: number) =>
+    categories.map((_, i) => point(i, fraction)).join(" ");
+  const data = categories.map((c, i) => point(i, c.score / 100)).join(" ");
+  const summary = categories.map((c) => `${c.label} ${c.score}`).join(", ");
+
+  return (
+    <figure className="mt-8">
+      <svg
+        viewBox={`0 0 ${size} ${size}`}
+        className="mx-auto w-full max-w-72"
+        role="img"
+        aria-label={`Radar chart of category scores: ${summary}`}
+      >
+        {[0.25, 0.5, 0.75, 1].map((f) => (
+          <polygon
+            key={f}
+            points={ring(f)}
+            fill="none"
+            stroke="var(--color-line-strong)"
+            strokeWidth="1"
+          />
+        ))}
+        {categories.map((c, i) => (
+          <line
+            key={c.label}
+            x1={center}
+            y1={center}
+            x2={point(i, 1).split(",")[0]}
+            y2={point(i, 1).split(",")[1]}
+            stroke="var(--color-line)"
+            strokeWidth="1"
+          />
+        ))}
+        <polygon
+          points={data}
+          fill="var(--color-accent-glow)"
+          stroke="var(--color-accent)"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+        {categories.map((c, i) => {
+          const [x, y] = point(i, 1.32).split(",").map(Number);
+          return (
+            <text
+              key={c.label}
+              x={x}
+              y={y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="var(--color-muted)"
+              fontSize="10"
+              fontFamily="var(--font-mono)"
+            >
+              {c.label} {c.score}
+            </text>
+          );
+        })}
+      </svg>
+      <figcaption className="mono-label mt-2 text-center uppercase text-faint">
+        Category profile — bars below give exact scores
+      </figcaption>
+    </figure>
   );
 }

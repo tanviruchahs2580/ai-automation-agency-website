@@ -4,11 +4,18 @@ Production website for VANTIQ SYSTEMS, an AI Engineering & Automation company:
 solutions, services, industries, interactive AI readiness assessment, ROI
 calculator and project intake.
 
+Design language: **"Operator's Console"** — see `DESIGN-SYSTEM.md` (tokens,
+components, motion, budgets) and `BRAND-GUIDE.md` (positioning, voice, copy
+rules). Accessibility matrix: `src/lib/a11y-matrix.md`. Locale strategy:
+`src/lib/i18n.md`. Redesign launch delta: `LAUNCH-CHECKLIST-UPDATE.md`.
+
 ## Stack
 
 - Next.js (App Router) · TypeScript · React
 - Tailwind CSS design system · Framer Motion
 - Zod-validated server-side forms · Vitest unit tests
+- Self-hosted fonts (`public/fonts/`: Geist, Inter Tight, JetBrains Mono,
+  Source Serif 4 — latin-subset woff2, `font-display: swap`)
 
 ## Getting started
 
@@ -18,6 +25,14 @@ npm run dev      # development server
 npm run build    # production build
 npm test         # unit tests
 npm run lint     # eslint
+npm run typecheck # typescript
+npm run test:e2e  # browser E2E + axe (Playwright, chromium)
+```
+
+Brand-voice audit (must be clean before ship):
+
+```bash
+grep -rniE "leverage|synergize|supercharge|unlock|revolutionize|game-changing|cutting-edge|world-class|best-in-class|next-gen|seamless|empower" src/
 ```
 
 ## Environment
