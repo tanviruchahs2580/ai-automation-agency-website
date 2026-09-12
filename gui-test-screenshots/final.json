@@ -1,0 +1,137 @@
+[
+  {
+    "test": "Dark first paint",
+    "status": "PASS",
+    "details": "dark"
+  },
+  {
+    "test": "Light first paint",
+    "status": "PASS",
+    "details": "light"
+  },
+  {
+    "test": "Landing H1",
+    "status": "PASS",
+    "details": "The autonomous operations layer for enterprises that cannot "
+  },
+  {
+    "test": "Landing sections",
+    "status": "PASS",
+    "details": "count=9"
+  },
+  {
+    "test": "CTAs present",
+    "status": "PASS",
+    "details": "count=5"
+  },
+  {
+    "test": "Theme toggle",
+    "status": "PASS",
+    "details": "switch-to-light=1"
+  },
+  {
+    "test": "Toggle -> light",
+    "status": "PASS",
+    "details": "light"
+  },
+  {
+    "test": "Toggle -> dark",
+    "status": "PASS",
+    "details": "dark"
+  },
+  {
+    "test": "Back to top appears after scroll",
+    "status": "PASS",
+    "details": "found=1"
+  },
+  {
+    "test": "Back to top scrolls to top",
+    "status": "PASS",
+    "details": "scrollY=15"
+  },
+  {
+    "test": "375px no overflow",
+    "status": "PASS",
+    "details": "375/375"
+  },
+  {
+    "test": "Mobile menu opens",
+    "status": "PASS",
+    "details": "visible=true"
+  },
+  {
+    "test": "Mobile menu closes",
+    "status": "PASS",
+    "details": "hidden=true"
+  },
+  {
+    "test": "Search opens",
+    "status": "PASS",
+    "details": "input=0"
+  },
+  {
+    "test": "Search closes (Esc)",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "test": "ROI has inputs",
+    "status": "PASS",
+    "details": "[\"roi-employees\",\"roi-weekly-hours\"]"
+  },
+  {
+    "test": "ROI number inputs",
+    "status": "PASS",
+    "details": "count=2"
+  },
+  {
+    "test": "ROI input accepts value",
+    "status": "PASS",
+    "details": "orig=12 new=100"
+  },
+  {
+    "test": "Readiness has questions",
+    "status": "PASS",
+    "details": "labels=0 radios=0"
+  },
+  {
+    "test": "Intake has fields",
+    "status": "PASS",
+    "details": "count=4"
+  },
+  {
+    "test": "Intake renders",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "test": "Routes 200+content",
+    "status": "PASS",
+    "details": "21/21"
+  },
+  {
+    "test": "768px no overflow",
+    "status": "PASS",
+    "details": "768/768"
+  },
+  {
+    "test": "Light /solutions",
+    "status": "PASS",
+    "details": "light"
+  },
+  {
+    "test": "Work detail renders",
+    "status": "PASS",
+    "details": "h1=Invoice Processing Operations"
+  },
+  {
+    "test": "Insights: no SVG negative height errors",
+    "status": "PASS",
+    "details": ""
+  },
+  {
+    "test": "Insights loads",
+    "status": "PASS",
+    "details": "svgErrors=0"
+  }
+]

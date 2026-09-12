@@ -1,0 +1,202 @@
+[
+  {
+    "test": "Dark theme flash check",
+    "status": "PASS",
+    "details": "data-theme=dark"
+  },
+  {
+    "test": "Light theme flash check",
+    "status": "PASS",
+    "details": "data-theme=light"
+  },
+  {
+    "test": "Landing has sections",
+    "status": "PASS",
+    "details": "count=9"
+  },
+  {
+    "test": "Landing H1",
+    "status": "PASS",
+    "details": "The autonomous operations layer for enterprises that cannot "
+  },
+  {
+    "test": "CTA \"Start a project\" visible",
+    "status": "PASS",
+    "details": "count=5"
+  },
+  {
+    "test": "Theme toggle (switch to light)",
+    "status": "PASS",
+    "details": "found"
+  },
+  {
+    "test": "Toggle dark -> light",
+    "status": "PASS",
+    "details": "light"
+  },
+  {
+    "test": "Toggle light -> dark",
+    "status": "PASS",
+    "details": "dark"
+  },
+  {
+    "test": "Mobile 375px no overflow",
+    "status": "PASS",
+    "details": "375/375"
+  },
+  {
+    "test": "Mobile menu opens",
+    "status": "PASS",
+    "details": "visible=true"
+  },
+  {
+    "test": "Mobile menu has key links",
+    "status": "PASS",
+    "details": "solutions=1 services=1 work=1"
+  },
+  {
+    "test": "Mobile menu closes (Esc)",
+    "status": "PASS",
+    "details": "hidden=true"
+  },
+  {
+    "test": "/solutions",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/solutions/ai-agents",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/services",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/services/ai-strategy",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/industries",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/industries/healthcare",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/work",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/work/invoice-processing-operations",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/insights",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/insights/building-an-ai-powered-enterprise",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/about",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/team",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/security",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/technology",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/approach",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/roi-calculator",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/ai-readiness",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/start-a-project",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/privacy",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/terms",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "/cookie-policy",
+    "status": "PASS",
+    "details": "status=200 content=true h1=true"
+  },
+  {
+    "test": "Search modal",
+    "status": "FAIL",
+    "details": "button not found"
+  },
+  {
+    "test": "ROI Calculator has sliders",
+    "status": "PASS",
+    "details": "count=0"
+  },
+  {
+    "test": "ROI slider input",
+    "status": "SKIP",
+    "details": "no sliders found"
+  },
+  {
+    "test": "AI Readiness has questions",
+    "status": "PASS",
+    "details": "count=0"
+  },
+  {
+    "test": "Project Intake has form fields",
+    "status": "PASS",
+    "details": "count=4"
+  },
+  {
+    "test": "Project Intake renders",
+    "status": "PASS",
+    "details": "fields found"
+  },
+  {
+    "test": "Back to top",
+    "status": "SKIP",
+    "details": "button not found"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "test": "Dark theme loads",
+    "status": "PASS",
+    "details": "dark"
+  },
+  {
+    "test": "H1 present",
+    "status": "PASS",
+    "details": "length=77"
+  },
+  {
+    "test": "Sections count",
+    "status": "PASS",
+    "details": "count=9"
+  },
+  {
+    "test": "CTA buttons",
+    "status": "PASS",
+    "details": "count=5"
+  },
+  {
+    "test": "Toggle dark to light",
+    "status": "PASS",
+    "details": "light"
+  },
+  {
+    "test": "Light theme loads",
+    "status": "PASS",
+    "details": "light"
+  },
+  {
+    "test": "H1 matches light",
+    "status": "PASS",
+    "details": "same=true"
+  },
+  {
+    "test": "Mobile 375px",
+    "status": "PASS",
+    "details": "h1=true nav=true"
+  },
+  {
+    "test": "Mobile no overflow",
+    "status": "PASS",
+    "details": "375/375"
+  },
+  {
+    "test": "Mobile menu opens",
+    "status": "FAIL",
+    "details": "62 chars"
+  },
+  {
+    "test": "Mobile menu closes",
+    "status": "PASS",
+    "details": "Esc pressed"
+  }
+]

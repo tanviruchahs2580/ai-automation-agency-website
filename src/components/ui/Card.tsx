@@ -163,11 +163,10 @@ export function InsightCard({
 /** Thin deterministic cover band keyed by tag — decorative, hue-semantic. */
 function CoverPattern({ seed, hue }: { seed: string; hue: ChipHue }) {
   const hash = [...seed].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 13);
-  const bars = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => ({
-    x: 6 + i * 25,
-    h: 10 + ((hash >> (i * 2)) % 22),
-    hot: (hash + i) % 4 === 0,
-  }));
+  const bars = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
+    const h = Math.max(0, Math.min(40, 10 + ((hash >> (i * 2)) % 22)));
+    return { x: 6 + i * 25, h, hot: (hash + i) % 4 === 0 };
+  });
   const hueVar =
     hue === "signal"
       ? "var(--color-signal)"

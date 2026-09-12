@@ -1,0 +1,5 @@
+gui-test-screenshots/firstpaint-dark.png
+gui-test-screenshots/firstpaint-light.png
+gui-test-screenshots/landing-dark-1440.png
+gui-test-screenshots/mobile-375-dark.png
+gui-test-screenshots/roi-calculator.png
