@@ -308,16 +308,54 @@
   margin-top: 1.25em;
 }
 
-/* ---------- Surfaces ---------- */
+/* ---------- Surfaces (Card v2 — "glass instrument") ---------- */
 
 .card-surface {
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
+  position: relative;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.035),
+      rgba(255, 255, 255, 0) 22%
+    ),
+    var(--color-surface);
+  border: 1px solid transparent;
+  background-clip: padding-box;
   border-radius: 1rem;
   transition:
     border-color var(--duration-fast) var(--ease-out-soft),
     transform var(--duration-fast) var(--ease-out-soft),
     box-shadow var(--duration-fast) var(--ease-out-soft);
+}
+
+/* Gradient hairline: top-lit edge, line-strong → transparent */
+.card-surface::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-line-strong),
+    transparent 38%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+[data-theme="light"] .card-surface {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.7),
+      rgba(255, 255, 255, 0) 24%
+    ),
+    var(--color-surface);
 }
 
 .card-surface:hover {
@@ -355,7 +393,284 @@ a.card-surface:hover,
   );
 }
 
-/* ---------- Status pulse (signal-green = live ONLY) ---------- */
+/* ---------- Design System v3: atmosphere ---------- */
+
+/* Aurora field — felt, not noticed (≤8% perceptual). Ambient only. */
+.aurora-bleed {
+  background:
+    radial-gradient(
+      42rem 22rem at 12% -6%,
+      rgba(46, 107, 246, 0.1),
+      transparent 62%
+    ),
+    radial-gradient(
+      34rem 20rem at 88% 8%,
+      rgba(0, 229, 168, 0.055),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 26rem at 55% 110%,
+      rgba(46, 107, 246, 0.07),
+      transparent 65%
+    );
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+}
+
+[data-theme="light"] .aurora-bleed {
+  background:
+    radial-gradient(
+      42rem 22rem at 12% -6%,
+      rgba(37, 99, 235, 0.08),
+      transparent 62%
+    ),
+    radial-gradient(
+      34rem 20rem at 88% 8%,
+      rgba(4, 120, 87, 0.06),
+      transparent 60%
+    );
+}
+
+/* Film grain — 2–3% SVG noise, kills the "flat digital" feel. */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+[data-theme="light"] .grain::after {
+  opacity: 0.022;
+}
+
+/* Spotlight hover — radial glow follows --mx/--my (set by <Spotlight />). */
+.spotlight {
+  position: relative;
+}
+
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out-soft);
+  background: radial-gradient(
+    15rem circle at var(--mx, 50%) var(--my, 50%),
+    rgba(82, 133, 255, 0.14),
+    transparent 68%
+  );
+}
+
+.spotlight:hover::after {
+  opacity: 1;
+}
+
+/* Gradient text — accent → signal; darker stops in light theme. */
+.text-gradient {
+  background: linear-gradient(
+    100deg,
+    var(--color-accent-strong) 10%,
+    var(--color-signal) 90%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+[data-theme="light"] .text-gradient {
+  background: linear-gradient(100deg, #1d4ed8 10%, #047857 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Icon chips — 40–44px, per-domain hue tint. Hues stay semantic. */
+.chip {
+  --chip-hue: var(--color-accent);
+  --chip-bg: rgba(46, 107, 246, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--chip-hue) 38%, transparent);
+  background: var(--chip-bg);
+  color: var(--chip-hue);
+  flex-shrink: 0;
+}
+
+.chip[data-hue="signal"] {
+  --chip-hue: var(--color-signal);
+  --chip-bg: rgba(0, 229, 168, 0.09);
+}
+
+.chip[data-hue="brass"] {
+  --chip-hue: var(--color-brass);
+  --chip-bg: rgba(183, 163, 106, 0.12);
+}
+
+.chip[data-hue="sky"] {
+  --chip-hue: var(--color-info);
+  --chip-bg: rgba(125, 211, 252, 0.1);
+}
+
+.chip[data-hue="amber"] {
+  --chip-hue: var(--color-warn);
+  --chip-bg: rgba(245, 183, 61, 0.1);
+}
+
+[data-theme="light"] .chip {
+  --chip-bg: rgba(37, 99, 235, 0.08);
+}
+
+[data-theme="light"] .chip[data-hue="signal"] {
+  --chip-bg: rgba(4, 120, 87, 0.08);
+}
+
+[data-theme="light"] .chip[data-hue="brass"] {
+  --chip-bg: rgba(122, 98, 48, 0.1);
+}
+
+[data-theme="light"] .chip[data-hue="sky"] {
+  --chip-bg: rgba(3, 105, 161, 0.08);
+}
+
+[data-theme="light"] .chip[data-hue="amber"] {
+  --chip-bg: rgba(146, 64, 14, 0.08);
+}
+
+/* Marquee — edge-masked loop; pauses on hover; global reduced-motion gate applies. */
+@keyframes marquee-x {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x 36s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Diagram live-path dash — pauses under reduced motion via explicit gate. */
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+.diagram-live-path {
+  stroke-dasharray: 7 7;
+  animation: dash-flow 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram-live-path,
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* Count-up numerals */
+.count-up {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hero display — larger scale reserved for the landing hero only. */
+.text-hero {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.0;
+  font-size: clamp(3rem, 7vw + 0.5rem, 6rem);
+  text-wrap: balance;
+}
+
+/* Interactive service rows (home) — expand on hover/focus, spring timing. */
+.service-row-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-slow) var(--ease-spring);
+}
+
+.group:hover .service-row-grid,
+.group:focus-within .service-row-grid {
+  grid-template-rows: 1fr;
+}
+
+.service-row-inner {
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out-soft);
+}
+
+.group:hover .service-row-inner,
+.group:focus-within .service-row-inner {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-row-grid {
+    grid-template-rows: 1fr;
+  }
+  .service-row-inner {
+    opacity: 1;
+  }
+}
+
+/* ROI gauge bands */
+.gauge-track {
+  position: relative;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-surface2);
+  border: 1px solid var(--color-line);
+  overflow: hidden;
+}
+
+.gauge-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--color-accent-strong),
+    var(--color-signal)
+  );
+}
 
 @keyframes pulse-dot {
   0%,

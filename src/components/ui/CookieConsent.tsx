@@ -30,33 +30,36 @@ export function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 z-[90] w-full border-t border-line bg-canvas/95 p-4 shadow-lg backdrop-blur-md sm:p-6">
-      <div className="container-x flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="max-w-2xl text-sm leading-relaxed text-muted">
-          We use essential cookies for site functionality. Optional analytics
-          cookies help us improve. You can change your preference at any time.
-          See our{" "}
-          <a href="/cookie-policy" className="underline underline-offset-2 hover:text-ink">
-            cookie policy
-          </a>{" "}
-          for details.
-        </p>
-        <div className="flex shrink-0 gap-3">
-          <button
-            type="button"
-            onClick={decline}
-            className="rounded-md border border-line-strong px-4 py-2 text-sm text-muted transition-colors hover:border-accent hover:text-ink"
-          >
-            Decline
-          </button>
-          <button
-            type="button"
-            onClick={accept}
-            className="rounded-md bg-accent px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
-          >
-            Accept
-          </button>
-        </div>
+    <div
+      role="dialog"
+      aria-label="Cookie consent"
+      className="fixed bottom-4 right-4 z-[90] w-[calc(100%-2rem)] max-w-sm rounded-xl border border-line bg-surface/95 p-5 shadow-2xl backdrop-blur-md sm:bottom-6 sm:right-6"
+    >
+      <p className="mono-label uppercase text-faint">Cookies</p>
+      <p className="mt-2 text-[13px] leading-relaxed text-muted">
+        We use essential cookies for site functionality. Optional analytics
+        cookies help us improve. You can change your preference at any time.
+        See our{" "}
+        <a href="/cookie-policy" className="underline underline-offset-2 hover:text-ink">
+          cookie policy
+        </a>{" "}
+        for details.
+      </p>
+      <div className="mt-4 flex gap-2">
+        <button
+          type="button"
+          onClick={decline}
+          className="btn-quiet btn min-h-10 flex-1 px-3 py-1.5 text-[13px]"
+        >
+          Decline
+        </button>
+        <button
+          type="button"
+          onClick={accept}
+          className="btn-primary btn min-h-10 flex-1 px-3 py-1.5 text-[13px]"
+        >
+          Accept
+        </button>
       </div>
     </div>
   );

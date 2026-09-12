@@ -38,7 +38,10 @@ type IconName =
   | "truck"
   | "code"
   | "eye"
-  | "stamp";
+  | "stamp"
+  | "compass"
+  | "terminal"
+  | "pulse";
 
 const paths: Record<IconName, ReactNode> = {
   "arrow-right": <path d="M3 12h17M14 6l6 6-6 6" />,
@@ -158,6 +161,23 @@ const paths: Record<IconName, ReactNode> = {
     <>
       <path d="M9 10.5c-1.5-.8-2.5-2-2.5-3.7 0-1.9 1.3-3.3 3-3.3h5c1.7 0 3 1.4 3 3.3 0 1.7-1 2.9-2.5 3.7l-.7 3h-4.6l-.7-3Z" />
       <path d="M5 16.5h14v4H5v-4Z" />
+    </>
+  ),
+  compass: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" />
+    </>
+  ),
+  terminal: (
+    <>
+      <rect x="3" y="4.5" width="18" height="15" rx="2" />
+      <path d="m7 9.5 3 3-3 3M12.5 15.5H17" />
+    </>
+  ),
+  pulse: (
+    <>
+      <path d="M3 12h4l2.5-6 4 12L16 12h5" />
     </>
   ),
 };

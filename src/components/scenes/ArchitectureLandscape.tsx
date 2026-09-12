@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence, useReducedMotion, useScroll, useMotionValueEvent } from "framer-motion";
 import { StatusDot } from "@/components/ui/Tag";
 import { cn } from "@/lib/utils";
 
@@ -53,10 +53,40 @@ const layers = [
 
 export function ArchitectureLandscape() {
   const [active, setActive] = useState<string>("agents");
+  const manualRef = useRef(false);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: rootRef,
+    offset: ["start 0.75", "end 0.35"],
+  });
+
+  // Scroll-linked story: layers highlight in sequence while the scene
+  // travels through the viewport. Any hover/focus/tap takes over for 4s
+  // (flag + timer live in refs so the render stays pure).
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    if (reduceMotion || manualRef.current) return;
+    const i = Math.min(layers.length - 1, Math.floor(v * layers.length));
+    const next = layers[i]?.id;
+    if (next) setActive((prev) => (prev === next ? prev : next));
+  });
+
+  useEffect(() => () => clearTimeout(resumeTimer.current), []);
+
+  const takeOver = (id: string) => {
+    manualRef.current = true;
+    clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(() => {
+      manualRef.current = false;
+    }, 4000);
+    setActive(id);
+  };
+
   const current = layers.find((l) => l.id === active) ?? layers[2];
 
   return (
-    <div className="card-surface grid gap-0 overflow-hidden p-0 lg:grid-cols-12">
+    <div ref={rootRef} className="card-surface grain grid gap-0 overflow-hidden p-0 lg:grid-cols-12">
       <div
         className="border-b border-line p-4 sm:p-5 lg:col-span-5 lg:border-b-0 lg:border-r"
         role="group"
@@ -71,9 +101,9 @@ export function ArchitectureLandscape() {
                 <button
                   type="button"
                   aria-pressed={isActive}
-                  onMouseEnter={() => setActive(layer.id)}
-                  onFocus={() => setActive(layer.id)}
-                  onClick={() => setActive(layer.id)}
+                  onMouseEnter={() => takeOver(layer.id)}
+                  onFocus={() => takeOver(layer.id)}
+                  onClick={() => takeOver(layer.id)}
                   className={cn(
                     "flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all duration-150",
                     isActive

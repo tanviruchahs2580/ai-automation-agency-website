@@ -2,6 +2,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { Reveal } from "@/components/ui/Reveal";
 import { InsightCard } from "@/components/ui/Card";
+import { Spotlight } from "@/components/ui/Spotlight";
 import {
   RevealStagger,
   RevealStaggerItem,
@@ -46,14 +47,22 @@ export default function InsightsPage() {
           <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {insights.map((insight) => (
               <RevealStaggerItem key={insight.slug}>
-                <InsightCard
-                  eyebrow={insight.category}
-                  title={insight.title}
-                  dek={insight.excerpt}
-                  byline={insight.author}
-                  readTime={`${formatDate(insight.publishedAt, "en-US", { year: "numeric", month: "short", day: "numeric" })} · ${readingTimeMinutes(insight)} min read`}
-                  href={`/insights/${insight.slug}`}
-                />
+                <Spotlight className="h-full">
+                  <InsightCard
+                    eyebrow={insight.category}
+                    title={insight.title}
+                    dek={insight.excerpt}
+                    byline={insight.author}
+                    readTime={`${formatDate(insight.publishedAt, "en-US", { year: "numeric", month: "short", day: "numeric" })} · ${readingTimeMinutes(insight)} min read`}
+                    href={`/insights/${insight.slug}`}
+                    patternSeed={insight.category}
+                    patternHue={
+                      (["brass", "signal", "sky", "amber", "accent"] as const)[
+                        [...insight.category].reduce((a, c) => a + c.charCodeAt(0), 0) % 5
+                      ]
+                    }
+                  />
+                </Spotlight>
               </RevealStaggerItem>
             ))}
           </RevealStagger>

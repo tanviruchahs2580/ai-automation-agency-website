@@ -1,6 +1,8 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { CapabilityCard } from "@/components/ui/Card";
+import { Spotlight } from "@/components/ui/Spotlight";
+import { chipFor } from "@/components/ui/Chip";
 import {
   RevealStagger,
   RevealStaggerItem,
@@ -31,18 +33,25 @@ export default function ServicesPage() {
       <section className="section-y">
         <div className="container-x">
           <RevealStagger className="grid gap-5 md:grid-cols-2">
-            {services.map((service, i) => (
-              <RevealStaggerItem key={service.slug}>
-                <CapabilityCard
-                  eyebrow="Service"
-                  index={String(i + 1).padStart(2, "0")}
-                  title={service.title}
-                  description={service.summary}
-                  meta={service.capabilities.slice(0, 3).join(" · ")}
-                  href={`/services/${service.slug}`}
-                />
-              </RevealStaggerItem>
-            ))}
+            {services.map((service, i) => {
+              const { icon, hue } = chipFor(service.slug, i);
+              return (
+                <RevealStaggerItem key={service.slug}>
+                  <Spotlight className="h-full">
+                    <CapabilityCard
+                      eyebrow="Service"
+                      index={String(i + 1).padStart(2, "0")}
+                      icon={icon}
+                      hue={hue}
+                      title={service.title}
+                      description={service.summary}
+                      meta={service.capabilities.slice(0, 3).join(" · ")}
+                      href={`/services/${service.slug}`}
+                    />
+                  </Spotlight>
+                </RevealStaggerItem>
+              );
+            })}
           </RevealStagger>
         </div>
       </section>

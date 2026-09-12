@@ -1,6 +1,8 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { CapabilityCard } from "@/components/ui/Card";
+import { Spotlight } from "@/components/ui/Spotlight";
+import { chipFor } from "@/components/ui/Chip";
 import {
   RevealStagger,
   RevealStaggerItem,
@@ -33,18 +35,25 @@ export default function SolutionsPage() {
       <section className="section-y">
         <div className="container-x">
           <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {solutions.map((solution, i) => (
-              <RevealStaggerItem key={solution.slug}>
-                <CapabilityCard
-                  eyebrow="Solution"
-                  index={String(i + 1).padStart(2, "0")}
-                  title={solution.title}
-                  description={solution.summary}
-                  meta="Architecture · Workflow · Security"
-                  href={`/solutions/${solution.slug}`}
-                />
-              </RevealStaggerItem>
-            ))}
+            {solutions.map((solution, i) => {
+              const { icon, hue } = chipFor(solution.slug, i);
+              return (
+                <RevealStaggerItem key={solution.slug}>
+                  <Spotlight className="h-full">
+                    <CapabilityCard
+                      eyebrow="Solution"
+                      index={String(i + 1).padStart(2, "0")}
+                      icon={icon}
+                      hue={hue}
+                      title={solution.title}
+                      description={solution.summary}
+                      meta="Architecture · Workflow · Security"
+                      href={`/solutions/${solution.slug}`}
+                    />
+                  </Spotlight>
+                </RevealStaggerItem>
+              );
+            })}
           </RevealStagger>
         </div>
       </section>

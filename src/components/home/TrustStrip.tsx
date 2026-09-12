@@ -2,6 +2,8 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 /**
  * Capability-based trust — no invented client counts, deployments or ROI.
+ * Edge-masked marquee (duplicated loop, screen-reader-safe); pauses on
+ * hover; static under reduced motion via the global + marquee gates.
  */
 
 const capabilities = [
@@ -21,15 +23,31 @@ export function TrustStrip() {
           eyebrow="What we are accountable for"
           title="Engineering capability you can verify in delivery"
           id="capabilities-heading"
+          index="01"
         />
-        <ul className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-[color:var(--color-line)] md:grid-cols-3 lg:grid-cols-6">
-          {capabilities.map((c) => (
-            <li key={c.name} className="bg-canvas p-5">
-              <p className="font-semibold leading-tight">{c.name}</p>
-              <p className="mono-label mt-2 leading-relaxed text-muted">{c.detail}</p>
-            </li>
+      </div>
+      <div className="marquee border-t border-line pb-10 pt-8">
+        <div className="marquee-track gap-4 pr-4">
+          {[0, 1].map((copy) => (
+            <ul
+              key={copy}
+              aria-hidden={copy === 1}
+              className="flex shrink-0 gap-4"
+            >
+              {capabilities.map((c) => (
+                <li
+                  key={c.name}
+                  className="card-surface flex w-64 shrink-0 flex-col p-5"
+                >
+                  <p className="font-semibold leading-tight">{c.name}</p>
+                  <p className="mono-label mt-2 leading-relaxed text-muted">
+                    {c.detail}
+                  </p>
+                </li>
+              ))}
+            </ul>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );

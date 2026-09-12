@@ -100,9 +100,12 @@ export default function AboutPage() {
             id="expertise-heading"
           />
           <ul className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-[color:var(--color-line)] md:grid-cols-4">
-            {disciplines.map((discipline) => (
-              <li key={discipline} className="bg-canvas p-5 text-sm font-medium leading-snug">
-                {discipline}
+            {disciplines.map((discipline, i) => (
+              <li key={discipline} className="bg-canvas p-5">
+                <p className="mono-label tabular text-accent-bright" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <p className="mt-2 text-sm font-medium leading-snug">{discipline}</p>
               </li>
             ))}
           </ul>

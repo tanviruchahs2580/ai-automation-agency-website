@@ -1,6 +1,8 @@
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { CapabilityCard } from "@/components/ui/Card";
+import { Spotlight } from "@/components/ui/Spotlight";
+import { chipFor } from "@/components/ui/Chip";
 import {
   RevealStagger,
   RevealStaggerItem,
@@ -31,18 +33,25 @@ export default function IndustriesPage() {
       <section className="section-y">
         <div className="container-x">
           <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {industries.map((industry, i) => (
-              <RevealStaggerItem key={industry.slug}>
-                <CapabilityCard
-                  eyebrow="Industry"
-                  index={String(i + 1).padStart(2, "0")}
-                  title={industry.title}
-                  description={industry.summary}
-                  meta={`${industry.useCases.length + industry.opportunities.length} use cases documented`}
-                  href={`/industries/${industry.slug}`}
-                />
-              </RevealStaggerItem>
-            ))}
+            {industries.map((industry, i) => {
+              const { icon, hue } = chipFor(industry.slug, i);
+              return (
+                <RevealStaggerItem key={industry.slug}>
+                  <Spotlight className="h-full">
+                    <CapabilityCard
+                      eyebrow="Industry"
+                      index={String(i + 1).padStart(2, "0")}
+                      icon={icon}
+                      hue={hue}
+                      title={industry.title}
+                      description={industry.summary}
+                      meta={`${industry.useCases.length + industry.opportunities.length} use cases documented`}
+                      href={`/industries/${industry.slug}`}
+                    />
+                  </Spotlight>
+                </RevealStaggerItem>
+              );
+            })}
           </RevealStagger>
         </div>
       </section>
