@@ -116,13 +116,24 @@
   --duration-base: 260ms;
   --duration-slow: 420ms;
 
-  /* Layout */
+  /* Layout — base gutter for <768px viewports (see override below) */
   --gutter: 1.5rem;
   --max-prose: 42rem;
 }
 
+/* Responsive gutter.
+ *
+ * IMPORTANT: `@media { @theme { ... } }` is NOT reliable in Tailwind v4 — the
+ * theme block is hoisted at build time and the media wrapper is dropped, which
+ * silently pinned --gutter to 3rem on every viewport (48px side padding at
+ * 320–767px, costing ~48px of readable width on phones).
+ *
+ * This is therefore a plain custom-property declaration. It is unlayered, so it
+ * wins over the `@layer theme` output of `@theme` while the media query is
+ * active, and falls back to the 1.5rem token below 768px.
+ */
 @media (min-width: 768px) {
-  @theme {
+  :root {
     --gutter: 3rem;
   }
 }

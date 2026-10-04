@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { siteNav, navDropdowns } from "@/data/site";
+import { siteNav, type NavItem } from "@/data/site";
 import { track, AnalyticsEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { SearchModal } from "@/components/ui/SearchModal";
@@ -71,7 +71,7 @@ function Dropdown({ label, href, isActive, children }: {
         aria-haspopup="menu"
         aria-expanded={open}
           className={cn(
-            "relative flex items-center gap-1 rounded px-3 py-2 text-sm transition-colors duration-150",
+            "relative flex items-center gap-1 whitespace-nowrap rounded px-2 py-2 text-sm transition-colors duration-150 xl:px-3",
             isActive ? "text-accent-strong" : "text-muted hover:text-ink",
           )}
         >
@@ -165,9 +165,6 @@ export function Navbar() {
     [pathname],
   );
 
-  const dropdownLabels = navDropdowns.map((d) => d.label);
-  const simpleItems = siteNav.filter((item) => !dropdownLabels.includes(item.label));
-
   return (
     <>
     <header
@@ -187,48 +184,49 @@ export function Navbar() {
       >
         <Wordmark compact={scrolled} />
 
-        <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
-          {navDropdowns.map((dropdown) => (
-            <Dropdown
-              key={dropdown.href}
-              label={dropdown.label}
-              href={dropdown.href}
-              isActive={isActive(dropdown.href)}
-            >
-              {dropdown.children.map((child) => (
-                <Link
-                  key={child.href}
-                  href={child.href}
-                  className="block rounded px-3 py-2 text-sm text-muted transition-colors hover:text-ink"
-                  role="menuitem"
-                >
-                  {child.label}
-                </Link>
-              ))}
-            </Dropdown>
-          ))}
-          {simpleItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive(item.href) ? "page" : undefined}
-              className={cn(
-                "relative rounded px-3 py-2 text-sm transition-colors duration-150",
-                isActive(item.href) ? "text-accent-strong" : "text-muted hover:text-ink",
-              )}
-            >
-              {item.label}
-              {isActive(item.href) && (
-                <span
-                  className="absolute inset-x-3 bottom-0.5 h-0.5 rounded bg-accent"
-                  aria-hidden="true"
-                />
-              )}
-            </Link>
-          ))}
+        <nav aria-label="Primary" className="hidden items-center lg:flex lg:gap-0 xl:gap-1">
+          {siteNav.map((item) =>
+            item.children ? (
+              <Dropdown
+                key={item.href}
+                label={item.label}
+                href={item.href}
+                isActive={isActive(item.href)}
+              >
+                {item.children.map((child) => (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    className="block rounded px-3 py-2 text-sm text-muted transition-colors hover:text-ink"
+                    role="menuitem"
+                  >
+                    {child.label}
+                  </Link>
+                ))}
+              </Dropdown>
+            ) : (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive(item.href) ? "page" : undefined}
+                className={cn(
+                  "relative whitespace-nowrap rounded px-2 py-2 text-sm transition-colors duration-150 xl:px-3",
+                  isActive(item.href) ? "text-accent-strong" : "text-muted hover:text-ink",
+                )}
+              >
+                {item.label}
+                {isActive(item.href) && (
+                  <span
+                    className="absolute inset-x-3 bottom-0.5 h-0.5 rounded bg-accent"
+                    aria-hidden="true"
+                  />
+                )}
+              </Link>
+            ),
+          )}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-2 lg:flex xl:gap-3">
           <button
             type="button"
             onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}
@@ -240,17 +238,17 @@ export function Navbar() {
             <kbd className="hidden rounded border border-line px-1 py-0.5 font-mono text-[10px] text-faint xl:inline">⌘K</kbd>
           </button>
           <ThemeToggle />
-          <Link
-            href="/ai-readiness"
-            onClick={() => track(AnalyticsEvent.CtaClick, { location: "nav-assess" })}
-            className="rounded-md border border-line-strong px-4 py-2 text-sm text-muted transition-colors hover:border-accent hover:text-accent-strong"
-          >
-            Assess My AI Opportunity
-          </Link>
+          {/*
+            "Assess My AI Opportunity" is deliberately desktop-header-only
+            below xl. Eight primary links + two CTAs measured 195px of
+            horizontal overflow at 1024px, so the tertiary path stays in the
+            mobile menu, hero, ROI teaser and final CTA — and the desktop
+            header keeps a single primary CTA.
+          */}
           <Link
             href="/start-a-project"
             onClick={() => track(AnalyticsEvent.CtaClick, { location: "nav-start" })}
-            className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+            className="whitespace-nowrap rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
           >
             Start a Project
           </Link>
@@ -277,29 +275,53 @@ export function Navbar() {
         hidden={!open}
         className="mobile-menu-spring border-t border-line bg-canvas/95 backdrop-blur-md lg:hidden"
       >
+        {/*
+          Mobile utility row. Both controls live in the desktop-only header
+          cluster (`hidden lg:flex`), which left search and the theme toggle
+          completely unreachable below 1024px — and ⌘K does not exist on a
+          touch keyboard. Rendering them here restores feature parity without
+          crowding the mobile header.
+        */}
+        <div className="container-x flex items-center gap-2 border-b border-line py-3">
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              document.dispatchEvent(
+                new KeyboardEvent("keydown", { key: "k", ctrlKey: true }),
+              );
+            }}
+            className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md border border-line-strong px-4 text-sm text-muted transition-colors duration-150 hover:border-accent hover:text-accent-strong"
+          >
+            <Icon name="search" size={14} />
+            Search
+          </button>
+          <ThemeToggle />
+        </div>
         <nav aria-label="Mobile" className="container-x flex flex-col py-4">
-          {navDropdowns.map((dropdown, di) => (
-            <MobileDropdownSection
-              key={dropdown.href}
-              dropdown={dropdown}
-              isActive={isActive}
-              onNavigate={() => setOpen(false)}
-              firstRef={di === 0 ? firstMobileLinkRef : undefined}
-            />
-          ))}
-          {simpleItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className={cn(
-                "rounded px-3 py-3 text-base",
-                isActive(item.href) ? "text-accent-strong" : "text-muted",
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {siteNav.map((item, i) =>
+            item.children ? (
+              <MobileDropdownSection
+                key={item.href}
+                dropdown={item}
+                isActive={isActive}
+                onNavigate={() => setOpen(false)}
+                firstRef={i === 0 ? firstMobileLinkRef : undefined}
+              />
+            ) : (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  "rounded px-3 py-3 text-base",
+                  isActive(item.href) ? "text-accent-strong" : "text-muted",
+                )}
+              >
+                {item.label}
+              </Link>
+            ),
+          )}
           <div className="mt-4 flex flex-col gap-3">
             <Link
               href="/ai-readiness"
@@ -336,7 +358,7 @@ function MobileDropdownSection({
   onNavigate,
   firstRef,
 }: {
-  dropdown: (typeof navDropdowns)[number];
+  dropdown: NavItem;
   isActive: (href: string) => boolean;
   onNavigate: () => void;
   firstRef?: React.RefObject<HTMLAnchorElement | null>;
@@ -360,7 +382,7 @@ function MobileDropdownSection({
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="mr-2 rounded p-2 text-muted"
+          className="mr-2 flex min-h-11 min-w-11 items-center justify-center rounded p-2 text-muted transition-colors hover:text-accent-strong"
           aria-expanded={expanded}
           aria-label={`Show ${dropdown.label} options`}
         >
@@ -373,7 +395,7 @@ function MobileDropdownSection({
       </div>
       {expanded && (
         <div className="ml-4 border-l border-line pl-3">
-          {dropdown.children.map((child) => (
+          {(dropdown.children ?? []).map((child) => (
             <Link
               key={child.href}
               href={child.href}

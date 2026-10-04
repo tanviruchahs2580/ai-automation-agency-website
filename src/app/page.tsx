@@ -5,6 +5,7 @@ import { ServiceRows } from "@/components/home/ServiceRows";
 import { MetricsPulse } from "@/components/scenes/MetricsPulse";
 import { IndustriesGrid } from "@/components/home/IndustriesGrid";
 import { CaseStudiesPreview } from "@/components/home/CaseStudiesPreview";
+import { TrustGovernance } from "@/components/home/TrustGovernance";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
@@ -92,7 +93,10 @@ export default function HomePage() {
       {/* 07 · CASE STUDIES */}
       <CaseStudiesPreview />
 
-      {/* 08 · ROI TEASER — gauge bands + live-pulsed estimate ranges */}
+      {/* 08 · TRUST & GOVERNANCE — enterprise trust layer (IA §8/§9) */}
+      <TrustGovernance />
+
+      {/* 09 · ROI TEASER — gauge bands + live-pulsed estimate ranges */}
       <section
         className="section-y border-t border-line bg-surface/30"
         aria-labelledby="roi-heading"
@@ -104,7 +108,7 @@ export default function HomePage() {
               title="Estimate what manual work really costs you."
               lead="Built on your numbers — not our marketing. Every output is labelled an estimate because it is one."
               id="roi-heading"
-              index="07"
+              index="08"
             />
             <dl className="mt-8 grid gap-4 sm:grid-cols-3">
               {roiTeaserMetrics.map((metric) => (
@@ -153,7 +157,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 09 · FINAL CTA */}
+      {/* 10 · FINAL CTA */}
       <CtaSection
         primaryCtaId="home-final-primary-a"
         secondaryCtaId="home-final-secondary-a"

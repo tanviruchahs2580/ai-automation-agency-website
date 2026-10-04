@@ -105,7 +105,7 @@ export function ArchitectureLandscape() {
                   onFocus={() => takeOver(layer.id)}
                   onClick={() => takeOver(layer.id)}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all duration-150",
+                    "flex min-h-11 w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all duration-150",
                     isActive
                       ? "border-accent/50 bg-accent/10"
                       : "border-transparent hover:border-line hover:bg-surface2",

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -219,35 +218,3 @@ export function Icon({
   );
 }
 
-/** Convenience: icon-button with guaranteed 44px target + label. */
-export function IconButton({
-  name,
-  label,
-  onClick,
-  href,
-  className,
-}: {
-  name: IconName;
-  label: string;
-  onClick?: () => void;
-  href?: string;
-  className?: string;
-}) {
-  const cls = cn(
-    "inline-flex h-11 w-11 items-center justify-center rounded-md text-muted transition-colors duration-150 hover:bg-surface2 hover:text-ink",
-    className,
-  );
-  const icon = <Icon name={name} size={20} />;
-  if (href) {
-    return (
-      <Link href={href} className={cls} aria-label={label}>
-        {icon}
-      </Link>
-    );
-  }
-  return (
-    <button type="button" className={cls} aria-label={label} onClick={onClick}>
-      {icon}
-    </button>
-  );
-}

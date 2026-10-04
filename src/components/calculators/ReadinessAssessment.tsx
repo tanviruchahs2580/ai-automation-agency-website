@@ -144,7 +144,12 @@ export function ReadinessAssessment() {
 
   return (
     <div className="card-surface mx-auto max-w-2xl p-6 md:p-10">
-      <div className="flex items-center justify-between">
+      {/*
+        Status message (WCAG 4.1.3): advancing to the next question changes
+        this region without moving focus, so assistive tech announces the new
+        question number instead of leaving the user unaware.
+      */}
+      <div className="flex items-center justify-between" aria-live="polite">
         <p className="mono-label uppercase text-faint">
           Question {index + 1} / {total}
         </p>        <div

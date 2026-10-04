@@ -97,6 +97,11 @@ uses the editorial serif.
 ## 4. Layout primitives
 
 - `.container-x`: `max-width: 78rem`, responsive `--gutter` (1.5rem → 3rem).
+  Implementation: the base value lives in `@theme`; the tablet/desktop bump is
+  an **unlayered `@media { :root { --gutter } }`**, not `@media { @theme {} }` —
+  Tailwind v4 hoists `@theme` blocks out of their media wrapper and silently
+  drops the condition, which pinned the gutter to 1.5rem everywhere.
+
 - `.section-y`: 4.5rem → 7rem vertical rhythm.
 - `<GridLines />` replaces `.panel-grid`: faint SVG grid at viewport edges
   only — intentional, not graph paper.
@@ -185,3 +190,23 @@ Lighthouse 100×4 home, ≥95 key routes · axe zero violations.
 
 Enforcement: SSG everywhere, `next/dynamic` below the fold,
 `optimizePackageImports` for Framer Motion, self-hosted subset fonts.
+
+### Measured status (2026-10-04, production build, local `next start`)
+
+| Budget | Measured | Status |
+| --- | --- | --- |
+| LCP < 1.2s (home) | 544ms (`/insights` 1076ms, worst of 5 routes) | met |
+| CLS < 0.05 | 0.0000 – 0.025 across 5 routes | met |
+| INP < 100ms | not field-measured (no CrUX/lab INP tooling offline) | pending field data |
+| JS < 90KB gzip initial | **192.8KB gzip** (629.1KB raw, 11 scripts) on `/` | **over budget** |
+| CSS < 24KB gzip | 11.4KB gzip | met |
+| fonts < 180KB | 147KB loaded per route (217KB on disk, 7 files) | met |
+| 0 raster images | 0 raster bytes on all routes | met |
+| axe zero serious/critical | 0 on `/`, `/start-a-project`, `/insights`, `/roi-calculator` × 3 engines | met |
+| Lighthouse 100×4 / ≥95 | not run — `lighthouse` CLI unavailable offline | pending (use pagespeed.web.dev, see LAUNCH-CHECKLIST §3.2) |
+
+The JS target predates React 19 + Next 16 + Framer Motion; ~190KB gzip is the
+runtime floor for this stack as bundled. Treat it as a tracked optimization
+item rather than a defect: LCP and CLS are already inside budget with 2×
+headroom. Reduce only through route-level `next/dynamic` and chunk auditing —
+never by vendoring or patching framework code.

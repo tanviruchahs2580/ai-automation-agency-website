@@ -137,8 +137,15 @@ export function HeroInstrument() {
               <div className="flex items-center gap-3 rounded-lg border border-line bg-surface2 px-3 py-2.5">
                 <StatusDot tone={layer.id === "workers" ? "accent" : "signal"} pulse={live} />
                 <div className="min-w-0">
-                  <p className="mono-label truncate">{layer.label}</p>
-                  <p className="truncate text-[11px] text-faint">{layer.detail}</p>
+                  {/* line-clamp (wrapping) rather than truncate (nowrap): a
+                      nowrap line sets this card's min-content width to the
+                      full detail string (~166px), which pushed the console
+                      26px past a 320px viewport. Clamping keeps the identical
+                      one-line ellipsis look without inflating intrinsic width. */}
+                  <p className="mono-label line-clamp-1">{layer.label}</p>
+                  <p className="line-clamp-1 text-[11px] text-faint">
+                    {layer.detail}
+                  </p>
                 </div>
                 <span className="mono-label ml-auto shrink-0 text-signal">
                   LIVE

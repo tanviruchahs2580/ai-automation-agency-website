@@ -24,19 +24,30 @@ test.describe("interactive tools", () => {
 
   test("readiness assessment completes and shows a score", async ({ page }) => {
     await page.goto("/ai-readiness");
-    // Answer every question by choosing the strongest option each time.
+
+    // The assessment is gated behind an explicit start button; without it the
+    // question region never renders. Assert on the result card, never on the
+    // page hero (which also contains the words "AI readiness score" and made
+    // an earlier version of this test pass with zero questions answered).
+    await page.getByRole("button", { name: /Start the Assessment/ }).click();
+
+    const scale = /^(Not at all|Partially|Moderately|Largely|Fully)/;
+    let answered = 0;
     for (let i = 0; i < 12; i++) {
-      const buttons = page
-        .locator('[aria-live="polite"] button, form button[type="button"]')
-        .filter({ hasText: /.+/ });
-      const visible = await buttons.first().isVisible().catch(() => false);
+      const option = page.getByRole("button", { name: scale });
+      const visible = await option.first().isVisible().catch(() => false);
       if (!visible) break;
-      // Click the last (highest) option if present, else the only one.
-      const option = buttons.last();
-      await option.click();
+      await option.last().click();
+      answered++;
       await page.waitForTimeout(150);
     }
-    await expect(page.getByText(/AI readiness score/i)).toBeVisible({ timeout: 15_000 });
+
+    expect(answered).toBe(10);
+    await expect(page.getByRole("button", { name: /Retake/ })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByText("Recommended next step")).toBeVisible();
+    await expect(page.getByText(/out of 100/)).toBeVisible();
   });
 
   test("project intake wizard submits end-to-end and shows reference ID", async ({
