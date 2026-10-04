@@ -88,6 +88,9 @@ export function ProjectIntake() {
     nextStep: string;
   } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  // Set as soon as the user edits the form; invalidates the deferred draft
+  // restore below so it can never overwrite live input or flash a bogus banner.
+  const editedBeforeRestoreRef = useRef(false);
   const reduceMotion = useReducedMotion();
 
   // Signals to tests/automation that controlled inputs are live so typed
@@ -101,6 +104,7 @@ export function ProjectIntake() {
   // still landing before first paint.
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
+      if (editedBeforeRestoreRef.current) return;
       try {
         const raw = window.localStorage.getItem(DRAFT_STORAGE_KEY);
         if (!raw) return;
@@ -129,6 +133,11 @@ export function ProjectIntake() {
   }, []);
 
   useEffect(() => {
+    // `initialForm` by reference means this is the mount run (or startFresh,
+    // which already cleared the draft) — nothing to persist yet. Any other
+    // change is live user input, which must beat the deferred restore above.
+    if (form === initialForm) return;
+    editedBeforeRestoreRef.current = true;
     try {
       window.localStorage.setItem(
         DRAFT_STORAGE_KEY,
@@ -414,7 +423,7 @@ export function ProjectIntake() {
             onClick={() => setDraftRestored(false)}
             className="mono-label uppercase text-accent-strong hover:underline"
           >
-            Continue
+            Keep editing
           </button>
           <button
             type="button"
