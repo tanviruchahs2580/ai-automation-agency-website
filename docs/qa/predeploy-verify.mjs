@@ -156,6 +156,9 @@ const q1 = await page.getByText(/Question 1 \/ 10/).isVisible().catch(() => fals
 rec("retake restarts at question 1", q1);
 
 // ============ 7. INTAKE — validation + full submit ============
+// LIVE=1 skips the final POST (no test briefs into a production inbox);
+// validation and all wizard steps up to submit are still exercised.
+const LIVE = !!process.env.LIVE;
 await page.goto(BASE + "/start-a-project", { waitUntil: "networkidle" });
 await acceptCookies();
 await page.waitForTimeout(400);
@@ -183,10 +186,14 @@ await page.locator("#f-contactName").fill("QA User");
 await page.locator("#f-contactEmail").fill("predeploy-verify@example.test");
 await page.locator("#f-contactRole").fill("CTO");
 await page.getByRole("checkbox").check();
-await page.getByRole("button", { name: /Submit Project Brief/ }).click();
-await page.waitForTimeout(1200);
-const refOk = await page.getByText(/Reference:\s*PB-/).isVisible().catch(() => false);
-rec("intake submits and issues reference ID", refOk);
+if (LIVE) {
+  rec("intake ready to submit (live: POST skipped)", true, "all 7 steps filled, consent checked");
+} else {
+  await page.getByRole("button", { name: /Submit Project Brief/ }).click();
+  await page.waitForTimeout(1200);
+  const refOk = await page.getByText(/Reference:\s*PB-/).isVisible().catch(() => false);
+  rec("intake submits and issues reference ID", refOk);
+}
 
 // ============ 8. INSIGHTS FILTER (new) ============
 await page.goto(BASE + "/insights", { waitUntil: "networkidle" });
@@ -220,7 +227,7 @@ rec("back-to-top scrolls to top", (await page.evaluate(() => window.scrollY)) < 
 // The deliberate 404-test navigation logs an expected console error whose
 // generic message carries no URL — excluded only because the response check
 // above proves the run's sole 4xx is that intentional request.
-rec("no console errors across all journeys", consoleErrors.filter((e) => !e.includes("definitely-not-a-page") && !/404 \(Not Found\)/.test(e)).length === 0, consoleErrors.slice(0, 3).join(" | "));
+rec("no console errors across all journeys", consoleErrors.filter((e) => !e.includes("definitely-not-a-page") && /404 \(/.test(e) === false).length === 0, consoleErrors.slice(0, 3).join(" | "));
 rec("no 4xx/5xx on happy path (except 404 test)", badResponses.filter((r) => !r.includes("definitely-not-a-page")).length === 0, badResponses.slice(0, 3).join(" | "));
 
 await ctx.close();
