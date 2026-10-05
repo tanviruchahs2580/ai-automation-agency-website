@@ -12,6 +12,8 @@ export interface Solution {
   slug: string;
   title: string;
   summary: string;
+  /** One-line factual descriptor for card footers — unique per solution. */
+  meta: string;
   problem: string;
   businessImpact: string[];
   approach: string[];

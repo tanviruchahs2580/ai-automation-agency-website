@@ -4,6 +4,8 @@ export const solutions: Solution[] = [
   {
     slug: "ai-agents",
     title: "AI Agents",
+    meta:
+      "Approval gates · Scoped tools · Audit trail",
     summary:
       "Autonomous and semi-autonomous agents that execute operational work inside your systems — with human approval exactly where it matters.",
     problem:
@@ -90,6 +92,8 @@ export const solutions: Solution[] = [
   {
     slug: "workflow-automation",
     title: "Workflow Automation",
+    meta:
+      "Documents · Approvals · Systems of record",
     summary:
       "End-to-end automation of business processes — documents, approvals, data entry and reporting — connected directly to the systems you already run.",
     problem:
@@ -176,6 +180,8 @@ export const solutions: Solution[] = [
   {
     slug: "ai-software",
     title: "AI Software",
+    meta:
+      "Copilots · Platforms · Owned code",
     summary:
       "Custom AI products and internal platforms — SaaS applications, copilots and intelligent tools engineered to production standards.",
     problem:
@@ -262,6 +268,8 @@ export const solutions: Solution[] = [
   {
     slug: "enterprise-ai",
     title: "Enterprise AI",
+    meta:
+      "Portfolio · Shared platforms · Governance",
     summary:
       "Organisation-scale AI programs: portfolio strategy, shared platforms, governance and the operating model that takes AI from experiments to production.",
     problem:
@@ -348,6 +356,8 @@ export const solutions: Solution[] = [
   {
     slug: "private-ai",
     title: "Private AI",
+    meta:
+      "VPC · On-premise · Data control",
     summary:
       "Deploy open-source and hosted models inside your own perimeter — cloud VPC or on-premise — so sensitive data never leaves your control.",
     problem:
@@ -434,6 +444,8 @@ export const solutions: Solution[] = [
   {
     slug: "ai-transformation",
     title: "AI Transformation",
+    meta:
+      "Strategy · Delivery · Adoption",
     summary:
       "Multi-quarter programs that rewire how a business operates with AI — strategy, delivery and change management under one accountable plan.",
     problem:

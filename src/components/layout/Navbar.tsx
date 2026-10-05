@@ -91,18 +91,23 @@ function Dropdown({ label, href, isActive, children }: {
 
       {open && (
         <div
-          className="absolute left-0 top-full z-50 min-w-[220px] rounded-lg border border-line bg-canvas p-2 shadow-xl"
+          className="dropdown-in absolute left-0 top-full z-50 w-[19rem] overflow-hidden rounded-xl border border-line-strong bg-surface/95 shadow-overlay backdrop-blur-xl"
           role="menu"
         >
           <Link
             href={href}
-            className="block rounded px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface2"
+            className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-surface2"
             role="menuitem"
           >
             {label} Overview
+            <span aria-hidden="true" className="font-mono text-xs text-faint">
+              →
+            </span>
           </Link>
-          <div className="my-1 border-t border-line" />
-          {children}
+          <div className="border-t border-line" />
+          <div className="p-1.5">
+            {children}
+          </div>
         </div>
       )}
     </div>
@@ -197,10 +202,22 @@ export function Navbar() {
                   <Link
                     key={child.href}
                     href={child.href}
-                    className="block rounded px-3 py-2 text-sm text-muted transition-colors hover:text-ink"
+                    className="group/item block rounded-lg px-3 py-2 transition-colors hover:bg-surface2"
                     role="menuitem"
                   >
-                    {child.label}
+                    <span
+                      className={cn(
+                        "block text-sm transition-colors",
+                        isActive(child.href)
+                          ? "text-accent-strong"
+                          : "text-ink group-hover/item:text-accent-strong",
+                      )}
+                    >
+                      {child.label}
+                    </span>
+                    <span className="mt-0.5 block text-xs leading-snug text-faint">
+                      {child.description}
+                    </span>
                   </Link>
                 ))}
               </Dropdown>
@@ -248,7 +265,7 @@ export function Navbar() {
           <Link
             href="/start-a-project"
             onClick={() => track(AnalyticsEvent.CtaClick, { location: "nav-start" })}
-            className="whitespace-nowrap rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+            className="btn btn-primary whitespace-nowrap rounded-md px-4"
           >
             Start a Project
           </Link>
@@ -339,7 +356,7 @@ export function Navbar() {
                 setOpen(false);
                 track(AnalyticsEvent.CtaClick, { location: "nav-start" });
               }}
-              className="rounded-md bg-accent px-4 py-3 text-center text-sm font-medium text-white"
+              className="btn btn-primary rounded-md px-4 py-3"
             >
               Start a Project
             </Link>

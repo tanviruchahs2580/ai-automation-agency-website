@@ -118,8 +118,11 @@ test.describe("interactive tools", () => {
  */
 async function openHydratedWizard(page: import("@playwright/test").Page) {
   await page.goto("/start-a-project");
+  // 20s: WebKit under a fully-parallel cross-engine run has measured hydration
+  // past the 10s default on loaded machines; the marker itself is instant.
   await expect(page.getByTestId("intake-wizard")).toHaveAttribute(
     "data-hydrated",
     "true",
+    { timeout: 20_000 },
   );
 }

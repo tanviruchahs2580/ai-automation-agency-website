@@ -47,7 +47,7 @@ export default function SolutionsPage() {
                       hue={hue}
                       title={solution.title}
                       description={solution.summary}
-                      meta="Architecture · Workflow · Security"
+                      meta={solution.meta}
                       href={`/solutions/${solution.slug}`}
                     />
                   </Spotlight>

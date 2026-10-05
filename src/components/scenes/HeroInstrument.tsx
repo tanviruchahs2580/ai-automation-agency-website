@@ -90,7 +90,7 @@ export function HeroInstrument() {
       {/* Floating state-bound chips — layered depth, values from live state */}
       <div
         aria-hidden="true"
-        className="absolute -left-3 -top-5 z-10 hidden rounded-lg border border-line bg-surface px-3 py-2 shadow-xl sm:block"
+        className="absolute -left-4 -top-14 z-10 hidden rounded-lg border border-line bg-surface px-3 py-2 shadow-xl sm:block"
       >
         <p className="mono-label text-faint">APPROVALS QUEUED</p>
         <p className="tabular mt-0.5 font-mono text-sm text-brass">{approvals}</p>

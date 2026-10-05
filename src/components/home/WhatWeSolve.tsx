@@ -4,6 +4,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
 import { Spotlight } from "@/components/ui/Spotlight";
 import { Chip, chipFor } from "@/components/ui/Chip";
+import { Icon } from "@/components/ui/Icon";
 import {
   RevealStagger,
   RevealStaggerItem,
@@ -34,6 +35,7 @@ export function WhatWeSolve() {
                 slug={feature.slug}
                 title={feature.title}
                 summary={feature.summary}
+                impacts={feature.businessImpact.slice(0, 3)}
                 feature
               />
             </RevealStaggerItem>
@@ -76,11 +78,14 @@ function BentoCell({
   slug,
   title,
   summary,
+  impacts,
   feature = false,
 }: {
   slug: string;
   title: string;
   summary: string;
+  /** Feature cell only: verifiable business impacts from the solution's own detail data. */
+  impacts?: string[];
   feature?: boolean;
 }) {
   const { icon, hue } = chipFor(slug);
@@ -95,10 +100,27 @@ function BentoCell({
           {title}
         </h3>
         <p
-          className={`mt-3 flex-1 leading-relaxed text-muted ${feature ? "max-w-xl" : "text-sm"}`}
+          className={`mt-3 leading-relaxed text-muted ${feature ? "max-w-xl" : "text-sm flex-1"}`}
         >
           {summary}
         </p>
+        {feature && impacts && impacts.length > 0 && (
+          <div className="mt-6 flex-1">
+            <p className="mono-label uppercase text-faint">What it changes</p>
+            <ul className="mt-3 space-y-2.5">
+              {impacts.map((impact) => (
+                <li key={impact} className="flex items-start gap-2.5 text-sm leading-relaxed text-muted">
+                  <Icon
+                    name="check"
+                    size={14}
+                    className="mt-1 shrink-0 text-signal"
+                  />
+                  <span>{impact}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <span className="mono-label mt-5 text-accent-strong">
           Explore solution{" "}
           <span

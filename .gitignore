@@ -43,3 +43,10 @@ Thumbs.db
 # Playwright
 test-results/
 playwright-report/
+
+# Local QA screenshot captures (evidence for reports, not source)
+gui-test-screenshots/
+docs/qa/audit2/
+docs/qa/audit2-rm/
+docs/qa/audit2-m/
+docs/qa/verify/

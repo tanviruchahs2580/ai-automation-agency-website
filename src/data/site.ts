@@ -20,7 +20,12 @@ import type { LinkItem } from "@/types/content";
  * and About now live inside Company (they remain in the footer and sitemap).
  */
 export interface NavItem extends LinkItem {
-  children?: LinkItem[];
+  children?: NavChild[];
+}
+
+/** Nav dropdown child with the one-line descriptor shown in the desktop menu. */
+export interface NavChild extends LinkItem {
+  description: string;
 }
 
 export const siteNav: NavItem[] = [
@@ -28,37 +33,113 @@ export const siteNav: NavItem[] = [
     label: "Solutions",
     href: "/solutions",
     children: [
-      { label: "AI Agents", href: "/solutions/ai-agents" },
-      { label: "Workflow Automation", href: "/solutions/workflow-automation" },
-      { label: "AI Software", href: "/solutions/ai-software" },
-      { label: "Enterprise AI", href: "/solutions/enterprise-ai" },
-      { label: "Private AI", href: "/solutions/private-ai" },
-      { label: "AI Transformation", href: "/solutions/ai-transformation" },
+      {
+        label: "AI Agents",
+        href: "/solutions/ai-agents",
+        description: "Autonomous execution with human approval gates",
+      },
+      {
+        label: "Workflow Automation",
+        href: "/solutions/workflow-automation",
+        description: "End-to-end process and document automation",
+      },
+      {
+        label: "AI Software",
+        href: "/solutions/ai-software",
+        description: "Custom platforms, SaaS and copilots",
+      },
+      {
+        label: "Enterprise AI",
+        href: "/solutions/enterprise-ai",
+        description: "Portfolio-scale programs and governance",
+      },
+      {
+        label: "Private AI",
+        href: "/solutions/private-ai",
+        description: "Models inside your own perimeter",
+      },
+      {
+        label: "AI Transformation",
+        href: "/solutions/ai-transformation",
+        description: "Multi-quarter operating-model change",
+      },
     ],
   },
   {
     label: "Services",
     href: "/services",
     children: [
-      { label: "AI Strategy", href: "/services/ai-strategy" },
-      { label: "AI Engineering", href: "/services/ai-engineering" },
-      { label: "Automation", href: "/services/automation" },
-      { label: "Software Engineering", href: "/services/software-engineering" },
-      { label: "Data & AI Infrastructure", href: "/services/data-ai-infrastructure" },
-      { label: "Security", href: "/services/security" },
-      { label: "AI Operations", href: "/services/ai-operations" },
+      {
+        label: "AI Strategy",
+        href: "/services/ai-strategy",
+        description: "Decide where AI creates value first",
+      },
+      {
+        label: "AI Engineering",
+        href: "/services/ai-engineering",
+        description: "Agents, RAG pipelines, copilots",
+      },
+      {
+        label: "Automation",
+        href: "/services/automation",
+        description: "Document, approval and data flows",
+      },
+      {
+        label: "Software Engineering",
+        href: "/services/software-engineering",
+        description: "Platforms, SaaS, modernisation",
+      },
+      {
+        label: "Data & AI Infrastructure",
+        href: "/services/data-ai-infrastructure",
+        description: "Pipelines, vector stores, observability",
+      },
+      {
+        label: "Security",
+        href: "/services/security",
+        description: "Isolation, auditability, governance",
+      },
+      {
+        label: "AI Operations",
+        href: "/services/ai-operations",
+        description: "Monitored, evaluated, improved",
+      },
     ],
   },
   {
     label: "Industries",
     href: "/industries",
     children: [
-      { label: "Financial Services", href: "/industries/financial-services" },
-      { label: "Healthcare", href: "/industries/healthcare" },
-      { label: "Manufacturing", href: "/industries/manufacturing" },
-      { label: "Retail", href: "/industries/retail" },
-      { label: "Logistics", href: "/industries/logistics" },
-      { label: "SaaS & Technology", href: "/industries/saas-technology" },
+      {
+        label: "Financial Services",
+        href: "/industries/financial-services",
+        description: "Accuracy and auditability first",
+      },
+      {
+        label: "Healthcare",
+        href: "/industries/healthcare",
+        description: "Privacy-first administrative automation",
+      },
+      {
+        label: "Manufacturing",
+        href: "/industries/manufacturing",
+        description: "Planning, quality and maintenance",
+      },
+      {
+        label: "Retail",
+        href: "/industries/retail",
+        description: "Support and merchandising operations",
+      },
+      {
+        label: "Logistics",
+        href: "/industries/logistics",
+        description: "Shipments, documents, exceptions",
+      },
+      {
+        label: "SaaS & Technology",
+        href: "/industries/saas-technology",
+        description: "Customer operations at scale",
+      },
     ],
   },
   { label: "Work", href: "/work" },
@@ -68,10 +149,26 @@ export const siteNav: NavItem[] = [
     label: "Company",
     href: "/about",
     children: [
-      { label: "About", href: "/about" },
-      { label: "Team", href: "/team" },
-      { label: "Approach", href: "/approach" },
-      { label: "Security", href: "/security" },
+      {
+        label: "About",
+        href: "/about",
+        description: "Who we are and how we operate",
+      },
+      {
+        label: "Team",
+        href: "/team",
+        description: "The engineers accountable for delivery",
+      },
+      {
+        label: "Approach",
+        href: "/approach",
+        description: "Architecture-first delivery method",
+      },
+      {
+        label: "Security",
+        href: "/security",
+        description: "Governance model and controls",
+      },
     ],
   },
 ];

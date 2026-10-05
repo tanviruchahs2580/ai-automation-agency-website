@@ -191,18 +191,18 @@ Lighthouse 100×4 home, ≥95 key routes · axe zero violations.
 Enforcement: SSG everywhere, `next/dynamic` below the fold,
 `optimizePackageImports` for Framer Motion, self-hosted subset fonts.
 
-### Measured status (2026-10-04, production build, local `next start`)
+### Measured status (2026-10-05, production build, local `next start`)
 
 | Budget | Measured | Status |
 | --- | --- | --- |
-| LCP < 1.2s (home) | 544ms (`/insights` 1076ms, worst of 5 routes) | met |
-| CLS < 0.05 | 0.0000 – 0.025 across 5 routes | met |
+| LCP < 1.2s (home) | 544ms (worst of 5 routes; `/solutions` 356ms, `/insights` 316ms) | met |
+| CLS < 0.05 | 0.0000 – 0.0245 across 5 routes | met |
 | INP < 100ms | not field-measured (no CrUX/lab INP tooling offline) | pending field data |
-| JS < 90KB gzip initial | **192.8KB gzip** (629.1KB raw, 11 scripts) on `/` | **over budget** |
+| JS < 90KB gzip initial | **765KB raw** (~193KB gzip est.) on `/` | **over budget** |
 | CSS < 24KB gzip | 11.4KB gzip | met |
-| fonts < 180KB | 147KB loaded per route (217KB on disk, 7 files) | met |
+| fonts < 180KB | 147KB loaded per route | met |
 | 0 raster images | 0 raster bytes on all routes | met |
-| axe zero serious/critical | 0 on `/`, `/start-a-project`, `/insights`, `/roi-calculator` × 3 engines | met |
+| axe zero serious/critical | 0 on key routes (Playwright axe suite, 3 engines) | met |
 | Lighthouse 100×4 / ≥95 | not run — `lighthouse` CLI unavailable offline | pending (use pagespeed.web.dev, see LAUNCH-CHECKLIST §3.2) |
 
 The JS target predates React 19 + Next 16 + Framer Motion; ~190KB gzip is the
