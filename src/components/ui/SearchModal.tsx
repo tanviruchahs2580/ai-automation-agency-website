@@ -148,14 +148,19 @@ export function SearchModal() {
   }, [open]);
 
   /*
-    Return focus once the dialog has actually unmounted, on the next frame.
-    The dialog holds focus and is then removed from the DOM, and WebKit
-    re-runs its own focus-fixup (dropping focus to <body>) after the commit —
-    so a synchronous focus() inside the effect was silently overwritten and
-    keyboard users ended up back at the top of the document.
+    Return focus to whatever opened the dialog.
+
+    Both a synchronous call and a next-frame re-assert, deliberately. The dialog
+    holds focus and is then removed from the DOM; WebKit re-runs its own
+    focus-fixup (dropping focus to <body>) after that commit, so a synchronous
+    focus() alone was silently overwritten and keyboard users ended up back at
+    the top of the document. Deferring alone is timing-sensitive, so the
+    immediate call handles the engines that accept it and the frame callback
+    re-asserts afterwards for the one that does not.
   */
   useEffect(() => {
     if (open) return;
+    restoreFocusRef.current?.focus();
     const raf = requestAnimationFrame(() => restoreFocusRef.current?.focus());
     return () => cancelAnimationFrame(raf);
   }, [open]);
