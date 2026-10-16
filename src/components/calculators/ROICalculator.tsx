@@ -6,6 +6,11 @@ import { useSearchParams } from "next/navigation";
 import { computeRoi } from "@/lib/roi";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { AnalyticsEvent, track } from "@/lib/analytics";
+import {
+  defaultIndustryPreset,
+  findIndustryPreset,
+  industryPresets,
+} from "@/data/roi-presets";
 import { MetricsPulse } from "@/components/scenes/MetricsPulse";
 
 /**
@@ -26,16 +31,6 @@ const defaults = {
   estimatedAnnualInvestment: 48000,
 };
 
-/** Conservative automation presets per industry — documented, not folklore. */
-const industryPresets = [
-  { value: "financial-services", label: "Financial services", automationRate: 55 },
-  { value: "healthcare", label: "Healthcare", automationRate: 45 },
-  { value: "manufacturing", label: "Manufacturing", automationRate: 60 },
-  { value: "retail", label: "Retail", automationRate: 55 },
-  { value: "logistics", label: "Logistics", automationRate: 60 },
-  { value: "saas-technology", label: "SaaS & technology", automationRate: 60 },
-] as const;
-
 const refinedFields = [
   { key: "averageSalary", label: "Average annual salary", min: 1000, max: 1000000, step: 1000, suffix: "$" },
   { key: "hoursPerTask", label: "Hours per task (manual)", min: 0.05, max: 40, step: 0.05, suffix: "h" },
@@ -50,7 +45,7 @@ type NumericKey = keyof typeof defaults;
 
 export function ROICalculator() {
   const [inputs, setInputs] = useState(defaults);
-  const [industry, setIndustry] = useState<string>(industryPresets[5].value);
+  const [industry, setIndustry] = useState<string>(defaultIndustryPreset.value);
   const [weeklyHours, setWeeklyHours] = useState(20);
   const [refined, setRefined] = useState(false);
   const [touched, setTouched] = useState(false);
@@ -66,7 +61,7 @@ export function ROICalculator() {
     const raf = requestAnimationFrame(() => {
       const slug = params.get("industry");
       if (!slug) return;
-      const preset = industryPresets.find((p) => p.value === slug);
+      const preset = findIndustryPreset(slug);
       if (!preset) return;
       setIndustry(preset.value);
       setInputs((prev) => ({ ...prev, automationRatePercent: preset.automationRate }));
@@ -105,7 +100,7 @@ export function ROICalculator() {
   const onIndustryChange = (value: string) => {
     markUsed();
     setIndustry(value);
-    const preset = industryPresets.find((p) => p.value === value);
+    const preset = findIndustryPreset(value);
     if (preset) {
       setInputs((prev) => ({ ...prev, automationRatePercent: preset.automationRate }));
     }
@@ -142,7 +137,7 @@ export function ROICalculator() {
               id="roi-industry"
               value={industry}
               onChange={(e) => onIndustryChange(e.target.value)}
-              className="mt-1.5 min-h-11 w-full rounded-md border border-line bg-surface2 px-3 py-2 text-sm focus:border-accent focus:outline-none"
+              className="mt-1.5 min-h-11 w-full rounded-md border border-line bg-surface2 px-3 py-2 text-sm focus:border-accent"
             >
               {industryPresets.map((preset) => (
                 <option key={preset.value} value={preset.value}>
@@ -346,7 +341,7 @@ function NumberField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={(e) => onBlur(Number(e.target.value))}
-          className="min-h-11 w-full rounded-md border border-line bg-surface2 px-3 py-2 font-mono text-sm tabular-nums focus:border-accent focus:outline-none"
+          className="min-h-11 w-full rounded-md border border-line bg-surface2 px-3 py-2 font-mono text-sm tabular-nums focus:border-accent"
         />
         {(suffix === "%" || suffix === "h") && (
           <span aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-faint">

@@ -2,16 +2,21 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * Middleware: trailing-slash canonicalization, trailing-slash redirect,
- * and simple bot detection logging.
+ * Request proxy: trailing-slash canonicalization.
  *
- * Next.js App Router does not require trailing slashes; this middleware
- * ensures consistent canonical URLs by redirecting /path/ → /path.
+ * Next.js App Router does not require trailing slashes, so `/path/` and
+ * `/path` would otherwise both serve the same page under two URLs. This
+ * redirects the slashed form to the clean one with 308, so the canonical URL
+ * emitted by `buildMetadata` is the only one that resolves.
+ *
+ * Named `proxy` and placed at `src/proxy.ts` because Next.js 16 renamed the
+ * `middleware` file convention to `proxy`; the file previously also claimed to
+ * do "simple bot detection logging", which was never implemented.
  */
 
 const TRAILING_SLASH_RE = /\/+$/;
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip internal Next.js paths, API routes, and static assets

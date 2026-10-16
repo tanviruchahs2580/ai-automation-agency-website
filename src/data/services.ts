@@ -20,6 +20,15 @@ export const services: Service[] = [
       "Technical feasibility spikes on candidate use-cases",
       "Roadmap presentation with named owners and metrics",
     ],
+    engagementShape: {
+      label: "4–8 week engagement shape",
+      phases: [
+        { phase: "Discover", duration: "Weeks 1–2", detail: "Executive interviews and process walkthroughs with operational teams." },
+        { phase: "Frame", duration: "Weeks 3–4", detail: "Opportunity map scored by value and feasibility." },
+        { phase: "Validate", duration: "Weeks 5–6", detail: "Technical feasibility spikes on candidate use-cases." },
+        { phase: "Commit", duration: "Weeks 7–8", detail: "Roadmap presentation with named owners and metrics." },
+      ],
+    },
     capabilities: [
       "Opportunity mapping",
       "Feasibility analysis",
@@ -29,7 +38,7 @@ export const services: Service[] = [
     ],
     technologies: [
       "Assessment frameworks",
-      "Cost modelling tools",
+      "Cost modeling tools",
       "Reference architectures",
       "Evaluation benchmarks",
     ],
@@ -37,7 +46,7 @@ export const services: Service[] = [
       {
         question: "How long does a strategy engagement take?",
         answer:
-          "Typically 4–8 weeks depending on organisational scope, ending in decisions you can act on immediately.",
+          "Typically 4–8 weeks depending on organizational scope, ending in decisions you can act on immediately.",
       },
     ],
   },
@@ -51,7 +60,7 @@ export const services: Service[] = [
     deliverables: [
       "Agent and RAG systems running in production",
       "Evaluation suites with regression gates",
-      "Model routing and cost optimisation layer",
+      "Model routing and cost optimization layer",
       "Prompt, context and memory architecture",
     ],
     engagement: [
@@ -60,6 +69,14 @@ export const services: Service[] = [
       "Evaluation-driven acceptance criteria",
       "Handover documentation and pairing",
     ],
+    engagementShape: {
+      label: "6-week engagement shape",
+      phases: [
+        { phase: "Discover", duration: "Weeks 1–2", detail: "Architecture design with your engineers in the room." },
+        { phase: "Architect", duration: "Weeks 3–4", detail: "Evaluation-driven acceptance criteria agreed before build." },
+        { phase: "Prototype", duration: "Weeks 5–6", detail: "Iterative delivery in two-week increments, then handover and pairing." },
+      ],
+    },
     capabilities: [
       "Autonomous agents & multi-agent orchestration",
       "RAG and knowledge systems",
@@ -100,6 +117,14 @@ export const services: Service[] = [
       "Parallel-run validation before cutover",
       "Hypercare after go-live",
     ],
+    engagementShape: {
+      label: "6-week engagement shape",
+      phases: [
+        { phase: "Discover", duration: "Weeks 1–2", detail: "Process discovery with the operators themselves." },
+        { phase: "Automate", duration: "Weeks 3–4", detail: "Segment-by-segment automation design." },
+        { phase: "Prove", duration: "Weeks 5–6", detail: "Parallel-run validation before cutover, then hypercare." },
+      ],
+    },
     capabilities: [
       "Business process automation",
       "Intelligent document processing",
@@ -140,6 +165,14 @@ export const services: Service[] = [
       "CI/CD, tests and monitoring as standard scope",
       "Full IP transfer on completion",
     ],
+    engagementShape: {
+      label: "6-week engagement shape",
+      phases: [
+        { phase: "Audit", duration: "Weeks 1–2", detail: "Technical audit of the existing system before committing to change." },
+        { phase: "Architect", duration: "Weeks 3–4", detail: "Target architecture with CI/CD, tests and monitoring as standard scope." },
+        { phase: "Build", duration: "Weeks 5–6", detail: "Two-week increments delivering working software, ending in full IP transfer." },
+      ],
+    },
     capabilities: [
       "Greenfield product development",
       "Legacy modernisation & replatforming",
@@ -180,6 +213,14 @@ export const services: Service[] = [
       "Load, cost and failure-mode testing",
       "Runbooks and team training",
     ],
+    engagementShape: {
+      label: "6-week engagement shape",
+      phases: [
+        { phase: "Audit", duration: "Weeks 1–2", detail: "Infrastructure audit against the target workload." },
+        { phase: "Provision", duration: "Weeks 3–4", detail: "Environment provisioning, cloud or on-premise." },
+        { phase: "Harden", duration: "Weeks 5–6", detail: "Load, cost and failure-mode testing, then runbooks and team training." },
+      ],
+    },
     capabilities: [
       "RAG infrastructure",
       "Vector database selection & operation",
@@ -205,7 +246,7 @@ export const services: Service[] = [
     slug: "security",
     title: "AI Security",
     summary:
-      "Security engineering for AI systems: isolation, access control, prompt-injection defence, secrets management and audit readiness.",
+      "Security engineering for AI systems: isolation, access control, prompt-injection defense, secrets management and audit readiness.",
     problem:
       "AI widens the attack surface: untrusted input reaches powerful tools, sensitive data reaches third-party endpoints, and actions happen at machine speed.",
     deliverables: [
@@ -220,6 +261,14 @@ export const services: Service[] = [
       "Penetration-style testing of agent boundaries",
       "Incident response playbooks for AI-specific failures",
     ],
+    engagementShape: {
+      label: "6-week engagement shape",
+      phases: [
+        { phase: "Review", duration: "Weeks 1–2", detail: "Security review of existing AI usage, including shadow AI." },
+        { phase: "Design", duration: "Weeks 3–4", detail: "Controls designed with your security team, plus incident response playbooks." },
+        { phase: "Test", duration: "Weeks 5–6", detail: "Penetration-style testing of agent boundaries." },
+      ],
+    },
     capabilities: [
       "Prompt injection mitigation",
       "PII detection and redaction pipelines",
@@ -252,7 +301,7 @@ export const services: Service[] = [
       "24/7 monitoring of quality, latency and spend",
       "Scheduled evaluations against golden datasets",
       "Model upgrade management with regression gates",
-      "Monthly optimisation reports in business language",
+      "Monthly optimization reports in business language",
     ],
     engagement: [
       "Defined SLAs and escalation paths",
@@ -260,10 +309,18 @@ export const services: Service[] = [
       "Quarterly roadmap reviews",
       "Transparent incident postmortems",
     ],
+    engagementShape: {
+      label: "Ongoing retainer shape",
+      phases: [
+        { phase: "Onboard", duration: "Weeks 1–2", detail: "SLAs, escalation paths, change windows and rollback procedures." },
+        { phase: "Operate", duration: "Continuous", detail: "Monitoring, scheduled evaluations against golden datasets, incident response." },
+        { phase: "Improve", duration: "Quarterly", detail: "Roadmap reviews, model upgrades and optimization reports." },
+      ],
+    },
     capabilities: [
       "Continuous evaluation",
       "Drift detection & retraining triggers",
-      "Cost optimisation",
+      "Cost optimization",
       "Incident response",
       "Lifecycle management",
     ],
@@ -277,7 +334,7 @@ export const services: Service[] = [
       {
         question: "Why do AI systems need ongoing operations?",
         answer:
-          "Unlike traditional software, behaviour depends on external models and live data. Both change underneath you — operations is how quality stays deliberate instead of accidental.",
+          "Unlike traditional software, behavior depends on external models and live data. Both change underneath you — operations is how quality stays deliberate instead of accidental.",
       },
     ],
   },

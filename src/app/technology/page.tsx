@@ -97,7 +97,13 @@ export default function TechnologyPage() {
         <div className="container-x">
           <SectionHeader
             eyebrow="Architecture landscape"
-            title="One stack, twelve layers, zero lock-in."
+            /*
+              Was "One stack, twelve layers, zero lock-in." — the component
+              below renders six layers, so the headline overstated it. Naming
+              the axis also separates it from the seven-layer platform stack
+              further up the page, which is a different thing.
+            */
+            title="Six architecture layers, zero lock-in."
             lead="Select any layer to see what it guarantees. Models change monthly — this structure keeps working regardless."
             id="landscape-heading"
           />

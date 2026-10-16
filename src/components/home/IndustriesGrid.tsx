@@ -31,7 +31,7 @@ export function IndustriesGrid({ compact = false }: { compact?: boolean }) {
                     hue={hue}
                     title={industry.title}
                     description={industry.summary}
-                    meta={`${industry.useCases.length + industry.opportunities.length} use cases`}
+                    meta={`${industry.useCases.length} use cases · ${industry.opportunities.length} opportunities`}
                     href={`/industries/${industry.slug}`}
                   />
                 </Spotlight>

@@ -36,6 +36,16 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  /*
+    Next infers the workspace root by walking up for a lockfile. A stray
+    package-lock.json above this directory makes it pick the wrong root, which
+    prints a warning on every build and widens the traced/watch scope beyond
+    the project. Pin both roots to this project explicitly.
+  */
+  turbopack: {
+    root: process.cwd(),
+  },
+  outputFileTracingRoot: process.cwd(),
   experimental: {
     // Trim Framer Motion to the imported modules (§10 budget enforcement).
     optimizePackageImports: ["framer-motion"],

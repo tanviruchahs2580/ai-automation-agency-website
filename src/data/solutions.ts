@@ -20,7 +20,7 @@ export const solutions: Solution[] = [
       "Map the workflow end-to-end before any model is chosen",
       "Classify actions by risk: auto-execute, monitored, human-approved",
       "Give agents narrowly scoped tools — never unrestricted system access",
-      "Evaluate agent behaviour continuously against golden test sets",
+      "Evaluate agent behavior continuously against golden test sets",
     ],
     architecture: [
       "Business goal & policy definition",
@@ -158,7 +158,7 @@ export const solutions: Solution[] = [
       "Environment isolation between test and production",
     ],
     implementation: [
-      "Process inventory and prioritisation",
+      "Process inventory and prioritization",
       "Automation design per process segment",
       "Iterative delivery with operator feedback",
       "Parallel-run validation against manual output",
@@ -229,7 +229,7 @@ export const solutions: Solution[] = [
       },
       {
         step: "Operate",
-        detail: "Monitoring, support SLAs and continuous optimisation.",
+        detail: "Monitoring, support SLAs and continuous optimization.",
       },
     ],
     technologies: [
@@ -271,11 +271,11 @@ export const solutions: Solution[] = [
     meta:
       "Portfolio · Shared platforms · Governance",
     summary:
-      "Organisation-scale AI programs: portfolio strategy, shared platforms, governance and the operating model that takes AI from experiments to production.",
+      "Organization-scale AI programs: portfolio strategy, shared platforms, governance and the operating model that takes AI from experiments to production.",
     problem:
       "Enterprises accumulate disconnected AI experiments — pilots that never reach production, shadow tools with uncontrolled data access, and no shared foundation to build on.",
     businessImpact: [
-      "A prioritised AI portfolio tied to business cases",
+      "A prioritized AI portfolio tied to business cases",
       "Shared infrastructure reused across initiatives",
       "Consistent governance instead of per-project improvisation",
       "Faster delivery as patterns and platforms mature",
@@ -300,7 +300,7 @@ export const solutions: Solution[] = [
         detail: "Readiness across domains with quantified gaps.",
       },
       {
-        step: "Prioritise",
+        step: "Prioritize",
         detail: "Use-cases ranked by value and feasibility.",
       },
       {
@@ -317,7 +317,7 @@ export const solutions: Solution[] = [
       },
       {
         step: "Operate",
-        detail: "Portfolio-level monitoring and optimisation.",
+        detail: "Portfolio-level monitoring and optimization.",
       },
     ],
     technologies: [
@@ -432,7 +432,7 @@ export const solutions: Solution[] = [
       {
         question: "Are open-weight models good enough for production?",
         answer:
-          "For many workloads — classification, extraction, summarisation, retrieval-grounded answers — yes. We validate against your tasks before committing, and keep hybrid routing where hosted models genuinely win.",
+          "For many workloads — classification, extraction, summarization, retrieval-grounded answers — yes. We validate against your tasks before committing, and keep hybrid routing where hosted models genuinely win.",
       },
       {
         question: "Can this run fully air-gapped?",
@@ -449,7 +449,7 @@ export const solutions: Solution[] = [
     summary:
       "Multi-quarter programs that rewire how a business operates with AI — strategy, delivery and change management under one accountable plan.",
     problem:
-      "Transformation efforts stall when strategy decks meet organisational reality: unclear ownership, legacy integration debt and staff who don't trust the new tooling.",
+      "Transformation efforts stall when strategy decks meet organizational reality: unclear ownership, legacy integration debt and staff who don't trust the new tooling.",
     businessImpact: [
       "Sequenced roadmap with owned, funded initiatives",
       "Measurable process changes, not slideware",

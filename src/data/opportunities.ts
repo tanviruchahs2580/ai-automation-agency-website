@@ -24,8 +24,8 @@ export const opportunities: Opportunity[] = [
     label: "Reduce operational cost",
     recommendedSystem: "Process Automation + AI Operations",
     summary:
-      "Cost reduction engineered from measurement: baseline metrics, automated processing, then continuous optimisation.",
-    flow: ["Baseline Metrics", "Process Automation", "Quality Gates", "Cost Monitoring", "Optimisation Loop"],
+      "Cost reduction engineered from measurement: baseline metrics, automated processing, then continuous optimization.",
+    flow: ["Baseline Metrics", "Process Automation", "Quality Gates", "Cost Monitoring", "Optimization Loop"],
     solutionSlug: "ai-transformation",
     serviceSlug: "automation",
   },

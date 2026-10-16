@@ -74,16 +74,12 @@
 
   /* Signature tokens — see DESIGN-SYSTEM.md §2 for usage rules */
   --color-signal: #00e5a8; /* live / verified / running ONLY */
-  --color-signal-dim: #00b486;
   --color-brass: #b7a36a; /* considered / reviewed / curated ONLY */
   --color-accent-glow: rgba(46, 107, 246, 0.18); /* halo, max 1 per viewport */
   --color-grid-line: rgba(244, 242, 236, 0.04);
-  --color-grid-line-strong: rgba(244, 242, 236, 0.08);
 
   /* Radius scale — restrained enterprise geometry */
-  --radius-sm: 0.375rem;
   --radius-md: 0.65rem;
-  --radius-lg: 0.9rem;
 
   /* Elevation — subtle, no decorative drop-shadow excess */
   --shadow-raised: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
@@ -156,11 +152,9 @@
   --color-critical: #b91c1c;
   --color-info: #0369a1;
   --color-signal: #047857;
-  --color-signal-dim: #065f46;
   --color-brass: #7a6230;
   --color-accent-glow: rgba(37, 99, 235, 0.12);
   --color-grid-line: rgba(0, 0, 0, 0.04);
-  --color-grid-line-strong: rgba(0, 0, 0, 0.1);
 }
 
 @layer base {
@@ -288,6 +282,16 @@
 }
 
 /* ---------- Layout primitives ---------- */
+
+/* Platform-conditional keyboard hints.
+   A shortcut hint must name a key that exists on the visitor's keyboard
+   (⌘K on macOS, Ctrl+K everywhere else). `data-platform` is set by the
+   blocking pre-paint script in app/layout.tsx, so neither variant flashes and
+   the wrong one is never rendered. */
+[data-platform="mac"] .key-other,
+[data-platform="other"] .key-mac {
+  display: none;
+}
 
 .container-x {
   width: 100%;
@@ -458,13 +462,6 @@ a.card-surface:hover,
 
 .card-pad {
   padding: 1.5rem;
-}
-
-/* Deprecated: use <GridLines /> — kept so old call sites keep rendering */
-.panel-grid {
-  background-image: linear-gradient(var(--color-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
-  background-size: 44px 44px;
 }
 
 .divider-top {

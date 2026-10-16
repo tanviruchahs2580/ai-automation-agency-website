@@ -1,123 +1,3 @@
-export interface ArchitectureNode {
-  id: string;
-  label: string;
-  role: string;
-  business: string;
-  technical: string;
-}
-
-/** Interactive system diagram — order matters (top → bottom flow). */
-export const architectureNodes: ArchitectureNode[] = [
-  {
-    id: "goal",
-    label: "Business Goal",
-    role: "The outcome everything serves",
-    business:
-      "Every layer below exists to move a named business metric — cycle time, cost, quality or capacity.",
-    technical:
-      "Encoded as measurable objectives that evaluation suites assert against on every release.",
-  },
-  {
-    id: "orchestration",
-    label: "Orchestration",
-    role: "Routes work and enforces process",
-    business:
-      "Keeps automation aligned with how your operation actually runs, not how a demo flows.",
-    technical:
-      "State machines coordinating agents, retries, timeouts and escalation paths.",
-  },
-  {
-    id: "agents",
-    label: "AI Agents",
-    role: "Do the cognitive work",
-    business:
-      "Handle judgment-heavy steps — classification, drafting, decision support — around the clock.",
-    technical:
-      "Specialised agents with scoped prompts, memory policies and model routing per task.",
-  },
-  {
-    id: "models",
-    label: "Models",
-    role: "The reasoning engines",
-    business:
-      "Vendor choice becomes an economic decision, not an architectural lock-in.",
-    technical:
-      "Gateway routing across OpenAI, Anthropic, Google and open-weight models with fallbacks.",
-  },
-  {
-    id: "tools",
-    label: "Tools",
-    role: "Hands on your systems",
-    business:
-      "Agents act where work lives: CRM, ERP, ticketing, documents — safely and logged.",
-    technical:
-      "Schema-validated tool registry with least-privilege credentials and approval gates.",
-  },
-  {
-    id: "knowledge",
-    label: "Knowledge",
-    role: "Grounded, cited context",
-    business:
-      "Answers reference your approved content — never invented facts.",
-    technical:
-      "RAG pipeline over permission-aware vector and keyword retrieval.",
-  },
-  {
-    id: "data",
-    label: "Data / Memory",
-    role: "State across time",
-    business:
-      "Workflows survive restarts; customers aren't asked twice.",
-    technical:
-      "PostgreSQL systems of record plus task-scoped memory with retention rules.",
-  },
-  {
-    id: "governance",
-    label: "Governance & Security",
-    role: "Rules enforced by architecture",
-    business:
-      "Policy compliance is structural, not aspirational — auditable by design.",
-    technical:
-      "Guardrails, PII redaction, RBAC and policy-as-code applied at runtime.",
-  },
-  {
-    id: "human",
-    label: "Human Approval",
-    role: "Judgment where it matters",
-    business:
-      "People stay accountable for consequential decisions; machines handle the rest.",
-    technical:
-      "Risk-tiered approval queues integrated into Slack/Teams/email.",
-  },
-  {
-    id: "systems",
-    label: "Business Systems",
-    role: "Systems of record",
-    business:
-      "Your existing platforms remain the source of truth — AI works through them.",
-    technical:
-      "Governed API integrations with write auditing and rollback procedures.",
-  },
-  {
-    id: "observability",
-    label: "Observability",
-    role: "See everything running",
-    business:
-      "Operational confidence: costs, quality and throughput visible in real time.",
-    technical:
-      "Traces of every prompt/tool/output; metrics and alerting on SLOs.",
-  },
-  {
-    id: "qa",
-    label: "Continuous QA",
-    role: "Quality that doesn't decay",
-    business:
-      "Improvements compound because regressions are caught before customers notice.",
-    technical:
-      "Golden datasets, scheduled evaluations and regression gates in CI/CD.",
-  },
-];
-
 export interface AgentStage {
   index: string;
   name: string;
@@ -258,7 +138,7 @@ export const processPhases: ProcessPhase[] = [
     name: "Discover",
     duration: "1–2 weeks",
     detail:
-      "Business and workflow analysis with the people who do the work. Output: prioritised opportunities with feasibility verdicts.",
+      "Business and workflow analysis with the people who do the work. Output: prioritized opportunities with feasibility verdicts.",
   },
   {
     index: "02",
@@ -342,7 +222,7 @@ export const engineeringPrinciples = [
   },
   {
     title: "Automated testing",
-    detail: "Including for AI behaviour — golden sets run in CI like any other test suite.",
+    detail: "Including for AI behavior — golden sets run in CI like any other test suite.",
   },
   {
     title: "Vendor/model independence",

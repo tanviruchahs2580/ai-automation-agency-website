@@ -8,7 +8,6 @@ import {
   companySizes,
   recommendedNextStep,
   timelines,
-  type ProjectBrief,
 } from "@/lib/validation";
 import { contact } from "@/data/site";
 import { AnalyticsEvent, track } from "@/lib/analytics";
@@ -88,6 +87,7 @@ export function ProjectIntake() {
     nextStep: string;
   } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
   // Set as soon as the user edits the form; invalidates the deferred draft
   // restore below so it can never overwrite live input or flash a bogus banner.
   const editedBeforeRestoreRef = useRef(false);
@@ -147,6 +147,13 @@ export function ProjectIntake() {
       /* storage unavailable — wizard still works without persistence */
     }
   }, [form]);
+
+  // Move focus to the receipt heading once the wizard resolves. The success
+  // view replaces the whole subtree, so without this the submit button that
+  // had focus is unmounted and the caret lands on <body>.
+  useEffect(() => {
+    if (status === "success") successHeadingRef.current?.focus();
+  }, [status]);
 
   const startFresh = () => {
     clearDraft();
@@ -260,9 +267,16 @@ export function ProjectIntake() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
+      /*
+        The response is parsed defensively rather than trusted. `response.json()`
+        is `any`, and an error page or proxy returning HTML would otherwise make
+        `data.ok` a runtime TypeError; reading the fields through a shape check
+        keeps the receipt honest about what the server actually sent.
+      */
+      const data = parseBriefResponse(await response.json().catch(() => null));
+      const briefId = data.briefId;
 
-      if (!response.ok || !data.ok) {
+      if (!response.ok || !data.ok || !briefId) {
         throw new Error(data.error ?? "Submission failed");
       }
 
@@ -270,9 +284,13 @@ export function ProjectIntake() {
       setStatus("success");
       track(AnalyticsEvent.IntakeComplete);
       setResult({
-        briefId: data.briefId,
+        briefId,
         nextStep:
-          data.nextStep ?? recommendedNextStep(form as unknown as ProjectBrief),
+          data.nextStep ??
+          recommendedNextStep({
+            problem: form.problem,
+            desiredOutcome: form.desiredOutcome,
+          }),
       });
     } catch (error) {
       setStatus("error");
@@ -310,11 +328,15 @@ export function ProjectIntake() {
       URL.revokeObjectURL(url);
     };
     return (
-      <div className="card-surface mx-auto max-w-2xl p-8 text-center md:p-10" aria-live="polite">
+      <div className="card-surface mx-auto max-w-2xl p-8 text-center md:p-10">
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-signal/50 bg-signal/10 text-2xl text-signal" aria-hidden="true">
           ✓
         </span>
-        <h2 className="mt-5 text-2xl font-bold tracking-tight">
+        <h2
+          ref={successHeadingRef}
+          tabIndex={-1}
+          className="mt-5 text-2xl font-bold tracking-tight"
+        >
           Your project brief is ready.
         </h2>
         <p className="mono-label mt-3 text-muted">Reference: {result.briefId}</p>
@@ -334,14 +356,30 @@ export function ProjectIntake() {
           <p className="mt-1 text-sm">{result.nextStep}</p>
         </div>
 
-        <div className="mt-7 grid gap-3 sm:grid-cols-3">
-          <a
-            href={contact.meetingLink}
-            onClick={() => track(AnalyticsEvent.MeetingClick)}
-            className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-strong"
-          >
-            Book a Call
-          </a>
+        {/*
+          Every action here has to work when it is rendered. [Book a Call]
+          previously pointed at a "#meeting-link-placeholder" anchor, so the
+          single highest-intent control on the site silently did nothing; it now
+          appears only when NEXT_PUBLIC_MEETING_LINK is configured. Download and
+          Share always work — they are generated in the browser.
+        */}
+        <div
+          className={cn(
+            "mt-7 grid gap-3",
+            contact.meetingLink ? "sm:grid-cols-3" : "sm:grid-cols-2",
+          )}
+        >
+          {contact.meetingLink && (
+            <a
+              href={contact.meetingLink}
+              target="_blank"
+              rel="noreferrer noopener"
+              onClick={() => track(AnalyticsEvent.MeetingClick)}
+              className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-strong"
+            >
+              Book a Call
+            </a>
+          )}
           <button
             type="button"
             onClick={downloadBrief}
@@ -448,14 +486,17 @@ export function ProjectIntake() {
         {(current.fields as readonly string[]).includes("companyName") && (
           <>
             <Field label="Company name" htmlFor="f-companyName" error={errors.companyName}>
-              <input
-                type="text"
-                id="f-companyName"
-                autoComplete="organization"
-                value={form.companyName}
-                onChange={(e) => set("companyName", e.target.value)}
-                className={inputClass(!!errors.companyName)}
-              />
+              {(aria) => (
+                <input
+                  type="text"
+                  id="f-companyName"
+                  autoComplete="organization"
+                  value={form.companyName}
+                  onChange={(e) => set("companyName", e.target.value)}
+                  {...aria}
+                  className={inputClass(!!errors.companyName)}
+                />
+              )}
             </Field>
             <div className="grid gap-5 sm:grid-cols-3">
               <SelectField
@@ -467,23 +508,29 @@ export function ProjectIntake() {
                 onChange={(v) => set("companySize", v)}
               />
               <Field label="Industry" htmlFor="f-industry" error={errors.industry}>
-                <input
-                  type="text"
-                  id="f-industry"
-                  value={form.industry}
-                  onChange={(e) => set("industry", e.target.value)}
-                  className={inputClass(!!errors.industry)}
-                />
+                {(aria) => (
+                  <input
+                    type="text"
+                    id="f-industry"
+                    value={form.industry}
+                    onChange={(e) => set("industry", e.target.value)}
+                    {...aria}
+                    className={inputClass(!!errors.industry)}
+                  />
+                )}
               </Field>
               <Field label="Country" htmlFor="f-country" error={errors.country}>
-                <input
-                  type="text"
-                  id="f-country"
-                  autoComplete="country-name"
-                  value={form.country}
-                  onChange={(e) => set("country", e.target.value)}
-                  className={inputClass(!!errors.country)}
-                />
+                {(aria) => (
+                  <input
+                    type="text"
+                    id="f-country"
+                    autoComplete="country-name"
+                    value={form.country}
+                    onChange={(e) => set("country", e.target.value)}
+                    {...aria}
+                    className={inputClass(!!errors.country)}
+                  />
+                )}
               </Field>
             </div>
           </>
@@ -496,13 +543,16 @@ export function ProjectIntake() {
             hint="The more concrete, the better our first response."
             error={errors.problem}
           >
-            <textarea
-              id="f-problem"
-              rows={5}
-              value={form.problem}
-              onChange={(e) => set("problem", e.target.value)}
-              className={cn(inputClass(!!errors.problem), "resize-y")}
-            />
+            {(aria) => (
+              <textarea
+                id="f-problem"
+                rows={5}
+                value={form.problem}
+                onChange={(e) => set("problem", e.target.value)}
+                {...aria}
+                className={cn(inputClass(!!errors.problem), "resize-y")}
+              />
+            )}
           </Field>
         )}
 
@@ -512,13 +562,16 @@ export function ProjectIntake() {
             label="How does this work get done today?"
             error={errors.currentWorkflow}
           >
-            <textarea
-              id="f-currentWorkflow"
-              rows={4}
-              value={form.currentWorkflow}
-              onChange={(e) => set("currentWorkflow", e.target.value)}
-              className={cn(inputClass(!!errors.currentWorkflow), "resize-y")}
-            />
+            {(aria) => (
+              <textarea
+                id="f-currentWorkflow"
+                rows={4}
+                value={form.currentWorkflow}
+                onChange={(e) => set("currentWorkflow", e.target.value)}
+                {...aria}
+                className={cn(inputClass(!!errors.currentWorkflow), "resize-y")}
+              />
+            )}
           </Field>
         )}
 
@@ -528,14 +581,18 @@ export function ProjectIntake() {
             label="Which systems are involved?"
             hint="ERP, CRM, ticketing, spreadsheets — comma separated. Optional."
             error={errors.existingSoftware}
+            required={false}
           >
-            <input
-              type="text"
-              id="f-existingSoftware"
-              value={form.existingSoftware}
-              onChange={(e) => set("existingSoftware", e.target.value)}
-              className={inputClass(false)}
-            />
+            {(aria) => (
+              <input
+                type="text"
+                id="f-existingSoftware"
+                value={form.existingSoftware}
+                onChange={(e) => set("existingSoftware", e.target.value)}
+                {...aria}
+                className={inputClass(false)}
+              />
+            )}
           </Field>
         )}
 
@@ -545,13 +602,16 @@ export function ProjectIntake() {
             label="What does success look like?"
             error={errors.desiredOutcome}
           >
-            <textarea
-              id="f-desiredOutcome"
-              rows={4}
-              value={form.desiredOutcome}
-              onChange={(e) => set("desiredOutcome", e.target.value)}
-              className={cn(inputClass(!!errors.desiredOutcome), "resize-y")}
-            />
+            {(aria) => (
+              <textarea
+                id="f-desiredOutcome"
+                rows={4}
+                value={form.desiredOutcome}
+                onChange={(e) => set("desiredOutcome", e.target.value)}
+                {...aria}
+                className={cn(inputClass(!!errors.desiredOutcome), "resize-y")}
+              />
+            )}
           </Field>
         )}
 
@@ -578,34 +638,43 @@ export function ProjectIntake() {
             />
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Your name" htmlFor="f-contactName" error={errors.contactName}>
-                <input
-                  type="text"
-                  id="f-contactName"
-                  autoComplete="name"
-                  value={form.contactName}
-                  onChange={(e) => set("contactName", e.target.value)}
-                  className={inputClass(!!errors.contactName)}
-                />
+                {(aria) => (
+                  <input
+                    type="text"
+                    id="f-contactName"
+                    autoComplete="name"
+                    value={form.contactName}
+                    onChange={(e) => set("contactName", e.target.value)}
+                    {...aria}
+                    className={inputClass(!!errors.contactName)}
+                  />
+                )}
               </Field>
               <Field label="Role" htmlFor="f-contactRole" error={errors.contactRole}>
-                <input
-                  type="text"
-                  id="f-contactRole"
-                  value={form.contactRole}
-                  onChange={(e) => set("contactRole", e.target.value)}
-                  className={inputClass(!!errors.contactRole)}
-                />
+                {(aria) => (
+                  <input
+                    type="text"
+                    id="f-contactRole"
+                    value={form.contactRole}
+                    onChange={(e) => set("contactRole", e.target.value)}
+                    {...aria}
+                    className={inputClass(!!errors.contactRole)}
+                  />
+                )}
               </Field>
             </div>
             <Field label="Work email" htmlFor="f-contactEmail" error={errors.contactEmail}>
-              <input
-                type="email"
-                id="f-contactEmail"
-                autoComplete="email"
-                value={form.contactEmail}
-                onChange={(e) => set("contactEmail", e.target.value)}
-                className={inputClass(!!errors.contactEmail)}
-              />
+              {(aria) => (
+                <input
+                  type="email"
+                  id="f-contactEmail"
+                  autoComplete="email"
+                  value={form.contactEmail}
+                  onChange={(e) => set("contactEmail", e.target.value)}
+                  {...aria}
+                  className={inputClass(!!errors.contactEmail)}
+                />
+              )}
             </Field>
 
             {/* Honeypot — hidden from humans */}
@@ -627,6 +696,8 @@ export function ProjectIntake() {
                   type="checkbox"
                   checked={form.consent}
                   onChange={(e) => set("consent", e.target.checked)}
+                  aria-invalid={errors.consent ? true : undefined}
+                  aria-describedby={errors.consent ? "f-consent-error" : undefined}
                   className="mt-1 h-4 w-4 accent-[color:var(--color-accent)]"
                 />
                 <span>
@@ -639,7 +710,7 @@ export function ProjectIntake() {
                 </span>
               </label>
               {errors.consent && (
-                <p role="alert" className="mt-1 text-xs text-critical">{errors.consent}</p>
+                <p id="f-consent-error" role="alert" className="mt-1 text-xs text-critical">{errors.consent}</p>
               )}
             </div>
           </>
@@ -678,33 +749,95 @@ export function ProjectIntake() {
   );
 }
 
+/**
+ * Shape-checked read of the intake API response. `response.json()` is `any`,
+ * so every field is narrowed before use instead of being trusted.
+ */
+function parseBriefResponse(value: unknown): {
+  ok: boolean;
+  error?: string;
+  briefId?: string;
+  nextStep?: string;
+} {
+  if (typeof value !== "object" || value === null) return { ok: false };
+  const record = value as Record<string, unknown>;
+  return {
+    ok: record.ok === true,
+    error: typeof record.error === "string" ? record.error : undefined,
+    briefId: typeof record.briefId === "string" ? record.briefId : undefined,
+    nextStep: typeof record.nextStep === "string" ? record.nextStep : undefined,
+  };
+}
+
 function inputClass(hasError: boolean): string {
   return cn(
-    "min-h-11 w-full rounded-md border bg-surface2 px-3 py-2.5 text-sm transition-colors duration-150 focus:border-accent focus:outline-none",
+    /*
+      No `focus:outline-none` here. The global `:focus-visible` rule in
+      globals.css draws a 2px accent outline, and a Tailwind utility would
+      outrank it, leaving only a 1px border-color shift as the focus
+      indicator. Keeping the outline restores a clearly visible focus state on
+      every input, textarea and select.
+    */
+    "min-h-11 w-full rounded-md border bg-surface2 px-3 py-2.5 text-sm transition-colors duration-150 focus:border-accent",
     hasError ? "border-critical" : "border-line",
   );
 }
 
+/** Aria wiring the control itself needs, supplied by `Field`. */
+interface FieldAria {
+  "aria-describedby": string | undefined;
+  "aria-invalid": true | undefined;
+  "aria-required": true | undefined;
+}
+
+/**
+ * Labelled form row.
+ *
+ * `children` is a render function rather than a node so the error/hint wiring
+ * can reach the control itself. Previously the message was announced once on
+ * submit (`role="alert"`) but the field carried no `aria-invalid`, no
+ * `aria-describedby` and no `aria-required`, so a screen-reader user reviewing
+ * the form — or returning after a server error — could not tell which field was
+ * wrong or what was required.
+ */
 function Field({
   label,
   htmlFor,
   children,
   error,
   hint,
+  required = true,
 }: {
   label: string;
-  htmlFor?: string;
-  children: React.ReactNode;
+  htmlFor: string;
+  children: (aria: FieldAria) => React.ReactNode;
   error?: string;
   hint?: string;
+  required?: boolean;
 }) {
+  const hintId = `${htmlFor}-hint`;
+  const errorId = `${htmlFor}-error`;
+  const describedBy =
+    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") ||
+    undefined;
+
   return (
     <div>
       <label htmlFor={htmlFor} className="block text-sm font-medium">{label}</label>
-      {hint && <p className="mt-1 text-xs text-faint">{hint}</p>}
-      <div className="mt-1.5">{children}</div>
+      {hint && (
+        <p id={hintId} className="mt-1 text-xs text-faint">
+          {hint}
+        </p>
+      )}
+      <div className="mt-1.5">
+        {children({
+          "aria-describedby": describedBy,
+          "aria-invalid": error ? true : undefined,
+          "aria-required": required ? true : undefined,
+        })}
+      </div>
       {error && (
-        <p key={error} role="alert" className="field-shake mt-1 text-xs text-critical">
+        <p id={errorId} key={error} role="alert" className="field-shake mt-1 text-xs text-critical">
           {error}
         </p>
       )}
@@ -729,26 +862,29 @@ function SelectField({
 }) {
   return (
     <Field label={label} error={error} htmlFor={id}>
-      <div className="relative">
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={cn(inputClass(!!error), "appearance-none pr-9")}
-        >
-          <option value="">Select…</option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <Icon
-          name="chevron-down"
-          size={12}
-          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-faint"
-        />
-      </div>
+      {(aria) => (
+        <div className="relative">
+          <select
+            id={id}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            {...aria}
+            className={cn(inputClass(!!error), "appearance-none pr-9")}
+          >
+            <option value="">Select…</option>
+            {options.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+          <Icon
+            name="chevron-down"
+            size={12}
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-faint"
+          />
+        </div>
+      )}
     </Field>
   );
 }

@@ -3,7 +3,7 @@ import type { CaseStudy } from "@/types/content";
 /**
  * These entries describe EXAMPLE ARCHITECTURES — reference implementations
  * showing how we approach a problem class. They are NOT claims of client
- * engagements and are labelled as such everywhere they appear.
+ * engagements and are labeled as such everywhere they appear.
  */
 
 export const caseStudies: CaseStudy[] = [
@@ -155,7 +155,7 @@ export const caseStudies: CaseStudy[] = [
     monitoring: [
       "Retrieval precision reviewed weekly",
       "Model drift checks against benchmark set",
-      "GPU utilisation and cost per query tracked",
+      "GPU utilization and cost per query tracked",
     ],
     after: [
       "Staff ask questions instead of guessing filenames",

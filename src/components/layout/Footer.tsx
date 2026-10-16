@@ -25,12 +25,20 @@ export function Footer() {
               We design, build, deploy and operate intelligent systems that make
               businesses faster, safer and more autonomous.
             </p>
-            <a
-              href={`mailto:${contact.email}`}
-              className="mt-4 block text-xs text-muted transition-colors hover:text-ink"
-            >
-              {contact.email}
-            </a>
+            {/*
+              Rendered only when a real address is configured. A reserved
+              *.example address would render as a live-looking mailto that
+              silently bounces; the Tools column already routes visitors to the
+              working intake form when no address is set.
+            */}
+            {contact.email && (
+              <a
+                href={`mailto:${contact.email}`}
+                className="mt-4 block text-xs text-muted transition-colors hover:text-ink"
+              >
+                {contact.email}
+              </a>
+            )}
           </div>
 
           {footerColumns.map((column) => (

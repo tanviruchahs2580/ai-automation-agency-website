@@ -184,7 +184,14 @@ export function HeroInstrument() {
           </div>
         </div>
 
-        <div className="border-t border-line px-5 py-3 sm:px-6" aria-live="polite">
+        {/*
+          aria-live="off", not "polite". This line is replaced every ~7 seconds
+          for as long as the page is open, so a polite live region queued an
+          endless stream of unsolicited announcements — decorative console
+          chatter is not information a screen-reader user needs. Reduced-motion
+          visitors never start the loop at all (see the effect above).
+        */}
+        <div className="border-t border-line px-5 py-3 sm:px-6" aria-live="off">
           <AnimatePresence mode="wait">
             <motion.p
               key={eventIndex}

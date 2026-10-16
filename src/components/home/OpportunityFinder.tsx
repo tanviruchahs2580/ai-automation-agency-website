@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { opportunities } from "@/data/opportunities";
+import { getOpportunity, opportunities } from "@/data/opportunities";
 import { AnalyticsEvent, track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 export function OpportunityFinder() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selected = opportunities.find((o) => o.id === selectedId) ?? null;
+  // Uses the data-layer accessor rather than re-implementing the lookup here,
+  // which is what left getOpportunity unreferenced.
+  const selected = selectedId ? (getOpportunity(selectedId) ?? null) : null;
 
   return (
     <div className="grid gap-8 lg:grid-cols-12">

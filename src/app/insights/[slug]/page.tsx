@@ -120,9 +120,17 @@ export default async function InsightPage({
                   <p key={j}>{paragraph}</p>
                 ))}
               </div>
-              {i === 1 && section.paragraphs[0] && (
+              {/*
+                The pull quote is authored per article (see Insight.pullQuote)
+                rather than sliced out of the second section's first sentence,
+                which could not be the strongest line and could dangle: one
+                article rendered "First, capability limits: ..." with no
+                "Second" to follow. Rendering it after the first section also
+                means it no longer depends on a second section existing.
+              */}
+              {i === 0 && (
                 <QuoteRail
-                  quote={section.paragraphs[0].split(". ")[0] + "."}
+                  quote={insight.pullQuote}
                   attribution={`${insight.author} — ${insight.category}`}
                 />
               )}

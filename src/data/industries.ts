@@ -1,7 +1,7 @@
 import type { Industry } from "@/types/content";
 
 /**
- * KPI lists describe metrics an organisation should track — they never
+ * KPI lists describe metrics an organization should track — they never
  * claim results we have not verified.
  */
 
@@ -111,7 +111,7 @@ export const industries: Industry[] = [
       {
         title: "Maintenance workflow automation",
         description:
-          "Sensor alerts become prioritised, parts-checked work orders automatically.",
+          "Sensor alerts become prioritized, parts-checked work orders automatically.",
       },
       {
         title: "Supplier communication agents",
@@ -237,7 +237,7 @@ export const industries: Industry[] = [
       {
         title: "Crop monitoring digests",
         description:
-          "Imagery and weather fused into prioritised scouting recommendations.",
+          "Imagery and weather fused into prioritized scouting recommendations.",
       },
       {
         title: "Procurement coordination",
@@ -315,7 +315,7 @@ export const industries: Industry[] = [
       "Listing generation from property data with broker review",
       "Lease abstraction pipelines with clause-level validation",
       "Maintenance request triage to vendors",
-      "Due-diligence summarisation with source citations",
+      "Due-diligence summarization with source citations",
     ],
     useCases: [
       {
@@ -382,7 +382,12 @@ export const industries: Industry[] = [
       "Realisation rate",
       "Knowledge reuse rate",
     ],
-    caseStudySlugs: [],
+    /* Sectors whose reference architectures carry a matching industry label
+       were previously left empty, so the two studies that explicitly name
+       these sectors ("SaaS & Technology · Customer operations", "Professional
+       Services · Knowledge management") had no inbound link from any industry
+       page. */
+    caseStudySlugs: ["private-knowledge-platform"],
   },
   {
     slug: "saas-technology",
@@ -424,7 +429,7 @@ export const industries: Industry[] = [
       "Support ticket deflection",
       "Enterprise deal cycle length",
     ],
-    caseStudySlugs: [],
+    caseStudySlugs: ["support-triage-agents"],
   },
   {
     slug: "government",
@@ -438,10 +443,10 @@ export const industries: Industry[] = [
       "Data sovereignty often mandated by law",
     ],
     opportunities: [
-      "Casework summarisation with full citation trails",
+      "Casework summarization with full citation trails",
       "Citizen enquiry routing in multiple languages",
       "Document classification for records management",
-      " FOI/request processing support",
+      "FOI/request processing support",
     ],
     useCases: [
       {
@@ -489,7 +494,7 @@ export const industries: Industry[] = [
       {
         title: "Asset health digests",
         description:
-          "Inspections, sensors and history condensed into prioritised action lists.",
+          "Inspections, sensors and history condensed into prioritized action lists.",
       },
       {
         title: "Field service enablement",

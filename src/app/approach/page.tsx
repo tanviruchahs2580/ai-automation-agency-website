@@ -18,7 +18,7 @@ const standards = [
   {
     title: "Definition of done",
     detail:
-      "Code reviewed, tested, documented and observable. For AI behaviour: evaluated against golden sets with agreed pass thresholds.",
+      "Code reviewed, tested, documented and observable. For AI behavior: evaluated against golden sets with agreed pass thresholds.",
   },
   {
     title: "Evaluation-driven acceptance",
@@ -102,15 +102,20 @@ export default function ApproachPage() {
             title="What 'finished' means here."
             id="standards-heading"
           />
+          {/*
+            Each <div> under a <dl> must contain its <dt>/<dd> directly. This
+            used to nest an extra wrapper — <Reveal> as the dl child, then a
+            card <div> inside it — giving `dl > div > div > dt`, which the HTML
+            spec forbids and axe flags as "dlitem" / "definition-list".
+            Passing the card styling to <Reveal> removes the stray wrapper.
+          */}
           <dl className="mt-12 grid gap-x-10 gap-y-8 md:grid-cols-2">
             {standards.map((standard) => (
-              <Reveal key={standard.title}>
-                <div className="card-surface h-full p-6">
-                  <dt className="font-semibold">{standard.title}</dt>
-                  <dd className="mt-2 text-sm leading-relaxed text-muted">
-                    {standard.detail}
-                  </dd>
-                </div>
+              <Reveal key={standard.title} className="card-surface h-full p-6">
+                <dt className="font-semibold">{standard.title}</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-muted">
+                  {standard.detail}
+                </dd>
               </Reveal>
             ))}
           </dl>

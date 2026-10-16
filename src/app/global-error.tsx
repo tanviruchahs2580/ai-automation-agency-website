@@ -14,10 +14,15 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  // Contact is env-driven at build time; fallback matches src/data/site.ts
-  // until NEXT_PUBLIC_CONTACT_EMAIL is configured (launch checklist §1).
+  /*
+    Contact is env-driven at build time. The root layout is not mounted here,
+    so this file cannot import src/data/site without pulling the whole app data
+    module into the fallback bundle; the env read is repeated deliberately and
+    the channel is omitted rather than faked when unset — a reserved *.example
+    address would render as a mailto that silently bounces.
+  */
   const contactEmail =
-    process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hello@vantiqsystems.example";
+    process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || null;
   const [timestamp] = useState(() => new Date().toISOString());
   return (
     <html lang="en">
@@ -53,12 +58,24 @@ export default function GlobalError({
               500 — server error.
             </span>
             <br />
-            An unexpected error occurred while loading this page. Please try
-            again — if it keeps happening, email{" "}
-            <a href={`mailto:${contactEmail}`} style={{ color: "#2e6bf6" }}>
-              {contactEmail}
-            </a>{" "}
-            and we will follow up directly.
+            An unexpected error occurred while loading this page.{" "}
+            {contactEmail ? (
+              <>
+                Please try again — if it keeps happening, email{" "}
+                <a href={`mailto:${contactEmail}`} style={{ color: "#2e6bf6" }}>
+                  {contactEmail}
+                </a>{" "}
+                and we will follow up directly.
+              </>
+            ) : (
+              <>
+                Please try again — if it keeps happening,{" "}
+                <a href="/start-a-project" style={{ color: "#2e6bf6" }}>
+                  send us the reference below
+                </a>{" "}
+                through the project brief form.
+              </>
+            )}
           </p>
           <p
             style={{

@@ -17,7 +17,7 @@ const securityControls = [
   { title: "Secrets management", detail: "Central vaults; no credentials in code or prompts." },
   { title: "API security", detail: "Authenticated, rate-limited, schema-validated endpoints." },
   { title: "PII protection", detail: "Detection and redaction before data reaches external systems." },
-  { title: "Monitoring", detail: "Anomaly alerts on usage, cost and behaviour drift." },
+  { title: "Monitoring", detail: "Anomaly alerts on usage, cost and behavior drift." },
   { title: "Rollback", detail: "Versioned deployments rehearsed for fast reversal." },
   { title: "Disaster recovery", detail: "Defined RPO/RTO targets with tested restore procedures." },
   { title: "Vendor abstraction", detail: "Model and provider swaps without architectural surgery." },

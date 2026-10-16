@@ -41,12 +41,13 @@ Signature additions:
 | Token | Value (dark) | Rule |
 |---|---|---|
 | `--color-signal` | `#00E5A8` | **Live / verified / running states ONLY.** Never decoration. |
-| `--color-signal-dim` | `#00B486` | Muted live states. |
 | `--color-critical` | `#F87171` (kept) | **Real errors ONLY.** Never accent. |
 | `--color-brass` | `#B7A36A` | "Considered" states: pull-quotes, engineering notes, reviewed badges. |
 | `--color-accent-glow` | `rgba(46,107,246,.18)` | Halo behind hero numerals / wordmark, **max 1 per viewport**. |
 | `--color-grid-line` | `rgba(244,242,236,.04)` | Background grid (`<GridLines />`). |
-| `--color-grid-line-strong` | `rgba(244,242,236,.08)` | Card borders on dark. |
+
+Card borders use `--color-line` / `--color-line-strong`, not a dedicated
+grid-line token.
 
 Light theme re-maps every token (see `globals.css`); contrast re-verified in
 `src/lib/a11y-matrix.md`.
@@ -85,7 +86,7 @@ Fluid scale:
 --text-h1:      clamp(2.25rem, 3.5vw + .5rem, 4rem);
 --text-h2:      clamp(1.75rem, 2vw + .5rem, 2.75rem);
 --text-h3:      clamp(1.25rem, 1vw + .5rem, 1.5rem);
---text-body:    1.0625rem / 1.65;
+--text-body:    1.0625rem;
 --text-small:   .875rem;
 --text-mono:    .8125rem;
 ```
@@ -103,8 +104,9 @@ uses the editorial serif.
   drops the condition, which pinned the gutter to 1.5rem everywhere.
 
 - `.section-y`: 4.5rem → 7rem vertical rhythm.
-- `<GridLines />` replaces `.panel-grid`: faint SVG grid at viewport edges
-  only — intentional, not graph paper.
+- `<GridLines />` is the only grid treatment: faint SVG grid at viewport edges
+  only — intentional, not graph paper. The legacy `.panel-grid` class it
+  replaced has been removed from `globals.css`; it had no remaining call sites.
 - `--max-prose: 42rem` for long-form.
 
 ## 5. Components (`src/components/ui/`)

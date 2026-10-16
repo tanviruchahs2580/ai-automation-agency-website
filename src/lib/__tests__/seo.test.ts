@@ -18,6 +18,24 @@ async function loadSiteUrl(envValue: string | undefined): Promise<string> {
   return mod.SITE_URL;
 }
 
+/**
+ * Resolution with no NEXT_PUBLIC_SITE_URL but with the hosting platform's own
+ * system variables present. Vercel exposes both at build time, so a deploy that
+ * forgets the env var must still publish correct canonicals instead of
+ * self-canonicalising every page to localhost.
+ */
+async function loadSiteUrlWithPlatformEnv(env: {
+  production?: string;
+  deployment?: string;
+}): Promise<string> {
+  vi.resetModules();
+  vi.stubEnv("NEXT_PUBLIC_SITE_URL", "");
+  vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", env.production ?? "");
+  vi.stubEnv("VERCEL_URL", env.deployment ?? "");
+  const mod = await import("@/lib/seo");
+  return mod.SITE_URL;
+}
+
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.resetModules();
@@ -69,5 +87,39 @@ describe("SITE_URL resolution", () => {
     expect(await loadSiteUrl("ht!tp://bad value")).toBe(
       "http://localhost:3000",
     );
+  });
+});
+
+describe("SITE_URL platform fallback", () => {
+  it("prefers the stable production domain over the deployment URL", async () => {
+    expect(
+      await loadSiteUrlWithPlatformEnv({
+        production: "ai-automation-agency-website-lilac.vercel.app",
+        deployment: "ai-automation-agency-website-abc123.vercel.app",
+      }),
+    ).toBe("https://ai-automation-agency-website-lilac.vercel.app");
+  });
+
+  it("uses the deployment URL when no production domain is exposed", async () => {
+    expect(
+      await loadSiteUrlWithPlatformEnv({
+        deployment: "ai-automation-agency-website-abc123.vercel.app",
+      }),
+    ).toBe("https://ai-automation-agency-website-abc123.vercel.app");
+  });
+
+  it("still falls back to localhost with no env at all", async () => {
+    expect(await loadSiteUrlWithPlatformEnv({})).toBe("http://localhost:3000");
+  });
+
+  it("prefers an explicit NEXT_PUBLIC_SITE_URL over the platform variables", async () => {
+    vi.resetModules();
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://vantiqsystems.com");
+    vi.stubEnv(
+      "VERCEL_PROJECT_PRODUCTION_URL",
+      "ai-automation-agency-website-lilac.vercel.app",
+    );
+    const mod = await import("@/lib/seo");
+    expect(mod.SITE_URL).toBe("https://vantiqsystems.com");
   });
 });

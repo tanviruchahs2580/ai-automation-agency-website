@@ -35,6 +35,9 @@ next-env.d.ts
 Thumbs.db
 .idea/
 .vscode/
+# Agent-tool config (generated locally; mirrors .gitignore, not project source)
+.zcodeignore
+.zcode/
 
 # Local databases / dumps
 *.sqlite

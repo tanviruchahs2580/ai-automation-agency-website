@@ -13,7 +13,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata = buildMetadata({
   title: "Work & Reference Architectures",
   description:
-    "Reference architectures showing how we engineer AI and automation systems — clearly labelled examples until verified client results are published.",
+    "Reference architectures showing how we engineer AI and automation systems — clearly labeled examples until verified client results are published.",
   path: "/work",
 });
 

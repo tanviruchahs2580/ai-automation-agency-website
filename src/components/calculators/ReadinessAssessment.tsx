@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { readinessQuestions } from "@/data/readiness-questions";
 import { answerScale, scoreReadiness } from "@/lib/readiness";
 import { AnalyticsEvent, track } from "@/lib/analytics";
@@ -13,6 +13,8 @@ export function ReadinessAssessment() {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [finished, setFinished] = useState(false);
+  const questionRef = useRef<HTMLFieldSetElement>(null);
+  const resultRef = useRef<HTMLHeadingElement>(null);
 
   const total = readinessQuestions.length;
   const question = readinessQuestions[index];
@@ -35,6 +37,19 @@ export function ReadinessAssessment() {
       setIndex(index + 1);
     }
   };
+
+  /*
+    Focus is handed off only when the view identity changes — start, finish,
+    retake — because those transitions unmount the control that was focused.
+    Advancing between questions deliberately does NOT move focus: the option
+    buttons are keyed by label, so React reuses the same DOM node and the
+    visitor keeps their place mid-list.
+  */
+  useEffect(() => {
+    if (!started) return;
+    if (finished) resultRef.current?.focus();
+    else questionRef.current?.focus();
+  }, [started, finished]);
 
   if (!started) {
     return (
@@ -64,8 +79,14 @@ export function ReadinessAssessment() {
 
   if (result) {
     return (
-      <div className="card-surface mx-auto max-w-2xl p-6 md:p-10" aria-live="polite">
-        <p className="mono-label uppercase text-faint">AI readiness score</p>
+      <div className="card-surface mx-auto max-w-2xl p-6 md:p-10">
+        <h2
+          ref={resultRef}
+          tabIndex={-1}
+          className="mono-label uppercase text-faint"
+        >
+          AI readiness score
+        </h2>
         <div className="mt-3 flex items-end gap-3">
           <span className="sr-only">{result.overall} out of 100</span>
           <span aria-hidden="true" className="font-mono text-6xl font-bold tabular-nums tracking-tight">
@@ -167,28 +188,45 @@ export function ReadinessAssessment() {
         </div>
       </div>
 
-      <fieldset className="mt-8">
+      {/*
+        Focus lands on the fieldset, not the legend. A <legend tabindex="-1">
+        is the prettier target in theory, but Firefox refuses to focus a
+        programmatically focused legend, so focus fell to <body> there and
+        keyboard users restarted from the top of the page. Screen readers
+        announce a fieldset's legend when the group receives focus.
+      */}
+      <fieldset ref={questionRef} tabIndex={-1} className="mt-8">
         <legend className="text-xl font-semibold leading-snug">
           {question.question}
         </legend>
         <p className="mt-2 text-sm text-muted">{question.help}</p>
         <div className="mt-6 flex flex-col gap-2">
-          {answerScale.map((label, value) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => answer(value)}
-              className={cn(
-                "flex min-h-11 items-center justify-between rounded-md border px-4 py-2.5 text-left text-sm transition-colors",
-                answers[question.id] === value
-                  ? "border-accent bg-accent/10 text-accent-strong"
-                  : "border-line bg-surface2 hover:border-line-strong",
-              )}
-            >
-              {label}
-              <span className="font-mono text-xs text-faint">{value}</span>
-            </button>
-          ))}
+          {answerScale.map((label, value) => {
+            const selected = answers[question.id] === value;
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => answer(value)}
+                /*
+                  aria-pressed exposes the current answer. Colour and border were
+                  the only signal, so a screen-reader user stepping back through
+                  the questions with [Previous] had no way to hear which option
+                  they had already chosen.
+                */
+                aria-pressed={selected}
+                className={cn(
+                  "flex min-h-11 items-center justify-between rounded-md border px-4 py-2.5 text-left text-sm transition-colors",
+                  selected
+                    ? "border-accent bg-accent/10 text-accent-strong"
+                    : "border-line bg-surface2 hover:border-line-strong",
+                )}
+              >
+                {label}
+                <span className="font-mono text-xs text-faint">{value}</span>
+              </button>
+            );
+          })}
         </div>
       </fieldset>
 

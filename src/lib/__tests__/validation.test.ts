@@ -108,7 +108,7 @@ describe("recommendedNextStep", () => {
     const step = recommendedNextStep({
       ...validBrief,
       problem: "Leadership wants an enterprise AI transformation roadmap strategy.",
-      desiredOutcome: "A prioritised readiness plan.",
+      desiredOutcome: "A prioritized readiness plan.",
     });
     expect(step).toContain("strategy");
   });

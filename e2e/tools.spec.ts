@@ -23,6 +23,16 @@ test.describe("interactive tools", () => {
   });
 
   test("readiness assessment completes and shows a score", async ({ page }) => {
+    /*
+      Reduced motion, deliberately. globals.css ships `html { scroll-behavior:
+      smooth }` and disables it under `prefers-reduced-motion: reduce`. With
+      smooth scrolling active, each answer re-renders the question and WebKit's
+      scroll animation keeps the option buttons moving past Playwright's
+      stability check, so clicks intermittently burned their whole timeout —
+      reproduced on the unmodified component, so it predates this change. The
+      assertions below are unchanged.
+    */
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/ai-readiness");
 
     // The assessment is gated behind an explicit start button; without it the
@@ -39,7 +49,17 @@ test.describe("interactive tools", () => {
       if (!visible) break;
       await option.last().click();
       answered++;
-      await page.waitForTimeout(150);
+      /*
+        Deterministic sync instead of a fixed 150ms sleep. The fixed sleep was
+        the flakiest part of this suite: under load the next question had not
+        settled when the following click was issued, and the click burned its
+        whole timeout waiting for a stable target. Waiting for the question
+        counter to advance proves the view actually changed, which is a
+        stronger check than sleeping and hoping.
+      */
+      if (answered < 10) {
+        await expect(page.getByText(`Question ${answered + 1} / 10`)).toBeVisible();
+      }
     }
 
     expect(answered).toBe(10);
@@ -54,6 +74,9 @@ test.describe("interactive tools", () => {
     page,
   }, testInfo) => {
     test.setTimeout(90_000);
+    // Same reason as the readiness test: the wizard animates each step, and
+    // reduced motion settles it so field actions are not racing the animation.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await openHydratedWizard(page);
 
     // Step 1 — Business

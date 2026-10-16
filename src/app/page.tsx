@@ -22,14 +22,24 @@ export const metadata = buildMetadata({
 });
 
 /**
+/**
  * Illustrative ranges stay static text: count-up on a range endpoint would
  * misrepresent the number (honesty wins over motion). The gauge bands carry
  * the visual momentum instead.
+ *
+ * Labels say "model" explicitly. The section lead promises "Built on your
+ * numbers — not our marketing", so a label reading "Manual triage reduction in
+ * 90 days" or "Typical first-year return" asserted typical client outcomes the
+ * site cannot evidence; these are outputs of the calculator's model.
+ *
+ * Band positions are percentages of each metric's own scale, not the printed
+ * value: "3–6×" cannot share an axis with "60–80%", so the multiplier maps
+ * 0–8× onto 0–100% (3× ≈ 37%, 6× = 75%).
  */
 const roiTeaserMetrics = [
-  { value: "60–80%", label: "Manual triage reduction in 90 days", lo: 60, hi: 80 },
-  { value: "40–60%", label: "Incident MTTR cut within one quarter", lo: 40, hi: 60 },
-  { value: "3–6×", label: "Typical first-year return on automated hours", lo: 37, hi: 75 },
+  { value: "60–80%", label: "Triage effort removed — 90-day model", lo: 60, hi: 80 },
+  { value: "40–60%", label: "Incident MTTR removed — one-quarter model", lo: 40, hi: 60 },
+  { value: "3–6×", label: "First-year return on automated hours — model", lo: 37, hi: 75 },
 ];
 
 /** Below-the-fold scene — code-split per the performance budget (§10). */
@@ -106,7 +116,7 @@ export default function HomePage() {
             <SectionHeader
               eyebrow="ROI calculator"
               title="Estimate what manual work really costs you."
-              lead="Built on your numbers — not our marketing. Every output is labelled an estimate because it is one."
+              lead="Built on your numbers — not our marketing. Every output is labeled an estimate because it is one."
               id="roi-heading"
               index="08"
             />
@@ -136,7 +146,7 @@ export default function HomePage() {
               ))}
             </dl>
             <p className="mono-label mt-4 uppercase text-faint">
-              Illustrative ranges — your estimate is computed from your inputs
+              Illustrative model outputs — not client results
             </p>
           </div>
           <div className="lg:col-span-5">

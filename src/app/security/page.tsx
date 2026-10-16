@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { Reveal } from "@/components/ui/Reveal";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SecurityGovernance } from "@/components/home/SecurityGovernance";
 import { ComplianceStamp } from "@/components/scenes/ComplianceStamp";
 import { contact } from "@/data/site";
@@ -61,18 +62,32 @@ export default function SecurityPage() {
         ]}
       />
 
+      {/*
+        `aria-labelledby` pointed at "practices-heading", which no element
+        carried, so this region was announced without a name. The section also
+        had no heading of its own — only the h2 card titles — which is why the
+        next section's eyebrow reads "In engineered systems" with nothing to
+        contrast against.
+      */}
       <section className="section-y" aria-labelledby="practices-heading">
-        <div className="container-x grid gap-5 md:grid-cols-2">
-          {practices.map((practice) => (
-            <Reveal key={practice.title}>
-              <div className="card-surface h-full p-7">
-                <h2 className="h-card">{practice.title}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-muted">
-                  {practice.detail}
-                </p>
-              </div>
-            </Reveal>
-          ))}
+        <div className="container-x">
+          <SectionHeader
+            eyebrow="This website"
+            title="How this site is actually secured."
+            id="practices-heading"
+          />
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {practices.map((practice) => (
+              <Reveal key={practice.title}>
+                <div className="card-surface h-full p-7">
+                  <h3 className="h-card">{practice.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted">
+                    {practice.detail}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -147,17 +162,33 @@ export default function SecurityPage() {
             Found a vulnerability? Tell us first.
           </h2>
           <p className="mt-4 leading-relaxed text-muted">
-            Email{" "}
-            <a
-              href={`mailto:${contact.email}?subject=${encodeURIComponent("Security report")}`}
-              className="text-accent-strong underline underline-offset-4 hover:text-ink"
-            >
-              {contact.email}
-            </a>{" "}
-            with a description and steps to reproduce. We acknowledge every
-            report within two business days, keep you updated on the fix, and
-            ask only that you give us reasonable time to remediate before any
-            public disclosure.
+            {contact.email ? (
+              <>
+                Email{" "}
+                <a
+                  href={`mailto:${contact.email}?subject=${encodeURIComponent("Security report")}`}
+                  className="text-accent-strong underline underline-offset-4 hover:text-ink"
+                >
+                  {contact.email}
+                </a>{" "}
+                with a description and steps to reproduce.
+              </>
+            ) : (
+              <>
+                Send a report through our{" "}
+                <Link
+                  href="/start-a-project"
+                  className="text-accent-strong underline underline-offset-4 hover:text-ink"
+                >
+                  project brief form
+                </Link>{" "}
+                and lead with &ldquo;security&rdquo; so it is routed to
+                engineering rather than to sales.
+              </>
+            )}{" "}
+            We acknowledge every report within two business days, keep you
+            updated on the fix, and ask only that you give us reasonable time to
+            remediate before any public disclosure.
           </p>
         </div>
       </section>

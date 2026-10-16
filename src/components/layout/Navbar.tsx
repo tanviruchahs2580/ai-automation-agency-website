@@ -11,15 +11,34 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Wordmark } from "@/components/layout/Wordmark";
 import { Icon } from "@/components/ui/Icon";
 
-function Dropdown({ label, href, isActive, children }: {
-  label: string;
-  href: string;
-  isActive: boolean;
-  children: React.ReactNode;
+/**
+ * Desktop navigation disclosure.
+ *
+ * Deliberately a disclosure — aria-expanded + aria-controls on the summary
+ * link — and not role="menu". The menu role obliges a full arrow-key /
+ * roving-focus model and forbids non-menuitem children, which this panel has;
+ * a list of links is what it actually is, so that is what it is exposed as.
+ */
+function Dropdown({
+  item,
+  isActive,
+}: {
+  item: NavItem;
+  isActive: (href: string) => boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLAnchorElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  /*
+    The panel opens on focus so keyboard users can reach the submenu, but that
+    means returning focus to the trigger after Escape would immediately reopen
+    it. This flag consumes exactly one focus event after an Escape-close.
+  */
+  const suppressFocusOpenRef = useRef(false);
+  // Leading/trailing slashes are stripped first, otherwise "/solutions" would
+  // yield "nav-menu--solutions" (a valid but needlessly awkward id).
+  const menuId = `nav-menu-${item.href.replace(/^\/+|\/+$/g, "").replace(/\W+/g, "-")}`;
 
   const onEnter = () => {
     clearTimeout(timeoutRef.current);
@@ -28,14 +47,12 @@ function Dropdown({ label, href, isActive, children }: {
   const onLeave = () => {
     timeoutRef.current = setTimeout(() => setOpen(false), 120);
   };
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
-      setOpen(false);
+  const onFocusIn = () => {
+    if (suppressFocusOpenRef.current) {
+      suppressFocusOpenRef.current = false;
+      return;
     }
-    if (e.key === "Enter" || e.key === " ") {
-      setOpen((v) => !v);
-    }
+    onEnter();
   };
 
   useEffect(() => () => clearTimeout(timeoutRef.current), []);
@@ -49,7 +66,7 @@ function Dropdown({ label, href, isActive, children }: {
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open ]);
+  }, [open]);
 
   return (
     <div
@@ -57,57 +74,91 @@ function Dropdown({ label, href, isActive, children }: {
       className="relative"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      onFocus={onEnter}
+      onFocus={onFocusIn}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node)) {
           setOpen(false);
         }
       }}
-      onKeyDown={onKeyDown}
+      onKeyDown={(e) => {
+        /*
+          Escape is the only key handled here. Key events bubble from the
+          submenu links, so reacting to Enter/Space closed the panel — and
+          unmounted the very link that had focus — while the user was tabbing
+          through it. Enter/Space now keep their native link behavior, and the
+          panel opens on focus and on hover as before.
+        */
+        if (e.key === "Escape" && open) {
+          e.stopPropagation();
+          suppressFocusOpenRef.current = true;
+          setOpen(false);
+          triggerRef.current?.focus();
+        }
+      }}
     >
       <Link
-        href={href}
-        aria-current={isActive ? "page" : undefined}
-        aria-haspopup="menu"
+        ref={triggerRef}
+        href={item.href}
+        aria-current={isActive(item.href) ? "page" : undefined}
         aria-expanded={open}
-          className={cn(
-            "relative flex items-center gap-1 whitespace-nowrap rounded px-2 py-2 text-sm transition-colors duration-150 xl:px-3",
-            isActive ? "text-accent-strong" : "text-muted hover:text-ink",
-          )}
-        >
-          {label}
-          <Icon
-            name="chevron-down"
-            size={10}
-            className={cn("transition-transform duration-200", open && "rotate-180")}
+        aria-controls={menuId}
+        className={cn(
+          "relative flex items-center gap-1 whitespace-nowrap rounded px-2 py-2 text-sm transition-colors duration-150 xl:px-3",
+          isActive(item.href) ? "text-accent-strong" : "text-muted hover:text-ink",
+        )}
+      >
+        {item.label}
+        <Icon
+          name="chevron-down"
+          size={10}
+          className={cn("transition-transform duration-200", open && "rotate-180")}
+        />
+        {isActive(item.href) && (
+          <span
+            className="absolute inset-x-3 bottom-0.5 h-0.5 rounded bg-accent transition-all duration-200"
+            aria-hidden="true"
           />
-          {isActive && (
-            <span
-              className="absolute inset-x-3 bottom-0.5 h-0.5 rounded bg-accent transition-all duration-200"
-              aria-hidden="true"
-            />
-          )}
-        </Link>
+        )}
+      </Link>
 
       {open && (
         <div
+          id={menuId}
           className="dropdown-in absolute left-0 top-full z-50 w-[19rem] overflow-hidden rounded-xl border border-line-strong bg-surface/95 shadow-overlay backdrop-blur-xl"
-          role="menu"
         >
           <Link
-            href={href}
+            href={item.href}
             className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-surface2"
-            role="menuitem"
           >
-            {label} Overview
+            {item.label} Overview
             <span aria-hidden="true" className="font-mono text-xs text-faint">
               →
             </span>
           </Link>
-          <div className="border-t border-line" />
-          <div className="p-1.5">
-            {children}
-          </div>
+          <ul className="border-t border-line p-1.5">
+            {(item.children ?? []).map((child) => (
+              <li key={child.href}>
+                <Link
+                  href={child.href}
+                  className="group/item block rounded-lg px-3 py-2 transition-colors hover:bg-surface2"
+                >
+                  <span
+                    className={cn(
+                      "block text-sm transition-colors",
+                      isActive(child.href)
+                        ? "text-accent-strong"
+                        : "text-ink group-hover/item:text-accent-strong",
+                    )}
+                  >
+                    {child.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-snug text-faint">
+                    {child.description}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
@@ -120,6 +171,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const searchButtonRef = useRef<HTMLButtonElement>(null);
   const firstMobileLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
@@ -192,35 +244,7 @@ export function Navbar() {
         <nav aria-label="Primary" className="hidden items-center lg:flex lg:gap-0 xl:gap-1">
           {siteNav.map((item) =>
             item.children ? (
-              <Dropdown
-                key={item.href}
-                label={item.label}
-                href={item.href}
-                isActive={isActive(item.href)}
-              >
-                {item.children.map((child) => (
-                  <Link
-                    key={child.href}
-                    href={child.href}
-                    className="group/item block rounded-lg px-3 py-2 transition-colors hover:bg-surface2"
-                    role="menuitem"
-                  >
-                    <span
-                      className={cn(
-                        "block text-sm transition-colors",
-                        isActive(child.href)
-                          ? "text-accent-strong"
-                          : "text-ink group-hover/item:text-accent-strong",
-                      )}
-                    >
-                      {child.label}
-                    </span>
-                    <span className="mt-0.5 block text-xs leading-snug text-faint">
-                      {child.description}
-                    </span>
-                  </Link>
-                ))}
-              </Dropdown>
+              <Dropdown key={item.href} item={item} isActive={isActive} />
             ) : (
               <Link
                 key={item.href}
@@ -245,14 +269,36 @@ export function Navbar() {
 
         <div className="hidden items-center gap-2 lg:flex xl:gap-3">
           <button
+            ref={searchButtonRef}
             type="button"
-            onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}
+            onClick={() => {
+              /*
+                Safari does not move focus to a button on mouse click, so the
+                search dialog captured <body> as its restore target and
+                Escape left keyboard users back at the top of the page.
+                Focusing the trigger first makes the restore target
+                deterministic in every engine — and matches what the other
+                engines already do natively.
+              */
+              searchButtonRef.current?.focus();
+              document.dispatchEvent(
+                new KeyboardEvent("keydown", { key: "k", ctrlKey: true }),
+              );
+            }}
             className="flex min-h-11 items-center gap-2 rounded-md border border-line-strong px-3 py-2 text-sm text-muted transition-colors duration-150 hover:border-accent hover:text-accent-strong"
-            aria-label="Search (Ctrl+K)"
+            aria-label="Search"
           >
             <Icon name="search" size={14} />
             <span className="hidden xl:inline">Search</span>
-            <kbd className="hidden rounded border border-line px-1 py-0.5 font-mono text-[10px] text-faint xl:inline">⌘K</kbd>
+            <kbd
+              aria-hidden="true"
+              className="hidden whitespace-nowrap rounded border border-line px-1 py-0.5 font-mono text-[10px] text-faint xl:inline"
+            >
+              {/* "Ctrl+K" has no inner space: the pill is narrow, and with one
+                  it wrapped onto two lines and clipped the key. */}
+              <span className="key-mac">⌘K</span>
+              <span className="key-other">Ctrl+K</span>
+            </kbd>
           </button>
           <ThemeToggle />
           {/*
@@ -304,6 +350,12 @@ export function Navbar() {
             type="button"
             onClick={() => {
               setOpen(false);
+              /*
+                This button lives inside #mobile-menu, which is hidden as the
+                menu closes — so it cannot be the dialog's focus-restore
+                target. Hand focus to the menu toggle, which stays visible.
+              */
+              menuButtonRef.current?.focus();
               document.dispatchEvent(
                 new KeyboardEvent("keydown", { key: "k", ctrlKey: true }),
               );
@@ -381,6 +433,7 @@ function MobileDropdownSection({
   firstRef?: React.RefObject<HTMLAnchorElement | null>;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const panelId = `mobile-menu-${dropdown.href.replace(/^\/+|\/+$/g, "").replace(/\W+/g, "-")}`;
 
   return (
     <div>
@@ -401,6 +454,7 @@ function MobileDropdownSection({
           onClick={() => setExpanded((v) => !v)}
           className="mr-2 flex min-h-11 min-w-11 items-center justify-center rounded p-2 text-muted transition-colors hover:text-accent-strong"
           aria-expanded={expanded}
+          aria-controls={panelId}
           aria-label={`Show ${dropdown.label} options`}
         >
           <Icon
@@ -411,7 +465,7 @@ function MobileDropdownSection({
         </button>
       </div>
       {expanded && (
-        <div className="ml-4 border-l border-line pl-3">
+        <div id={panelId} className="ml-4 border-l border-line pl-3">
           {(dropdown.children ?? []).map((child) => (
             <Link
               key={child.href}

@@ -14,7 +14,7 @@ export function CaseStudiesPreview() {
         <SectionHeader
           eyebrow="Work & reference architectures"
           title="How we engineer, shown concretely."
-          lead="Until verified client results can be published, we present reference architectures — honest engineering walkthroughs, clearly labelled as examples."
+          lead="Until verified client results can be published, we present reference architectures — honest engineering walkthroughs, clearly labeled as examples."
           id="work-heading"
           index="06"
         />

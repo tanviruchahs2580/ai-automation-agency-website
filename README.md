@@ -32,8 +32,12 @@ npm run test:e2e  # browser E2E + axe (Playwright, chromium)
 Brand-voice audit (must be clean before ship):
 
 ```bash
-grep -rniE "leverage|synergize|supercharge|unlock|revolutionize|game-changing|cutting-edge|world-class|best-in-class|next-gen|seamless|empower" src/
+grep -rniE "leverage|synergize|supercharge|unlock|revolutionize|game-changing|cutting-edge|world-class|best-in-class|next-gen|robust|seamless|empower" src/
 ```
+
+`scalable` is on the forbidden list too, but conditionally — it is allowed when
+it describes a verifiable system property, so it is checked by reading the hits
+rather than by this regex (see BRAND-GUIDE.md §3).
 
 ## Environment
 

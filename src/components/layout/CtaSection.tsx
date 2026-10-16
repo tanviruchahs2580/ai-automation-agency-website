@@ -60,9 +60,13 @@ export function CtaSection({
                 {secondaryLabel}
               </Button>
             </div>
-            <p className="mono-label mt-6 text-faint">
-              Honest technical read — including when AI is the wrong tool
-            </p>
+            {/*
+              A mono-label line used to sit here reading "Honest technical read
+              — including when AI is the wrong tool", which restated the `lead`
+              above it word for word inside the same card. The lead already
+              carries that promise, so the duplicate is gone rather than
+              replaced with padding.
+            */}
           </div>
         </Reveal>
       </div>

@@ -4,6 +4,13 @@
 
 **No `git push`, no commits, no CI/CD, no remote/deploy actions.** All changes in working tree only.
 
+> **Point-in-time record.** Every count in this document ("21/21 routes",
+> "9 sections", "27/27 checks") describes the tree as it stood on the date
+> above and is deliberately not updated: rewriting a dated QA report would
+> falsify the record. The site has since grown to 51 sitemap URLs and 10
+> landing sections. For current figures, read `src/app/sitemap.ts` and the
+> latest CI run.
+
 ---
 
 ## 1 · Executive Summary

@@ -112,18 +112,32 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/*
+        This section pointed `aria-labelledby` at "standards-heading" while no
+        element carried that id, so the region was announced with no name — and
+        the cards below are h3 with no h2 above them, which left a heading-level
+        gap. Every other section on this page has a visible heading; this one
+        now does too.
+      */}
       <section className="section-y" aria-labelledby="standards-heading">
-        <div className="container-x grid gap-10 md:grid-cols-2">
-          {commitments.map((commitment) => (
-            <Reveal key={commitment.title}>
-              <div className="card-surface h-full p-7">
-                <h3 className="h-card">{commitment.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted">
-                  {commitment.detail}
-                </p>
-              </div>
-            </Reveal>
-          ))}
+        <div className="container-x">
+          <SectionHeader
+            eyebrow="Working with us"
+            title="Four commitments we will not trade away."
+            id="standards-heading"
+          />
+          <div className="mt-10 grid gap-10 md:grid-cols-2">
+            {commitments.map((commitment) => (
+              <Reveal key={commitment.title}>
+                <div className="card-surface h-full p-7">
+                  <h3 className="h-card">{commitment.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted">
+                    {commitment.detail}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 

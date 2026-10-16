@@ -11,6 +11,8 @@ const raw: Array<Omit<Insight, "slug">> = [
     category: "Enterprise AI",
     tags: ["production", "architecture", "evaluation"],
     publishedAt: "2026-07-14",
+    pullQuote:
+      "Demos show the happy path.",
     sections: [
       {
         heading: "1. No definition of 'working'",
@@ -58,6 +60,8 @@ const raw: Array<Omit<Insight, "slug">> = [
     category: "Agentic Systems",
     tags: ["agents", "security", "tools"],
     publishedAt: "2026-06-30",
+    pullQuote:
+      "LLMs produce plausible but wrong arguments.",
     sections: [
       {
         heading: "Tools are permissions",
@@ -91,6 +95,8 @@ const raw: Array<Omit<Insight, "slug">> = [
     category: "AI Engineering",
     tags: ["rag", "retrieval", "knowledge"],
     publishedAt: "2026-06-12",
+    pullQuote:
+      "Permissions: if your vector store ignores ACLs, RAG becomes an exfiltration channel.",
     sections: [
       {
         heading: "What RAG genuinely solves",
@@ -124,11 +130,13 @@ const raw: Array<Omit<Insight, "slug">> = [
     category: "AI Economics",
     tags: ["cost", "routing", "models"],
     publishedAt: "2026-05-21",
+    pullQuote:
+      "Token prices mislead; cost per resolved ticket, processed document or completed workflow is what finance cares about.",
     sections: [
       {
         heading: "Not every task needs the frontier",
         paragraphs: [
-          "Classification, extraction and formatting tasks are routinely handled by small, fast models at a fraction of the cost. Reserving flagship models for planning and complex judgement keeps quality where it matters.",
+          "Classification, extraction and formatting tasks are routinely handled by small, fast models at a fraction of the cost. Reserving flagship models for planning and complex judgment keeps quality where it matters.",
           "The pattern: measure task difficulty signals at runtime, route accordingly, and sample outputs for continuous comparison.",
         ],
       },
@@ -143,13 +151,13 @@ const raw: Array<Omit<Insight, "slug">> = [
         heading: "Measure cost per outcome",
         paragraphs: [
           "Token prices mislead; cost per resolved ticket, processed document or completed workflow is what finance cares about. Instrument outcomes, not usage.",
-          "Teams that track cost-per-outcome typically find double-digit percentage savings within the first quarter of routing discipline — savings that scale with success rather than being capped by it.",
+          "Cost-per-outcome also changes what a team optimizes. It rewards routing decisions that improve the numerator rather than ones that only shave the token price — so the discipline compounds as volume grows instead of being capped by it.",
         ],
       },
     ],
   },
   {
-    title: "Prompt injection: honest threats, honest defences",
+    title: "Prompt injection: honest threats, honest defenses",
     excerpt:
       "You cannot fully prevent prompt injection today. You can architect systems where attempts fail safely. Here's our control hierarchy.",
     author: "VANTIQ Systems Engineering Team",
@@ -157,6 +165,8 @@ const raw: Array<Omit<Insight, "slug">> = [
     category: "AI Security",
     tags: ["security", "prompt-injection"],
     publishedAt: "2026-05-02",
+    pullQuote:
+      "Security claims without test evidence are marketing.",
     sections: [
       {
         heading: "Assume the injection arrives",
@@ -166,7 +176,7 @@ const raw: Array<Omit<Insight, "slug">> = [
         ],
       },
       {
-        heading: "Defence in depth, ordered by reliability",
+        heading: "Defense in depth, ordered by reliability",
         paragraphs: [
           "First, capability limits: agents hold no standing credentials, so stolen instructions have nothing to steal. Second, tool validation: even convincing instructions cannot bypass schema checks. Third, human gates: consequential actions queue for approval regardless of confidence.",
           "Screening classifiers sit at the edge as an early filter — valuable, but treated as one layer among four.",
@@ -190,6 +200,8 @@ const raw: Array<Omit<Insight, "slug">> = [
     category: "Automation",
     tags: ["roadmap", "strategy", "process"],
     publishedAt: "2026-04-10",
+    pullQuote:
+      "Early wins fund later ambition.",
     sections: [
       {
         heading: "Score candidates on three axes",
@@ -202,7 +214,7 @@ const raw: Array<Omit<Insight, "slug">> = [
         heading: "Respect the trust curve",
         paragraphs: [
           "Early wins fund later ambition. A first automation that quietly works for ninety days earns adoption that no launch campaign can buy.",
-          "Ambitious-but-risky ideas belong third or fourth in the roadmap, after the organisation has seen automation behave predictably.",
+          "Ambitious-but-risky ideas belong third or fourth in the roadmap, after the organization has seen automation behave predictably.",
         ],
       },
       {

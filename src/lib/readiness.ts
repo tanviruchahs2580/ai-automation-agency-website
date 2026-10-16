@@ -33,12 +33,6 @@ export const answerScale = [
   "Fully",
 ] as const;
 
-export function categoryLabel(key: ReadinessCategoryKey): string {
-  return (
-    readinessCategories.find((c) => c.key === key)?.label ?? key
-  );
-}
-
 export interface CategoryScore {
   key: ReadinessCategoryKey;
   label: string;

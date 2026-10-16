@@ -8,7 +8,7 @@ import { Suspense } from "react";
 export const metadata = buildMetadata({
   title: "ROI Calculator",
   description:
-    "Estimate the annual cost of manual processes and the potential return from automation — using your numbers, clearly labelled as indicative estimates.",
+    "Estimate the annual cost of manual processes and the potential return from automation — using your numbers, clearly labeled as indicative estimates.",
   path: "/roi-calculator",
 });
 

@@ -101,6 +101,14 @@ export function ArchitectureLandscape() {
                 <button
                   type="button"
                   aria-pressed={isActive}
+                  /*
+                    The button swaps the shared detail panel; aria-controls
+                    exposes that relationship so a screen-reader user knows
+                    which region the pressed state affects. The panel is
+                    deliberately NOT a live region — the active layer also
+                    changes on scroll, which would spam announcements.
+                  */
+                  aria-controls="architecture-layer-panel"
                   onMouseEnter={() => takeOver(layer.id)}
                   onFocus={() => takeOver(layer.id)}
                   onClick={() => takeOver(layer.id)}
@@ -132,7 +140,10 @@ export function ArchitectureLandscape() {
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
-            initial={{ opacity: 0, y: 8 }}
+            id="architecture-layer-panel"
+            /* Gated like every other motion in the codebase: the 8px slide was
+               the one animation that still ran for reduced-motion visitors. */
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}

@@ -23,7 +23,7 @@ export default function TeamPage() {
       <PageHero
         eyebrow="Team"
         title="One engineering team, shared byline."
-        lead="Every article on this site is published as the VANTIQ Engineering Team until verified individual profiles exist. No ghost authors, no stock faces."
+        lead="Every article on this site is published as the VANTIQ Systems Engineering Team. No ghost authors, no stock faces."
         breadcrumbs={[
           { name: "Home", path: "/" },
           { name: "Team", path: "/team" },
@@ -66,8 +66,9 @@ export default function TeamPage() {
             ))}
           </div>
           <p className="mt-8 text-sm text-muted">
-            Individual profiles with roles and verified links will appear here
-            when they exist. Until then, reach the whole team via{" "}
+            We publish capability rather than headshots: no individual profiles
+            appear until there is verified authorship to attach them to. Reach
+            the whole team via{" "}
             <Link
               href="/start-a-project"
               className="text-accent-strong underline underline-offset-4 hover:text-ink"

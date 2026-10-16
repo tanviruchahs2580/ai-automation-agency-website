@@ -4,13 +4,22 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Chip, chipFor } from "@/components/ui/Chip";
 import { Icon } from "@/components/ui/Icon";
 import { Reveal } from "@/components/ui/Reveal";
+import { countWord } from "@/lib/utils";
 
 /**
  * Services as an interactive numbered list — each row carries a big mono
  * index, chip, and title; hover/focus expands the existing summary with a
  * spring-timed reveal. Same data, same links, same copy.
+ *
+ * The headline count, the trailing ordinal and the "Compare all N services"
+ * link are all derived from the services array. They were literal strings
+ * ("Seven services", "08", "all seven") sitting next to a `services.map()`, so
+ * adding or removing a service silently produced wrong copy.
  */
 export function ServiceRows() {
+  const serviceCount = services.length;
+  const compareOrdinal = String(serviceCount + 1).padStart(2, "0");
+
   return (
     <section
       className="section-y border-t border-line bg-surface/30"
@@ -19,7 +28,7 @@ export function ServiceRows() {
       <div className="container-x">
         <SectionHeader
           eyebrow="Capabilities"
-          title="Seven services, one accountable team."
+          title={`${countWord(serviceCount, { capitalize: true })} services, one accountable team.`}
           lead="Engage us for a single deliverable or the full lifecycle — the same engineers stay accountable throughout."
           id="services-heading"
           index="04"
@@ -66,9 +75,9 @@ export function ServiceRows() {
                 href="/services"
                 className="group flex items-center gap-4 bg-surface px-5 py-5 transition-colors duration-150 hover:bg-surface2 sm:px-7"
               >
-                <span className="mono-label tabular w-8 shrink-0 text-faint">08</span>
+                <span className="mono-label tabular w-8 shrink-0 text-faint">{compareOrdinal}</span>
                 <span className="font-display text-lg font-semibold tracking-tight text-muted group-hover:text-ink sm:text-xl">
-                  Compare all seven services
+                  Compare all {countWord(serviceCount)} services
                 </span>
                 <Icon
                   name="arrow-right"

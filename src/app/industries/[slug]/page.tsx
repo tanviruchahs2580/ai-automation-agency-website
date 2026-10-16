@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { getIndustry, industries } from "@/data/industries";
 import { caseStudies } from "@/data/case-studies";
+import { hasIndustryPreset } from "@/data/roi-presets";
 import { buildMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -77,6 +78,7 @@ export default async function IndustryPage({
     industry.caseStudySlugs.includes(c.slug),
   );
   const compliance = complianceByIndustry[industry.slug] ?? defaultCompliance;
+  const sectorHasPreset = hasIndustryPreset(industry.slug);
 
   return (
     <>
@@ -116,19 +118,36 @@ export default async function IndustryPage({
                   .
                 </p>
               </div>
+              {/*
+                Copy depends on whether this sector actually has a preset.
+                Every industry page used to promise "Industry benchmark preset
+                applied" while the calculator recognised only six of the twelve
+                sectors, so the other six received the default assumption with
+                no indication that it was not sector-specific.
+              */}
               <IncludesCard
                 title="Estimate for this sector"
-                items={[
-                  "Industry benchmark preset applied",
-                  "Refine with your own headcount",
-                  "Methodology fully documented",
-                ]}
+                items={
+                  sectorHasPreset
+                    ? [
+                        "Sector automation assumption pre-applied",
+                        "Refine with your own headcount",
+                        "Methodology fully documented",
+                      ]
+                    : [
+                        "Neutral defaults — set your own assumption",
+                        "Refine with your own headcount",
+                        "Methodology fully documented",
+                      ]
+                }
                 action={
                   <Button
                     href={`/roi-calculator?industry=${industry.slug}`}
                     variant="quiet"
                   >
-                    Open pre-set calculator
+                    {sectorHasPreset
+                      ? "Open pre-set calculator"
+                      : "Open the calculator"}
                   </Button>
                 }
               />

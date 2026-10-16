@@ -38,8 +38,13 @@ existing stack."*
 `leverage, synergize, supercharge, unlock, revolutionize, game-changing,
 cutting-edge, world-class, best-in-class, next-gen, robust, seamless,
 empower` — and `scalable` unless describing a verifiable system property.
-Audit: `grep -rniE "leverage|synergize|supercharge|unlock|revolutionize|game-changing|cutting-edge|world-class|best-in-class|next-gen|seamless|empower" src/`
+Audit: `grep -rniE "leverage|synergize|supercharge|unlock|revolutionize|game-changing|cutting-edge|world-class|best-in-class|next-gen|robust|seamless|empower" src/`
 must return zero non-quoted hits before ship.
+
+`scalable` is deliberately absent from that regex rather than from the list
+above: it is permitted only when it names a verifiable system property ("scales
+to 40 concurrent agent sessions"), so each hit needs a human read instead of a
+mechanical zero.
 
 ## 4. Do / don't copy patterns
 

@@ -1,13 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { contact } from "@/data/site";
 
 /**
- * 500 — console-style operator error with request ID (digest),
- * timestamp, and a report-to-engineering mailto link.
+ * 500 — console-style operator error with request ID (digest), timestamp, and
+ * a report-to-engineering link.
+ *
+ * Named RouteError, not GlobalError: the identifier was previously shared with
+ * the unrelated root boundary in global-error.tsx, which made stack traces and
+ * searches ambiguous.
  */
-export default function GlobalError({
+export default function RouteError({
   error,
   reset,
 }: {
@@ -28,6 +33,9 @@ export default function GlobalError({
   return (
     <section className="section-y" role="alert">
       <div className="container-x py-10">
+        {/* Heading-navigation anchor — the visual design is a console readout,
+            which otherwise leaves this page with no heading at all. */}
+        <h1 className="sr-only">Server error — this page could not be loaded</h1>
         <div className="grain mx-auto max-w-2xl rounded-xl border border-line bg-surface p-6 font-mono text-sm sm:p-8">
           <p className="text-critical">$ vantiq serve --status</p>
           <p className="mt-3 text-faint">
@@ -45,13 +53,19 @@ export default function GlobalError({
           </dl>
           <p className="mt-4 border-t border-line pt-4 leading-relaxed text-muted">
             We hit an unexpected error. Retry immediately — if it persists,{" "}
-            <a
-              href={`mailto:${contact.email}?subject=${encodeURIComponent(`Error report ${requestId}`)}`}
-              className="text-accent-strong underline underline-offset-4"
-            >
-              report it to engineering
-            </a>
-            .
+            {contact.email ? (
+              <a
+                href={`mailto:${contact.email}?subject=${encodeURIComponent(`Error report ${requestId}`)}`}
+                className="text-accent-strong underline underline-offset-4"
+              >
+                report it to engineering
+              </a>
+            ) : (
+              <Link href="/start-a-project" className="text-accent-strong underline underline-offset-4">
+                send it to engineering
+              </Link>
+            )}
+            , quoting the request ID above.
           </p>
         </div>
 

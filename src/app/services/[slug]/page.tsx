@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
@@ -33,13 +34,6 @@ const nav = [
   { href: "#problem", label: "Why it exists" },
   { href: "#engagement", label: "Engagement" },
   { href: "#faq", label: "FAQ" },
-];
-
-/** The 6-week engagement shape: discover → architect → prototype. */
-const engagementShape = [
-  { phase: "Discover", duration: "Weeks 1–2", detail: "Objectives, walkthroughs, feasibility." },
-  { phase: "Architect", duration: "Weeks 3–4", detail: "Design reviewed with your engineers." },
-  { phase: "Prototype", duration: "Weeks 5–6", detail: "Real data, kill-or-commit evidence." },
 ];
 
 export default async function ServiceDetailPage({
@@ -88,9 +82,9 @@ export default async function ServiceDetailPage({
                 }
               />
               <div className="card-surface p-6">
-                <p className="eyebrow">6-week engagement shape</p>
+                <p className="eyebrow">{service.engagementShape.label}</p>
                 <ol className="mt-4 space-y-4">
-                  {engagementShape.map((step, i) => (
+                  {service.engagementShape.phases.map((step, i) => (
                     <li key={step.phase} className="flex gap-3">
                       <span className="mono-label shrink-0 text-accent-bright">
                         {String(i + 1).padStart(2, "0")}
@@ -109,9 +103,20 @@ export default async function ServiceDetailPage({
                     </li>
                   ))}
                 </ol>
+                {/*
+                  Was "Fixed-shape start; production build continues in
+                  two-week increments" — true of project work, false of the
+                  operations retainer, so the note is shape-agnostic now.
+                */}
                 <p className="mt-4 border-t border-line pt-4 text-[11px] leading-relaxed text-faint">
-                  Fixed-shape start; production build continues in two-week
-                  increments. Full lifecycle in <a href="/approach" className="underline underline-offset-4 hover:text-ink">our approach</a>.
+                  Full delivery lifecycle and governance in{" "}
+                  <Link
+                    href="/approach"
+                    className="underline underline-offset-4 hover:text-ink"
+                  >
+                    our approach
+                  </Link>
+                  .
                 </p>
               </div>
             </>

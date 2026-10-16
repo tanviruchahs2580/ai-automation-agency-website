@@ -1,11 +1,10 @@
 import type { LinkItem } from "@/types/content";
 
 /**
- * PLACEHOLDER BRAND & CONTACT DATA.
- * Contact details below are env-driven so launch configuration never
- * requires a code change: set NEXT_PUBLIC_CONTACT_EMAIL and
- * NEXT_PUBLIC_MEETING_LINK at deploy time (build-time inlined).
- * Fallbacks are intentional placeholders until those vars exist.
+ * PLACEHOLDER BRAND DATA.
+ * The brand/legal entity form and any real contact channels must be supplied
+ * before launch — see LAUNCH-CHECKLIST.md §1. Contact values are env-driven so
+ * launch configuration never requires a code change.
  */
 
 /**
@@ -80,7 +79,7 @@ export const siteNav: NavItem[] = [
         description: "Agents, RAG pipelines, copilots",
       },
       {
-        label: "Automation",
+        label: "Automation Engineering",
         href: "/services/automation",
         description: "Document, approval and data flows",
       },
@@ -95,7 +94,7 @@ export const siteNav: NavItem[] = [
         description: "Pipelines, vector stores, observability",
       },
       {
-        label: "Security",
+        label: "AI Security",
         href: "/services/security",
         description: "Isolation, auditability, governance",
       },
@@ -126,12 +125,12 @@ export const siteNav: NavItem[] = [
         description: "Planning, quality and maintenance",
       },
       {
-        label: "Retail",
+        label: "Retail & E-commerce",
         href: "/industries/retail",
         description: "Support and merchandising operations",
       },
       {
-        label: "Logistics",
+        label: "Logistics & Supply Chain",
         href: "/industries/logistics",
         description: "Shipments, documents, exceptions",
       },
@@ -173,41 +172,49 @@ export const siteNav: NavItem[] = [
   },
 ];
 
+/**
+ * Footer columns.
+ *
+ * Solutions and Services are derived from `siteNav` so a link added to the
+ * navigation cannot silently go missing in the footer — the two lists were
+ * maintained by hand and had already drifted apart. Each derived column leads
+ * with its index page, which previously had no site-wide footer link at all.
+ *
+ * Company and Tools carry destinations that are not in the primary navigation,
+ * so they stay explicit.
+ */
+const FOOTER_DERIVED_SECTIONS = ["/solutions", "/services"] as const;
+
 export const footerColumns: Array<{ heading: string; links: LinkItem[] }> = [
-  {
-    heading: "Solutions",
-    links: [
-      { label: "AI Agents", href: "/solutions/ai-agents" },
-      { label: "Workflow Automation", href: "/solutions/workflow-automation" },
-      { label: "AI Software", href: "/solutions/ai-software" },
-      { label: "Enterprise AI", href: "/solutions/enterprise-ai" },
-      { label: "Private AI", href: "/solutions/private-ai" },
-      { label: "AI Transformation", href: "/solutions/ai-transformation" },
-    ],
-  },
-  {
-    heading: "Services",
-    links: [
-      { label: "AI Strategy", href: "/services/ai-strategy" },
-      { label: "AI Engineering", href: "/services/ai-engineering" },
-      { label: "Automation", href: "/services/automation" },
-      { label: "Software Engineering", href: "/services/software-engineering" },
-      {
-        label: "Data & AI Infrastructure",
-        href: "/services/data-ai-infrastructure",
-      },
-      { label: "Security", href: "/services/security" },
-      { label: "AI Operations", href: "/services/ai-operations" },
-    ],
-  },
+  ...siteNav
+    .filter((item) =>
+      (FOOTER_DERIVED_SECTIONS as readonly string[]).includes(item.href),
+    )
+    .map((item) => ({
+      heading: item.label,
+      links: [
+        { label: `All ${item.label.toLowerCase()}`, href: item.href },
+        ...(item.children ?? []).map((child) => ({
+          label: child.label,
+          href: child.href,
+        })),
+      ],
+    })),
   {
     heading: "Industries",
     links: [
-      { label: "Financial Services", href: "/industries/financial-services" },
+      { label: "All industries", href: "/industries" },
+      {
+        label: "Financial Services",
+        href: "/industries/financial-services",
+      },
       { label: "Healthcare", href: "/industries/healthcare" },
       { label: "Manufacturing", href: "/industries/manufacturing" },
-      { label: "Retail", href: "/industries/retail" },
-      { label: "Logistics", href: "/industries/logistics" },
+      { label: "Retail & E-commerce", href: "/industries/retail" },
+      {
+        label: "Logistics & Supply Chain",
+        href: "/industries/logistics",
+      },
       { label: "SaaS & Technology", href: "/industries/saas-technology" },
     ],
   },
@@ -219,6 +226,7 @@ export const footerColumns: Array<{ heading: string; links: LinkItem[] }> = [
       { label: "Approach", href: "/approach" },
       { label: "Work", href: "/work" },
       { label: "Insights", href: "/insights" },
+      { label: "Technology", href: "/technology" },
       { label: "Security", href: "/security" },
     ],
   },
@@ -239,9 +247,21 @@ export const legalLinks: LinkItem[] = [
   { label: "Cookie Policy", href: "/cookie-policy" },
 ];
 
-/** PLACEHOLDER fallbacks — override via NEXT_PUBLIC_* env vars before launch.
- * Uses || (not ??) so an env var saved with an empty value still falls back. */
+/**
+ * Public contact channels.
+ *
+ * Both are genuinely absent until NEXT_PUBLIC_CONTACT_EMAIL /
+ * NEXT_PUBLIC_MEETING_LINK are set at deploy time (build-time inlined). They
+ * are modelled as `null` rather than as placeholder strings because a reserved
+ * `*.example` address or a `#placeholder` href is a dead end presented as a
+ * live channel — visitors click it and nothing happens. Consumers omit the
+ * channel when it is null and point at the intake form instead, which works
+ * with no configuration at all.
+ *
+ * Empty values are treated as unset (`||`, not `??`), because hosting panels
+ * happily save an env var with an empty value.
+ */
 export const contact = {
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hello@vantiqsystems.example",
-  meetingLink: process.env.NEXT_PUBLIC_MEETING_LINK || "#meeting-link-placeholder",
-};
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || null,
+  meetingLink: process.env.NEXT_PUBLIC_MEETING_LINK?.trim() || null,
+} as const;

@@ -39,14 +39,16 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/*
-          Blocking theme script — runs before first paint so the server'd
-          dark markup never flashes for light-theme visitors. Single source
+          Blocking pre-paint script. Sets the theme before first paint so the
+          server'd dark markup never flashes for light-theme visitors, and
+          records the platform so keyboard-shortcut hints can name a key that
+          actually exists on the visitor's keyboard (⌘ vs Ctrl). Single source
           of truth shared with ThemeToggle: localStorage["vantiq-theme"],
           else OS preference, else dark.
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("vantiq-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}})();`,
+            __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem("vantiq-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}d.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}try{document.documentElement.setAttribute("data-platform",/mac|iphone|ipad/i.test(navigator.userAgent)?"mac":"other")}catch(e){}})();`,
           }}
         />
       </head>
@@ -57,11 +59,14 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        {/* Rendered here, not after the footer, so the banner sits near the top
+            of both tab order and the accessibility-tree landmark list. It is
+            position:fixed, so DOM order does not affect where it paints. */}
+        <CookieConsent />
         <Navbar />
         <main id="main">{children}</main>
         <Footer />
         <BackToTop />
-        <CookieConsent />
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
       </body>

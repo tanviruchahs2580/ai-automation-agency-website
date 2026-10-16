@@ -4,9 +4,15 @@ const FALLBACK_SITE_URL = "http://localhost:3000";
 
 /**
  * Production domain is injected via NEXT_PUBLIC_SITE_URL.
- * Until it is configured, canonical URLs resolve to localhost — intentional
- * placeholder behaviour so nothing is published against a domain we do not
- * control yet.
+ *
+ * When that var is unset we still try to resolve the real origin from the
+ * hosting platform's own system variables before falling back to localhost.
+ * Vercel exposes both at build time, so a deploy that forgets the env var
+ * publishes correct canonicals instead of self-canonicalising every page to
+ * localhost (which deindexes the site). `VERCEL_PROJECT_PRODUCTION_URL` is the
+ * stable production domain and wins over the per-deployment `VERCEL_URL`;
+ * preview URLs are noindexed by Vercel, so canonicalising previews to the
+ * production domain is correct there too.
  *
  * Resolution is defensive because this runs at module evaluation during
  * builds where a crash takes the whole deploy down:
@@ -18,7 +24,11 @@ const FALLBACK_SITE_URL = "http://localhost:3000";
  * The result is normalized to a bare origin (no path/query/trailing slash).
  */
 export const SITE_URL = (() => {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
+  const raw =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim() ||
+    process.env.VERCEL_URL?.trim() ||
+    "";
   if (!raw) return FALLBACK_SITE_URL;
   const candidate = /^https?:\/\//i.test(raw)
     ? raw

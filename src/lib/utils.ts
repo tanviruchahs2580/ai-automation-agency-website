@@ -30,3 +30,33 @@ export function slugify(input: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
+
+const COUNT_WORDS = [
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+] as const;
+
+/**
+ * Spelled-out cardinal for counts that appear inside copy, so headline text
+ * such as "Seven services, one accountable team." is derived from the data
+ * instead of being retyped next to it. House style spells these numbers
+ * out, so `formatNumber` cannot be used for them.
+ *
+ * Falls back to the numeral beyond the table rather than guessing a word.
+ */
+export function countWord(value: number, options?: { capitalize?: boolean }): string {
+  const word = COUNT_WORDS[value] ?? String(value);
+  if (!options?.capitalize || word.length === 0) return word;
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
