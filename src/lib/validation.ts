@@ -1,89 +1,74 @@
 import { z } from "zod";
+import { budgetRanges, companySizes, normalizeDash, timelines } from "@/lib/intake";
 
 /**
  * Server-side schema for the project intake form. The client mirrors these
  * constraints for UX, but the server never trusts client validation.
  *
  * `companyWebsite` is a honeypot field — bots fill it, humans never see it.
+ *
+ * Ordering note: length is bounded **before** the control-character transform,
+ * so an oversized field is rejected without the sanitizer ever scanning it.
+ * `cleanString` therefore reads `.trim().max().transform().refine()` rather
+ * than the more obvious `.trim().transform().refine()`.
+ *
+ * The option arrays and `recommendedNextStep` live in `@/lib/intake` so the
+ * client wizard can import them without pulling zod into the browser bundle.
  */
 
-const cleanString = (min: number, max: number) =>
+export const MAX_FIELD_LENGTH = 4000;
+
+const cleanString = (min: number, max: number, label: string) =>
   z
-    .string()
+    .string({ message: `${label} is required` })
     .trim()
-    .transform((s) => s.replace(/[\u0000-\u001F\u007F]/g, ""))
-    .refine((s) => s.length >= min && s.length <= max, {
-      message: `Must be between ${min} and ${max} characters`,
+    .max(max, { message: `${label} must be ${max} characters or fewer` })
+    .transform((s) => s.replace(/[\u0000-\u001F\u007F]/g, "").trim())
+    .refine((s) => s.length >= min, {
+      message:
+        min === 0
+          ? `${label} is invalid`
+          : `${label} must be at least ${min} characters`,
     });
 
-export const budgetRanges = [
-  "Under $25k",
-  "$25k – $75k",
-  "$75k – $200k",
-  "$200k+",
-  "Not sure yet",
-] as const;
-
-export const timelines = [
-  "Immediately",
-  "Within 3 months",
-  "3 – 6 months",
-  "6 – 12 months",
-  "Exploring options",
-] as const;
-
-export const companySizes = [
-  "1 – 50",
-  "51 – 250",
-  "251 – 1,000",
-  "1,000 – 5,000",
-  "5,000+",
-] as const;
-
-/**
- * Enum values use typographic en-dashes (e.g. "51 – 250"). Browser clients
- * submit them verbatim, but API integrations commonly send ASCII hyphens.
- * Normalise before validation so both forms are accepted without loosening
- * the allowed value set.
- */
-const normalizeDash = (value: unknown) =>
-  typeof value === "string" ? value.replace(/-/g, "\u2013").trim() : value;
-
 export const projectBriefSchema = z.object({
-  companyName: cleanString(2, 120),
+  companyName: cleanString(2, 120, "Company name"),
   companySize: z.preprocess(normalizeDash, z.enum(companySizes)),
-  industry: cleanString(2, 80),
-  country: cleanString(2, 80),
-  contactName: cleanString(2, 120),
-  contactEmail: z.string().trim().email().max(160),
-  contactRole: cleanString(2, 80),
-  problem: cleanString(30, 4000),
-  currentWorkflow: cleanString(10, 4000),
-  existingSoftware: cleanString(0, 500),
-  desiredOutcome: cleanString(20, 2000),
+  industry: cleanString(2, 80, "Industry"),
+  country: cleanString(2, 80, "Country"),
+  contactName: cleanString(2, 120, "Contact name"),
+  contactEmail: z
+    .string({ message: "Work email is required" })
+    .trim()
+    .pipe(z.email({ message: "Enter a valid work email address" }).max(160)),
+  contactRole: cleanString(2, 80, "Role"),
+  problem: cleanString(30, MAX_FIELD_LENGTH, "Problem statement"),
+  currentWorkflow: cleanString(10, MAX_FIELD_LENGTH, "Current workflow"),
+  existingSoftware: cleanString(0, 500, "Existing software"),
+  desiredOutcome: cleanString(20, 2000, "Desired outcome"),
   budgetRange: z.preprocess(normalizeDash, z.enum(budgetRanges)),
   timeline: z.preprocess(normalizeDash, z.enum(timelines)),
-  consent: z.literal(true),
-  companyWebsite: z.string().max(0).optional(),
+  consent: z.literal(true, { message: "Consent is required to submit a brief" }),
+  /**
+   * Honeypot: hidden from humans, so any value means a bot.
+   *
+   * Deliberately *not* constrained to `max(0)`. Rejecting it here produced a
+   * 422 whose `issues` named the field and echoed Zod's own message ("Too big:
+   * expected string to have <=0 characters") — which tells a bot exactly which
+   * trap it hit, on an endpoint whose every other error was rewritten into
+   * plain prose. The handler now accepts it and returns an ordinary receipt
+   * without notifying anyone.
+   */
+  companyWebsite: z.string().optional(),
 });
 
 export type ProjectBrief = z.infer<typeof projectBriefSchema>;
 
-export function recommendedNextStep(
-  brief: Pick<ProjectBrief, "problem" | "desiredOutcome">,
-): string {
-  const text = `${brief.problem} ${brief.desiredOutcome}`.toLowerCase();
-  if (/agent|copilot|assistant/.test(text)) {
-    return "A scoped AI agent architecture session with our engineering team.";
-  }
-  if (/automat|manual|repetitive|workflow/.test(text)) {
-    return "A workflow automation assessment to map your highest-value processes.";
-  }
-  if (/data|infrastructur|platform|rag|private/.test(text)) {
-    return "A data & AI infrastructure review with our architects.";
-  }
-  if (/strateg|roadmap|readiness|transformation/.test(text)) {
-    return "An AI strategy discovery workshop with leadership.";
-  }
-  return "A technical discovery call with a senior AI engineer.";
-}
+/**
+ * Largest JSON body the intake endpoint will read, in bytes. The schema caps
+ * every field, but a hostile client can still send an arbitrarily large body
+ * before validation runs, so the transport layer rejects it first. Comfortably
+ * above the schema's worst case (~13 KB of field content plus JSON overhead
+ * and multi-byte characters).
+ */
+export const MAX_BRIEF_BYTES = 64 * 1024;
