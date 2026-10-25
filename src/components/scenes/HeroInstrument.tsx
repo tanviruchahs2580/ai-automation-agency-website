@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { StatusDot } from "@/components/ui/Tag";
+import { DURATION, EASE } from "@/lib/motion";
+import { disclaimers } from "@/data/disclaimers";
 import { Icon } from "@/components/ui/Icon";
 
 /**
@@ -86,18 +88,18 @@ export function HeroInstrument() {
     .join(" ");
 
   return (
-    <motion.div style={reduceMotion ? undefined : { y: panelY }} className="relative">
+    <m.div style={reduceMotion ? undefined : { y: panelY }} className="relative">
       {/* Floating state-bound chips — layered depth, values from live state */}
       <div
         aria-hidden="true"
-        className="absolute -left-4 -top-14 z-10 hidden rounded-lg border border-line bg-surface px-3 py-2 shadow-xl sm:block"
+        className="absolute -start-4 -top-14 z-10 hidden rounded-lg border border-line bg-surface px-3 py-2 shadow-xl sm:block"
       >
         <p className="mono-label text-faint">APPROVALS QUEUED</p>
         <p className="tabular mt-0.5 font-mono text-sm text-brass">{approvals}</p>
       </div>
       <div
         aria-hidden="true"
-        className="absolute -bottom-5 -right-2 z-10 hidden rounded-lg border border-line bg-surface px-3 py-2 shadow-xl sm:block"
+        className="absolute -bottom-5 -end-2 z-10 hidden rounded-lg border border-line bg-surface px-3 py-2 shadow-xl sm:block"
       >
         <p className="mono-label text-faint">EVENTS RESOLVED</p>
         <p className="tabular mt-0.5 font-mono text-sm text-signal">{resolved}</p>
@@ -122,7 +124,7 @@ export function HeroInstrument() {
           {layers.map((layer, i) => (
             <li key={layer.id}>
               {i > 0 && (
-                <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="ml-5">
+                <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="ms-5">
                   <line
                     x1="6"
                     y1="0"
@@ -193,12 +195,12 @@ export function HeroInstrument() {
         */}
         <div className="border-t border-line px-5 py-3 sm:px-6" aria-live="off">
           <AnimatePresence mode="wait">
-            <motion.p
+            <m.p
               key={eventIndex}
               initial={live ? { opacity: 0, y: 4 } : false}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: DURATION.base, ease: EASE.outSoft }}
               className="flex items-center gap-2 text-xs text-muted"
             >
               <Icon
@@ -207,17 +209,17 @@ export function HeroInstrument() {
                 className={flash ? "text-signal" : "text-faint"}
               />
               <span>
-                <span className="mono-label mr-2 text-signal">RESOLVED</span>
+                <span className="mono-label me-2 text-signal">RESOLVED</span>
                 {anomalies[eventIndex]}
               </span>
-            </motion.p>
+            </m.p>
           </AnimatePresence>
         </div>
 
         <p className="border-t border-line px-5 py-2.5 text-[11px] leading-snug text-faint sm:px-6">
-          All figures simulated for illustration. No client data is shown.
+          {disclaimers.simulationLabel}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

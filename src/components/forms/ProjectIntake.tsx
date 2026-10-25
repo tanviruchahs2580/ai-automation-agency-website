@@ -2,16 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
+import { useMotionGate } from "@/components/motion/useMotionGate";
 import {
   budgetRanges,
   companySizes,
+  intakeSteps,
   recommendedNextStep,
   timelines,
-} from "@/lib/validation";
+} from "@/lib/intake";
 import { contact } from "@/data/site";
+import { siteConfig } from "@/data/site";
 import { AnalyticsEvent, track } from "@/lib/analytics";
 import { Icon } from "@/components/ui/Icon";
+import { DURATION, EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 /**
@@ -55,15 +59,7 @@ const initialForm: FormState = {
   companyWebsite: "",
 };
 
-const steps = [
-  { title: "Business", fields: ["companyName", "companySize", "industry", "country"] },
-  { title: "Problem", fields: ["problem"] },
-  { title: "Current Workflow", fields: ["currentWorkflow"] },
-  { title: "Existing Software", fields: ["existingSoftware"] },
-  { title: "Desired Outcome", fields: ["desiredOutcome"] },
-  { title: "Budget Range", fields: ["budgetRange"] },
-  { title: "Timeline & Contact", fields: ["timeline", "contactName", "contactEmail", "contactRole", "consent"] },
-] as const;
+const steps = intakeSteps;
 
 /**
  * Draft persistence — the wizard restores an in-progress submission after an
@@ -88,10 +84,21 @@ export function ProjectIntake() {
   } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const successHeadingRef = useRef<HTMLHeadingElement>(null);
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null);
   // Set as soon as the user edits the form; invalidates the deferred draft
   // restore below so it can never overwrite live input or flash a bogus banner.
   const editedBeforeRestoreRef = useRef(false);
+  // Distinguishes the mount render from a user-driven step change, so loading
+  // the page never steals focus but pressing Continue always announces the step.
+  const stepAdvanceRef = useRef(false);
+  // +1 when moving forward, -1 when moving back, so the step transition slides
+  // in the direction the user actually travelled. State rather than a ref: the
+  // value is read during render (it sets the entrance offset), and reading a
+  // ref during render is not permitted. Both setters run in the same event
+  // handler as `setStep`, so React batches them into a single render.
+  const [direction, setDirection] = useState(1);
   const reduceMotion = useReducedMotion();
+  const gate = useMotionGate();
 
   // Signals to tests/automation that controlled inputs are live so typed
   // values cannot race ahead of hydration on slow engines.
@@ -154,6 +161,24 @@ export function ProjectIntake() {
   useEffect(() => {
     if (status === "success") successHeadingRef.current?.focus();
   }, [status]);
+
+  /*
+    Move focus to the step heading when the step changes.
+
+    This is the WAI-recommended way to announce a multi-step form change: the
+    heading is the new step's name, so a screen-reader user hears "Problem,
+    heading level 2" and the following field is the next thing in tab order.
+    Previously nothing moved, and the container carried `aria-live="polite"`
+    instead — which re-announced the entire step (headings plus every field and
+    its label) on each change, and raced with the per-field `role="alert"`
+    errors on a failed Continue, so one click could produce two overlapping
+    announcements. Focus movement replaces both.
+  */
+  useEffect(() => {
+    if (!stepAdvanceRef.current) return;
+    stepAdvanceRef.current = false;
+    stepHeadingRef.current?.focus();
+  }, [step]);
 
   const startFresh = () => {
     clearDraft();
@@ -244,8 +269,17 @@ export function ProjectIntake() {
     if (step === steps.length - 1) {
       void submit();
     } else {
+      setDirection(1);
+      stepAdvanceRef.current = true;
       setStep(step + 1);
     }
+  };
+
+  const goBack = () => {
+    if (step === 0) return;
+    setDirection(-1);
+    stepAdvanceRef.current = true;
+    setStep(Math.max(0, step - 1));
   };
 
   async function submit() {
@@ -304,7 +338,7 @@ export function ProjectIntake() {
 
   if (status === "success" && result) {
     const briefText = [
-      `VANTIQ SYSTEMS — project brief ${result.briefId}`,
+      `${siteConfig.name} — project brief ${result.briefId}`,
       ``,
       `Company: ${form.companyName} (${form.companySize}, ${form.industry}, ${form.country})`,
       `Contact: ${form.contactName}, ${form.contactRole}, ${form.contactEmail}`,
@@ -341,7 +375,7 @@ export function ProjectIntake() {
         </h2>
         <p className="mono-label mt-3 text-muted">Reference: {result.briefId}</p>
 
-        <div className="mt-7 rounded-lg border border-line bg-surface2 p-5 text-left">
+        <div className="mt-7 rounded-lg border border-line bg-surface2 p-5 text-start">
           <p className="mono-label uppercase text-faint">Summary</p>
           <dl className="mt-3 space-y-2 text-sm">
             <SummaryRow label="Company" value={`${form.companyName} · ${form.companySize}`} />
@@ -375,9 +409,10 @@ export function ProjectIntake() {
               target="_blank"
               rel="noreferrer noopener"
               onClick={() => track(AnalyticsEvent.MeetingClick)}
-              className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-strong"
+              className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-press"
             >
               Book a Call
+              <span className="sr-only"> (opens in a new tab)</span>
             </a>
           )}
           <button
@@ -403,7 +438,6 @@ export function ProjectIntake() {
   }
 
   const current = steps[step];
-  const progress = ((step + 1) / steps.length) * 100;
 
   return (
     <div
@@ -411,40 +445,45 @@ export function ProjectIntake() {
       data-testid="intake-wizard"
       className="card-surface mx-auto max-w-2xl p-6 md:p-10"
     >
-      {/* Step indicator */}
-      <div className="flex items-baseline justify-between gap-4">
-        <p className="mono-label tabular text-faint" aria-hidden="true">
-          {String(step + 1).padStart(2, "0")} / {String(steps.length).padStart(2, "0")}
-        </p>
-        <p className="mono-label uppercase text-faint">{current.title}</p>
-      </div>
-      <ol className="mt-2 flex flex-wrap gap-x-4 gap-y-1" aria-label="Form steps">
-        {steps.map((s, i) => (
-          <li key={s.title} aria-current={i === step ? "step" : undefined}>
-            <span
-              className={cn(
-                "mono-label uppercase",
-                i === step ? "text-accent-strong" : i < step ? "text-muted" : "text-faint",
-              )}
+      {/*
+        Progress is shown once, as segments, and the step name is shown once, as
+        the h2 inside the panel below. The previous header encoded the same state
+        four times over — a numeric "01 / 07" counter, the section name as a
+        second label, a wrapped list of all seven step names, and a separate
+        progress bar — so the highest-intent screen on the site read like a debug
+        readout. Screen readers still get position, name and state from the list
+        semantics below.
+      */}
+      <ol className="flex items-center gap-1.5" aria-label="Brief progress">
+        {steps.map((s, i) => {
+          const state = i === step ? "current" : i < step ? "done" : "upcoming";
+          return (
+            <li
+              key={s.title}
+              className="flex-1"
+              aria-current={state === "current" ? "step" : undefined}
             >
-              {i + 1}. {s.title}
-            </span>
-          </li>
-        ))}
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "block h-1.5 rounded-full transition-colors duration-200",
+                  state === "current" && "bg-accent",
+                  state === "done" && "bg-accent/45",
+                  state === "upcoming" && "bg-surface2",
+                )}
+              />
+              <span className="sr-only">
+                {`Step ${i + 1} of ${steps.length}: ${s.title}`}
+                {state === "current"
+                  ? " — current step"
+                  : state === "done"
+                    ? " — completed"
+                    : ""}
+              </span>
+            </li>
+          );
+        })}
       </ol>
-      <div
-        role="progressbar"
-        aria-valuenow={Math.round(progress)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Overall progress"
-        className="mt-4 h-1 overflow-hidden rounded-full bg-surface2"
-      >
-        <div
-          className="h-full rounded-full bg-accent transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
       {draftRestored && (
         <div
           role="status"
@@ -459,29 +498,46 @@ export function ProjectIntake() {
           <button
             type="button"
             onClick={() => setDraftRestored(false)}
-            className="mono-label uppercase text-accent-strong hover:underline"
+            className="mono-label min-h-11 uppercase text-accent-strong hover:underline"
           >
             Keep editing
           </button>
           <button
             type="button"
             onClick={startFresh}
-            className="mono-label uppercase text-faint hover:text-ink hover:underline"
+            className="mono-label min-h-11 uppercase text-faint hover:text-ink hover:underline"
           >
             Start fresh
           </button>
         </div>
       )}
 
-      <motion.div
+      {/*
+        `initial` is gated on mount: rendering it on the server put
+        `style="opacity:0;transform:translateX(24px)"` into the HTML for the
+        whole wizard body, so the primary conversion form on the site was
+        invisible until hydration finished (and stayed invisible with JavaScript
+        blocked). With the gate the first paint is the visible resting state, and
+        every step change after that still animates. The slide direction follows
+        the user's actual direction, so Back no longer slides content in from the
+        right as though it were moving forward.
+      */}
+      <m.div
         key={step}
-        initial={reduceMotion ? false : { opacity: 0, x: 24 }}
+        initial={
+          gate && !reduceMotion ? { opacity: 0, x: 24 * direction } : false
+        }
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
-        aria-live="polite"
+        transition={{ duration: DURATION.base, ease: EASE.outSoft }}
         className="mt-8 space-y-5"
       >
-        <h2 className="text-xl font-bold tracking-tight">{current.title}</h2>
+        <h2
+          ref={stepHeadingRef}
+          tabIndex={-1}
+          className="text-xl font-bold tracking-tight outline-none"
+        >
+          {current.title}
+        </h2>
 
         {(current.fields as readonly string[]).includes("companyName") && (
           <>
@@ -655,6 +711,7 @@ export function ProjectIntake() {
                   <input
                     type="text"
                     id="f-contactRole"
+                    autoComplete="organization-title"
                     value={form.contactRole}
                     onChange={(e) => set("contactRole", e.target.value)}
                     {...aria}
@@ -694,6 +751,8 @@ export function ProjectIntake() {
               <label className="flex items-start gap-3 text-sm text-muted">
                 <input
                   type="checkbox"
+                  required
+                  aria-required="true"
                   checked={form.consent}
                   onChange={(e) => set("consent", e.target.checked)}
                   aria-invalid={errors.consent ? true : undefined}
@@ -701,7 +760,7 @@ export function ProjectIntake() {
                   className="mt-1 h-4 w-4 accent-[color:var(--color-accent)]"
                 />
                 <span>
-                  I agree that VANTIQ SYSTEMS may process this brief to respond
+                  I agree that {siteConfig.name} may process this brief to respond
                   to my enquiry, as described in the{" "}
                   <Link href="/privacy" className="underline underline-offset-2">
                     privacy policy
@@ -715,7 +774,7 @@ export function ProjectIntake() {
             </div>
           </>
         )}
-      </motion.div>
+      </m.div>
 
       {status === "error" && (
         <p role="alert" className="mt-6 rounded border border-warn/40 bg-warn/10 px-4 py-3 text-sm text-warn">
@@ -726,9 +785,15 @@ export function ProjectIntake() {
       <div className="mt-9 flex items-center justify-between">
         <button
           type="button"
-          onClick={() => setStep(Math.max(0, step - 1))}
+          onClick={goBack}
           disabled={step === 0 || status === "submitting"}
-          className="mono-label uppercase text-muted transition-colors hover:text-ink disabled:opacity-40"
+          /*
+            Padded up to the 44px minimum touch target. It previously had no
+            padding at all, which rendered the label at roughly 19px tall —
+            below the project's own documented minimum and awkward to hit on a
+            phone, on the Back control of a seven-step form.
+          */
+          className="mono-label -ms-2 inline-flex min-h-11 items-center rounded px-2 uppercase text-muted transition-colors hover:text-ink disabled:opacity-40"
         >
           ← Back
         </button>
@@ -736,7 +801,7 @@ export function ProjectIntake() {
           type="button"
           onClick={goNext}
           disabled={status === "submitting"}
-          className="inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong disabled:opacity-60"
+          className="inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-press disabled:opacity-60"
         >
           {status === "submitting"
             ? "Submitting…"
@@ -772,14 +837,19 @@ function parseBriefResponse(value: unknown): {
 function inputClass(hasError: boolean): string {
   return cn(
     /*
-      No `focus:outline-none` here. The global `:focus-visible` rule in
+      `border-field` rather than `border-line`: `--color-line` is a 9%-alpha
+      hairline compositing to ~1.2:1 against the control's own fill, which fails
+      WCAG 1.4.11 (non-text contrast, 3:1) — the field boundary was effectively
+      invisible until focus arrived. `--color-field` composites to ≥3:1 against
+      both the fill and the page background in both themes, and is used only for
+      interactive controls so the decorative hairlines elsewhere are unchanged.
+
+      No `focus:outline-none` either. The global `:focus-visible` rule in
       globals.css draws a 2px accent outline, and a Tailwind utility would
-      outrank it, leaving only a 1px border-color shift as the focus
-      indicator. Keeping the outline restores a clearly visible focus state on
-      every input, textarea and select.
+      outrank it, leaving only a 1px border-color shift as the focus indicator.
     */
     "min-h-11 w-full rounded-md border bg-surface2 px-3 py-2.5 text-sm transition-colors duration-150 focus:border-accent",
-    hasError ? "border-critical" : "border-line",
+    hasError ? "border-critical" : "border-field",
   );
 }
 
@@ -869,7 +939,7 @@ function SelectField({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             {...aria}
-            className={cn(inputClass(!!error), "appearance-none pr-9")}
+            className={cn(inputClass(!!error), "appearance-none pe-9")}
           >
             <option value="">Select…</option>
             {options.map((option) => (
@@ -881,7 +951,7 @@ function SelectField({
           <Icon
             name="chevron-down"
             size={12}
-            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-faint"
+            className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-faint"
           />
         </div>
       )}

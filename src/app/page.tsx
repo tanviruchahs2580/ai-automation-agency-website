@@ -1,3 +1,5 @@
+import { siteConfig } from "@/data/site";
+import { disclaimers } from "@/data/disclaimers";
 import { Hero } from "@/components/home/Hero";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { WhatWeSolve } from "@/components/home/WhatWeSolve";
@@ -7,17 +9,17 @@ import { IndustriesGrid } from "@/components/home/IndustriesGrid";
 import { CaseStudiesPreview } from "@/components/home/CaseStudiesPreview";
 import { TrustGovernance } from "@/components/home/TrustGovernance";
 import { CtaSection } from "@/components/layout/CtaSection";
+import { ArchitectureLandscape } from "@/components/scenes/ArchitectureLandscape";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { ScrollDepthTracker } from "@/components/ui/ScrollDepthTracker";
 import { buildMetadata } from "@/lib/seo";
-import dynamic from "next/dynamic";
 
 export const metadata = buildMetadata({
   title: "AI Engineering & Automation for the Enterprise",
   description:
-    "VANTIQ Systems engineers the autonomous operations layer for enterprises that cannot afford guesswork — from first architecture to production.",
+    `${siteConfig.proseName} engineers the autonomous operations layer for enterprises that cannot afford guesswork — from first architecture to production.`,
   path: "/",
 });
 
@@ -42,27 +44,19 @@ const roiTeaserMetrics = [
   { value: "3–6×", label: "First-year return on automated hours — model", lo: 37, hi: 75 },
 ];
 
-/** Below-the-fold scene — code-split per the performance budget (§10). */
-const ArchitectureLandscape = dynamic(
-  () =>
-    import("@/components/scenes/ArchitectureLandscape").then(
-      (mod) => mod.ArchitectureLandscape,
-    ),
-  {
-    loading: () => (
-      <div
-        className="card-surface flex min-h-72 items-center justify-center p-12"
-        aria-hidden="true"
-      >
-        <span className="signal-loader">
-          <span />
-          <span />
-          <span />
-        </span>
-      </div>
-    ),
-  },
-);
+/*
+  Imported directly, not through `next/dynamic`.
+
+  The dynamic import carried a `loading` fallback, and that fallback is what
+  made Next.js emit this scene's entire subtree inside a `<div hidden id="S:0">`
+  container that an inline `$RC(...)` call reveals. Two consequences, both
+  measured: with JavaScript disabled the architecture scene — layer buttons and
+  detail panel — was permanently invisible on `/` and `/technology`, and the
+  route could not be crawled for its layer content. It also bought nothing: the
+  chunk was counted in first-load JavaScript either way, so the "code-split per
+  the performance budget" note was describing a split that did not defer a
+  fetch. A normal import renders it in the HTML and the budget is unchanged.
+*/
 
 export default function HomePage() {
   return (
@@ -146,7 +140,7 @@ export default function HomePage() {
               ))}
             </dl>
             <p className="mono-label mt-4 uppercase text-faint">
-              Illustrative model outputs — not client results
+              {disclaimers.modelRangesLabel}
             </p>
           </div>
           <div className="lg:col-span-5">

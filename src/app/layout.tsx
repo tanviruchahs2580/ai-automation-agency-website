@@ -1,16 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { MotionProvider } from "@/components/motion/MotionProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { CookieConsent } from "@/components/ui/CookieConsent";
-import { JsonLd } from "@/components/ui/Accordion";
-import {
-  SITE_URL,
-  organizationJsonLd,
-  siteConfig,
-  websiteJsonLd,
-} from "@/lib/seo";
+import { HydrationSignal } from "@/components/ui/HydrationSignal";
+import { JsonLd } from "@/components/ui/JsonLd";
+import { siteConfig } from "@/data/site";
+import { SITE_URL, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -51,11 +49,34 @@ export default function RootLayout({
             __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem("vantiq-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}d.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}try{document.documentElement.setAttribute("data-platform",/mac|iphone|ipad/i.test(navigator.userAgent)?"mac":"other")}catch(e){}})();`,
           }}
         />
+        {/*
+          Preload the two faces that paint in the first viewport — the display
+          face used by every h1 and the body face. Both are defined in
+          globals.css, which is render-blocking, so without this hint the font
+          requests are not discovered until CSS has been parsed and the browser
+          has matched the first text. The mono face is intentionally not
+          preloaded: it is used for labels, not for the largest contentful
+          paint, and a third competing request costs more than it saves.
+        */}
+        <link
+          rel="preload"
+          href="/fonts/geist-700.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/inter-tight-400.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="min-h-screen antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:text-white"
+          className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:text-white"
         >
           Skip to main content
         </a>
@@ -63,10 +84,15 @@ export default function RootLayout({
             of both tab order and the accessibility-tree landmark list. It is
             position:fixed, so DOM order does not affect where it paints. */}
         <CookieConsent />
-        <Navbar />
-        <main id="main">{children}</main>
-        <Footer />
+        <MotionProvider>
+          <Navbar />
+          <main id="main" tabIndex={-1}>
+            {children}
+          </main>
+          <Footer />
+        </MotionProvider>
         <BackToTop />
+        <HydrationSignal />
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
       </body>
