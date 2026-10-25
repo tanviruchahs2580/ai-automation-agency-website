@@ -1,11 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
+import { SPRING } from "@/lib/motion";
 
 /**
  * Magnetic — ≤4px spring nudge on hover for hero/final CTAs only.
  * Transform-only; statically rendered on touch pointers + reduced-motion.
+ * Uses `m` (not `motion`) so LazyMotion can supply the feature set.
  */
 export function Magnetic({ children }: { children: ReactNode }) {
   const reduce = useReducedMotion();
@@ -13,12 +15,12 @@ export function Magnetic({ children }: { children: ReactNode }) {
   if (reduce) return <span className="inline-flex">{children}</span>;
 
   return (
-    <motion.span
+    <m.span
       className="inline-flex"
       whileHover={{ x: 3, y: -1 }}
-      transition={{ type: "spring", stiffness: 400, damping: 18 }}
+      transition={SPRING.nudge}
     >
       {children}
-    </motion.span>
+    </m.span>
   );
 }

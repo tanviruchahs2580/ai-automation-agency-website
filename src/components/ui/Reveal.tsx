@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { DURATION, EASE, REVEAL_VIEWPORT } from "@/lib/motion";
 
 interface RevealProps {
   children: ReactNode;
@@ -18,11 +19,13 @@ interface RevealProps {
  * wrapper, so no `opacity: 0` inline style mismatches hydration.
  *
  * Content already inside the viewport at mount stays static. Reveal is a
- * *scroll* reveal: handing an above-the-fold element to framer-motion would
+ * *scroll* reveal: handing an above-the-fold element to Framer Motion would
  * paint it at full opacity (SSR) and then re-run `initial: opacity 0` on
  * hydration — a visible hide-and-return that gated the hero's LCP at
  * ~1.5s (budget: 1.2s). Below-the-fold elements keep the entrance motion,
  * and they are off-screen while the switch happens, so it is never seen.
+ *
+ * Uses `m` (not `motion`) so LazyMotion can supply the feature set.
  */
 export function Reveal({ children, delay = 0, className, y = 18 }: RevealProps) {
   const reduceMotion = useReducedMotion();
@@ -47,15 +50,15 @@ export function Reveal({ children, delay = 0, className, y = 18 }: RevealProps) 
   }
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className={className}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.55, delay, ease: [0.21, 0.6, 0.35, 1] }}
+      viewport={REVEAL_VIEWPORT}
+      transition={{ duration: DURATION.slow, delay, ease: EASE.outSoft }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

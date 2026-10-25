@@ -1,4 +1,3 @@
-import { Tag } from "@/components/ui/Tag";
 import type { Faq } from "@/types/content";
 
 export function Accordion({ items }: { items: Faq[] }) {
@@ -24,23 +23,3 @@ export function Accordion({ items }: { items: Faq[] }) {
   );
 }
 
-/** Server-rendered JSON-LD injection */
-export function JsonLd({ data }: { data: Record<string, unknown> }) {
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        // Escape "<" so embedded content can never close the script tag early.
-        __html: JSON.stringify(data).replace(/</g, "\\u003c"),
-      }}
-    />
-  );
-}
-
-export function ExampleBadge() {
-  return (
-    <Tag accent>
-      Example Architecture — not a client engagement
-    </Tag>
-  );
-}

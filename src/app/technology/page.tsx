@@ -3,33 +3,27 @@ import { CtaSection } from "@/components/layout/CtaSection";
 import { TechnologyMap } from "@/components/home/TechnologyMap";
 import { HeroInstrument } from "@/components/scenes/HeroInstrument";
 import { AgentWorkflow } from "@/components/home/AgentWorkflow";
+import { ArchitectureLandscape } from "@/components/scenes/ArchitectureLandscape";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
+import { architectureLayers } from "@/data/architecture";
 import { buildMetadata } from "@/lib/seo";
-import dynamic from "next/dynamic";
+import { capitalize, countWord } from "@/lib/text";
 
-/** Below-the-fold scene — code-split per the performance budget (§10). */
-const ArchitectureLandscape = dynamic(
-  () =>
-    import("@/components/scenes/ArchitectureLandscape").then(
-      (mod) => mod.ArchitectureLandscape,
-    ),
-  {
-    loading: () => (
-      <div
-        className="card-surface flex min-h-72 items-center justify-center p-12"
-        aria-hidden="true"
-      >
-        <span className="signal-loader">
-          <span />
-          <span />
-          <span />
-        </span>
-      </div>
-    ),
-  },
-);
+/*
+  Imported directly, not through `next/dynamic`.
+
+  The dynamic import carried a `loading` fallback, and that fallback is what
+  made Next.js emit this scene's entire subtree inside a `<div hidden id="S:0">`
+  container that an inline `$RC(...)` call reveals. Two consequences, both
+  measured: with JavaScript disabled the architecture scene — layer buttons and
+  detail panel — was permanently invisible on `/` and `/technology`, and the
+  route could not be crawled for its layer content. It also bought nothing: the
+  chunk was counted in first-load JavaScript either way, so the "code-split per
+  the performance budget" note was describing a split that did not defer a
+  fetch. A normal import renders it in the HTML and the budget is unchanged.
+*/
 
 export const metadata = buildMetadata({
   title: "Technology & Platform",
@@ -40,7 +34,7 @@ export const metadata = buildMetadata({
 
 const aiStackLayers = [
   { name: "Model Router", detail: "Task-aware routing across providers with fallbacks and budgets." },
-  { name: "Agent Orchestrator", detail: "Coordinates specialised agents, retries and escalation paths." },
+  { name: "Agent Orchestrator", detail: "Coordinates specialized agents, retries and escalation paths." },
   { name: "Tool Registry", detail: "Schema-validated, least-privilege access to business systems." },
   { name: "RAG Pipeline", detail: "Permission-aware retrieval over your approved knowledge." },
   { name: "Memory", detail: "Task-scoped state with retention rules and user controls." },
@@ -68,11 +62,16 @@ export default function TechnologyPage() {
         <div className="container-x grid gap-12 lg:grid-cols-12 lg:items-start">
           <Reveal className="lg:col-span-5">
             <p className="eyebrow mb-3">Internal AI stack</p>
-            <h2 id="stack-heading" className="h-section">Seven layers between a prompt and a production system.</h2>
+            <h2 id="stack-heading" className="h-section">
+              {capitalize(countWord(aiStackLayers.length))} platform layers between a prompt and a
+              production system.
+            </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted">
               Every layer is replaceable. That&apos;s the point — when models,
               vendors or regulations shift, your system adapts in configuration
-              rather than surgery.
+              rather than surgery. These are the components we install; the
+              architecture landscape further down describes a system&apos;s shape,
+              and maps onto them rather than competing with them.
             </p>
           </Reveal>
           <div className="lg:col-span-7">
@@ -98,12 +97,15 @@ export default function TechnologyPage() {
           <SectionHeader
             eyebrow="Architecture landscape"
             /*
-              Was "One stack, twelve layers, zero lock-in." — the component
-              below renders six layers, so the headline overstated it. Naming
-              the axis also separates it from the seven-layer platform stack
-              further up the page, which is a different thing.
+              Both counts are derived from data, and the comments here used to
+              be the only thing keeping them honest: the headline said "twelve
+              layers" while the component rendered six. The axis is named in the
+              title as well as the count, so the six architecture layers here and
+              the seven platform layers above are legible as two different
+              abstractions rather than a contradiction. The platform stack's lead
+              paragraph states the relationship directly.
             */
-            title="Six architecture layers, zero lock-in."
+            title={`${capitalize(countWord(architectureLayers.length))} architecture layers, zero lock-in.`}
             lead="Select any layer to see what it guarantees. Models change monthly — this structure keeps working regardless."
             id="landscape-heading"
           />
