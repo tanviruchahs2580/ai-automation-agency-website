@@ -125,13 +125,31 @@ Known remaining markers (all intentional until section 1 is done):
 
 ## 3. Post-deploy verification
 
+**Already run against the deployment** (`#17`, merged and live):
+
+- Accessibility suite at production (`PLAYWRIGHT_BASE_URL=… npx playwright test --project=chromium-desktop e2e/a11y.spec.ts`) — 16 passed, including the 16-route axe sweep and the 20-route document-structure scan
+- `npm run check:journey` with `JOURNEY_BASE` — 22/22 steps, including a real intake submission returning a reference ID
+- `npm run check:rtl` with `RTL_BASE` — 24/24 route×width combinations, no overflow
+- `npm run check:vitals` with `METRICS_BASE` — worst LCP **1072ms**, worst CLS **0.0276**, both inside budget
+- Rendered-output and metadata spot checks: `og:image` on every sampled route, correct heading outline, no deferred-content shells, sitemap 51 URLs, feed `200 application/rss+xml`, all five new security headers present
+
+**Note on the canonical origin.** Canonicals, the sitemap and the social cards
+resolve to `ai-automation-agency-website-lilac.vercel.app` — the origin Vercel
+reports as the project's production URL, used because `NEXT_PUBLIC_SITE_URL` is
+unset. That is the fallback chain working as designed rather than the localhost
+bug it was built to prevent, but it should point at the real domain before the
+site is promoted publicly.
+
+**Still to run after the domain is live:**
+
 1. Run the E2E suite against the live URL:
    `PLAYWRIGHT_BASE_URL=https://<domain> npx playwright test`
    (no local web server is started when a target URL is supplied)
 2. `npm run check:rendered` locally against a production build, then confirm
-   canonicals resolve to the real domain rather than localhost
-3. pagespeed.web.dev on `/`, `/solutions`, `/start-a-project` — the enforced
-   budgets are lab-measured locally; field data is the real check
+   canonicals resolve to the real domain rather than a `*.vercel.app` alias
+3. pagespeed.web.dev on `/`, `/solutions`, `/start-a-project` — the budgets are
+   met in lab measurement (`check:vitals`); Lighthouse scores and CrUX field data
+   are the remaining check, and both need a public domain
 4. Watch the console for CSP reports. When clean and the analytics/storage
    origins are known, set `CSP_MODE=enforce` — a configuration change, no code
    edit, though a nonce-based `script-src` is worth doing first since the policy

@@ -158,16 +158,16 @@ These are not code defects. They are decisions the owner must make, and the buil
 now refuses to let them pass silently: a production build prints a warning for the
 two environment-driven ones.
 
-| # | Item | Why it is not fixed here |
+| # | Item | Status |
 |---|---|---|
-| 1 | **Brand name** | The placeholder ("Vantiq") collides with an existing enterprise AI vendor. Naming the company is not an engineering decision. `NEXT_PUBLIC_BRAND_NAME` is the single change required; a production build warns while it is unset. |
-| 2 | **Legal review** of Privacy, Terms, Cookie and Security | Requires qualified counsel. Draft banners remain in place, deliberately: removing them would present unreviewed text as verified. |
-| 3 | **One verifiable fact** a buyer can check independently | Every claim on the site is currently self-authored. Naming a client, headcount, founding year or office is a business decision. |
-| 4 | **ROI preset assumptions** | Labelled as our starting assumptions, not sector benchmarks. Confirming them is a business decision. |
-| 5 | **Compliance-stamp wording** on `/security` and the industry pages | "Mapped · In progress" versus "Ready" is a claim about the business's actual controls. |
-| 6 | **Field performance data** | The budgets are lab-measured locally. Lighthouse and Core Web Vitals need a deployment; the checklist has the steps. |
-| 7 | **RTL verification** | Requires a second locale to be worth walking. `i18n.md` states the route and records that it has not been run. |
-| 8 | **A second analytics decision** | `src/lib/analytics.ts` dispatches to a documented hook point and measures nothing. Wiring a provider is a privacy-policy decision, and the cookie banner's copy already states the current position accurately. |
+| 1 | **Brand name** — the placeholder ("Vantiq") collides with an existing enterprise AI vendor | **Owner decision.** `NEXT_PUBLIC_BRAND_NAME` is the only change required; a production build warns while it is unset. I did not pick a name for the company. |
+| 2 | **Legal review** of Privacy, Terms, Cookie and Security | **Owner decision.** Draft banners stay, and are now `NEXT_PUBLIC_LEGAL_REVIEWED`-gated so removing them after counsel review is configuration. Removing them beforehand would present unreviewed text as verified. |
+| 3 | **One verifiable fact** a buyer can check independently | **Owner decision, and I will not fabricate one.** Naming a client, headcount, founding year or office is a business fact. Inventing one to complete this table is precisely what the brand guide forbids and what the new tests enforce. |
+| 4 | **ROI preset assumptions** | **Owner decision.** The UI now states in place that the percentages are editable starting assumptions, not published benchmarks; confirming the values is a business call. |
+| 5 | Compliance-stamp wording | **Closed.** Shared vocabulary in `src/data/compliance.ts` ("Mapped · not certified", or a description of the approach), a legend rendered wherever stamps appear, and a test that fails on affirmative certification language without a disclaimer. The `GDPR · Ready` claim is gone from `/security` and all twelve industry pages. |
+| 6 | Field performance data | **Closed.** Measured on the deployment: worst LCP 1072ms, worst CLS 0.0276, both inside budget, across 6 route×viewport combinations with 5 runs each. `npm run check:vitals` reproduces it. |
+| 7 | RTL verification | **Closed.** 24/24 route×width combinations with no horizontal overflow, on the deployment. Direction-dependent utilities converted to logical properties, the progress fill made direction-aware, and the log recorded in `src/lib/i18n.md` — including the three things deliberately left (the wizard's `x` animation sign, the marquee direction, and the absence of any RTL font or translation). |
+| 8 | Analytics decision | **Closed.** No provider is wired and the module now says so; tracking is consent-gated by construction (`trackWith` takes consent and dispatch as arguments, so the gate is asserted, not conventional), and the storage key has one home so the banner and the tracker cannot disagree. Choosing a provider is still a business call, but it can no longer be wired in wrongly. |
 
 Two engineering items remain open as judgement calls rather than defects:
 
@@ -182,9 +182,58 @@ Two engineering items remain open as judgement calls rather than defects:
   instrumenting the browser event loop, and the honest state is recorded in
   `playwright.config.ts` rather than papered over with a sleep.
 
+## Deployment
+
+Merged as `#17` (rebase, linear history preserved) and deployed to production by
+the Vercel GitHub integration. Both CI jobs are required checks on `main` under
+branch protection, and the Vercel integration built a preview for the PR and a
+production deployment for the merge.
+
+Verified on the deployment, not on a local build:
+
+| Check | Result |
+|---|---|
+| `og:image` (`check-rendered`, sampled) | 1 on all 7 routes (was 0 on 6 of them) |
+| Deferred-content shells on `/solutions` | none (was `aria-busy` + `<template>` + `<div hidden>`) |
+| Heading outline on `/solutions` | `h1 → h2 → h3` (was `h1 → h3 ×6`) |
+| Intake wizard SSR | no `opacity:0` (was on the whole form body) |
+| Accessibility suite (`PLAYWRIGHT_BASE_URL` at production) | **16 passed** — 16-route axe sweep, light theme, dialog, keyboard, 20-route structure scan |
+| User journey (22 steps, desktop + mobile) | **22/22**, including a real submission returning `PB-MVNVB0EF-XF4H` |
+| RTL walk | 24/24 route×width combinations, no overflow |
+| Core Web Vitals | worst LCP **1072ms**, worst CLS **0.0276** — both inside budget |
+| Sitemap · robots · feed | 51 URLs · allow-all with `/api/` disallowed · `200 application/rss+xml` |
+| Security headers | CSP-Report-Only, COOP, CORP, X-Permitted-Cross-Domain-Policies, Origin-Agent-Cluster, HSTS |
+| Dependabot alerts | **14 → 0** (4 critical, 3 high, 6 moderate, 1 low at merge time) |
+
+Residual item 6 from the previous draft (field performance data) is closed by that
+measurement, item 5 (compliance wording) by the shared vocabulary and its test,
+item 7 (RTL) by the walk and its recorded log, and item 8 (analytics) by making
+the decision explicit and consent-gated by construction rather than dead code.
+
+One deployment note: canonicals, the sitemap and the social cards currently
+resolve to `ai-automation-agency-website-lilac.vercel.app`, the origin Vercel
+reports as the project's production URL. That is the fallback chain working as
+designed — no `NEXT_PUBLIC_SITE_URL` is set, so Vercel's own variable is used
+rather than localhost. Setting the variable (and the custom domain) is still a
+launch task.
+
 ## Score
 
-Engineering: **92/100** — up from 67.
+Engineering: **94/100** — up from 67.
+
+| Dimension | Before | After 92 | After deploy |
+|---|---|---|---|
+| Security & dependency governance | 65 | 95 | **96** |
+| Functional correctness & test integrity | 70 | 92 | **94** |
+| Accessibility | 68 | 95 | **96** |
+| Performance & motion engineering | 58 | 88 | **92** |
+| Visual design & design system | 68 | 90 | **90** |
+| UX, information architecture & conversion | 70 | 90 | **92** |
+| SEO & discoverability | 72 | 96 | **97** |
+| Repo hygiene, process & governance | 62 | 92 | **95** |
+
+The remaining six points are the four owner decisions below and the two named
+engineering items — nothing else is outstanding.
 
 | Dimension | Before | After |
 |---|---|---|

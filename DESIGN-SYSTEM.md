@@ -208,7 +208,7 @@ validator never reaches the browser.
 | --- | --- | --- |
 | LCP < 1.2s (home) | 544ms (worst of 5 routes; `/solutions` 356ms, `/insights` 316ms) | met |
 | CLS < 0.05 | 0.0000 – 0.0245 across 5 routes | met |
-| INP < 100ms | not field-measured (no CrUX/lab INP tooling offline) | pending field data |
+| INP < 100ms | not measured — needs real interactions in the field (CrUX), not a lab run | pending field data |
 | shared JS baseline < 165KB gzip | 157.0KB gzip on all 23 routes | met (`npm run check:budget`) |
 | heaviest route < 185KB gzip | 176.9KB gzip on `/` | met (`npm run check:budget`) |
 | CSS < 20KB gzip | 12.2KB gzip | met (`npm run check:budget`) |
@@ -217,7 +217,10 @@ validator never reaches the browser.
 | axe zero violations above minor impact | 0 across 20 route scans + light theme + open dialog (Playwright axe suite) | met |
 | document structure (best-practice rules) | 0 across 20 routes | met (`e2e/a11y.spec.ts`) |
 | rendered-output invariants | 0 violations across 53 documents | met (`npm run check:rendered`) |
-| Lighthouse 100×4 / ≥95 | not run — `lighthouse` CLI unavailable offline | pending (use pagespeed.web.dev, see LAUNCH-CHECKLIST §3.2) |
+| LCP < 1.2s (measured on the deployment) | **1072ms worst** of 6 route×viewport combinations, 5 runs each | met (`npm run check:vitals`) |
+| CLS < 0.05 (measured on the deployment) | **0.0276 worst** | met (`npm run check:vitals`) |
+| Web Vitals, other | FCP 716–1072ms · TTFB 179–296ms · 400–515 KB transferred | measured, not budgeted |
+| Lighthouse 100×4 / ≥95 | not run — `lighthouse` CLI is not fetchable from this environment | pending (use pagespeed.web.dev, see LAUNCH-CHECKLIST §3.2) |
 
 ### Why the old 90KB figure is gone
 
