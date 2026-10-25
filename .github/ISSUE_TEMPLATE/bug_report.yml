@@ -1,0 +1,50 @@
+name: Bug report
+description: Something on the site is broken, wrong, or misleading.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For anything exploitable, use GitHub's private vulnerability reporting
+        instead of this form — see `.github/SECURITY.md`.
+
+  - type: input
+    id: url
+    attributes:
+      label: Where
+      description: The URL, and the route name if it is a dynamic page.
+      placeholder: https://example.com/solutions/ai-agents
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happens
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, version and viewport width
+      placeholder: Firefox 141, 1440px
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before filing
+      options:
+        - label: I checked at more than one viewport width (the layout changes at 768px and 1024px).
+          required: false
+        - label: If this is a broken claim or number, I have quoted the exact text from the page.
+          required: false

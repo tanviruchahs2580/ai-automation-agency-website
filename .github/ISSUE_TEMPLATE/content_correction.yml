@@ -1,0 +1,45 @@
+name: Content correction
+description: Something stated on the site is inaccurate, out of date, or not substantiated.
+labels: ["content", "honesty"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This site's stated position is "no hype metrics" and evidence over
+        claims. That applies to its own copy first, so content accuracy reports
+        are treated as defects rather than nitpicks.
+
+  - type: input
+    id: url
+    attributes:
+      label: Page
+      placeholder: https://example.com/work/invoice-processing-operations
+    validations:
+      required: true
+
+  - type: textarea
+    id: quote
+    attributes:
+      label: Exact text as it appears
+      description: Copy and paste it verbatim so it can be found in the source.
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong with it
+      description: |
+        For example: it reads as a verified client result but is a modelled
+        estimate; it implies a certification that is not held; it duplicates a
+        number that is stated differently elsewhere; it uses a word the
+        brand-voice audit forbids.
+    validations:
+      required: true
+
+  - type: textarea
+    id: correction
+    attributes:
+      label: Suggested correction
+    validations:
+      required: false

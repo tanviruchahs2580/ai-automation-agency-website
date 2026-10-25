@@ -29,7 +29,17 @@ for (const theme of ["dark", "light"]) {
   await shot(page, `home-landscape-${theme}-1440`, "text=We don't just add AI");
   await shot(page, `home-services-${theme}-1440`, "text=Seven services");
   await shot(page, `home-roi-${theme}-1440`, "text=Estimate what manual work");
-  await shot(page, `home-cta-${theme}-1440`, "text=Start a project");
+  /*
+    `#main > section:last-of-type`, not `text=Start a project`.
+
+    The text locator matched the *header* button "Start a Project" — visible at
+    the top of the page — so `scrollIntoViewIfNeeded()` was a no-op and every
+    "home-cta" capture in this folder is actually the ROI section further up.
+    The homepage's final CTA and footer were never recorded. A structural
+    selector cannot collide with header chrome and does not depend on the copy.
+  */
+  await shot(page, `home-cta-${theme}-1440`, "#main > section:last-of-type");
+  await shot(page, `home-footer-${theme}-1440`, "footer");
   await page.goto(BASE + "/solutions/ai-agents", { waitUntil: "networkidle" });
   await shot(page, `solution-detail-${theme}-1440`, "text=What this includes");
   await page.goto(BASE + "/work/invoice-processing-operations", { waitUntil: "networkidle" });

@@ -1,9 +1,16 @@
 import { expect, test } from "@playwright/test";
+import { siteConfig } from "../src/data/site";
 
 test.describe("smoke: core journeys", () => {
   test("homepage renders brand, hero and primary CTAs", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/VANTIQ/);
+    /*
+      Against the configured brand, not the literal "VANTIQ". The suite is the
+      one place a rename would otherwise fail silently in the wrong direction —
+      asserting the old name passes while the site has moved on, or fails on a
+      legitimate rename.
+    */
+    await expect(page).toHaveTitle(new RegExp(siteConfig.shortName, "i"));
     await expect(page.locator("h1").first()).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Start a Project" }).first(),
