@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/data/site";
+import { SOCIAL_IMAGE, socialImageUrl } from "@/lib/social-image";
 
 const FALLBACK_SITE_URL = "http://localhost:3000";
 
@@ -49,23 +51,46 @@ export const SITE_URL = (() => {
   }
 })();
 
-/** Company brand — confirm registered legal entity form before launch. */
-export const siteConfig = {
-  name: "VANTIQ SYSTEMS",
-  shortName: "VANTIQ",
-  tagline: "AI Engineering & Automation for the Enterprise",
-  description:
-    "We design, engineer and operate intelligent automation systems that connect your people, software, data and workflows — from first architecture to production.",
-  locale: "en_US",
-} as const;
-
 interface BuildMetadataInput {
   title: string;
   description: string;
   path: string;
   ogType?: "website" | "article";
   publishedTime?: string;
-  authors?: string[];
+  modifiedTime?: string;
+  /**
+   * Route of this page's own social card, e.g. `cardPath("insights", slug)`.
+   * Omit to use the default brand card.
+   *
+   * This has to be passed explicitly rather than left to the
+   * `opengraph-image` file convention. Next.js *replaces* the accumulated
+   * `openGraph` object at each metadata level (`resolve-metadata.js`: it
+   * assigns `newResolvedMetadata.openGraph = resolveOpenGraph(...)` rather than
+   * deep-merging), so the moment a page returns its own `openGraph` — which
+   * every page here must, to set og:url and og:type — the root card attached by
+   * the file convention is discarded. That is why 51 of 52 routes shipped with
+   * no `og:image` at all and only the homepage had one.
+   */
+  cardPath?: string;
+}
+
+/**
+ * Feed autodiscovery descriptor.
+ *
+ * Set from `buildMetadata` rather than once in the root layout for the same
+ * reason as `og:image`: Next replaces (does not deep-merge) each metadata
+ * object per level, so a page returning its own `alternates` — which every page
+ * must, to set a canonical — drops whatever the layout had put there. Declaring
+ * it in the layout alone left the feed, valid and linked from the footer,
+ * reachable only by clicking that link: no crawler or feed reader could
+ * discover it.
+ */
+function feedAlternates() {
+  return {
+    "application/rss+xml": [
+      { url: `${SITE_URL}/feed.xml`, title: `${siteConfig.name} — Insights` },
+    ],
+  };
 }
 
 export function buildMetadata({
@@ -74,13 +99,22 @@ export function buildMetadata({
   path,
   ogType = "website",
   publishedTime,
+  modifiedTime,
+  cardPath,
 }: BuildMetadataInput): Metadata {
   const url = `${SITE_URL}${path}`;
   const fullTitle = `${title} — ${siteConfig.shortName}`;
+  const image = {
+    url: socialImageUrl(SITE_URL, cardPath),
+    width: SOCIAL_IMAGE.width,
+    height: SOCIAL_IMAGE.height,
+    alt: `${fullTitle}${cardPath ? "" : ` — ${siteConfig.tagline}`}`,
+  };
+
   return {
     title: fullTitle,
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: url, types: feedAlternates() },
     openGraph: {
       title: fullTitle,
       description,
@@ -88,17 +122,28 @@ export function buildMetadata({
       siteName: siteConfig.name,
       locale: siteConfig.locale,
       type: ogType,
+      images: [image],
       ...(publishedTime ? { publishedTime } : {}),
+      ...(modifiedTime ? { modifiedTime } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description,
+      images: [image],
     },
   };
 }
 
 /* ---------- Structured data ---------- */
+
+/** Organization logo, referenced by the Organization and publisher blocks. */
+const LOGO = {
+  "@type": "ImageObject",
+  url: `${SITE_URL}/icons/icon-512.png`,
+  width: 512,
+  height: 512,
+} as const;
 
 export function organizationJsonLd(): Record<string, unknown> {
   return {
@@ -107,6 +152,8 @@ export function organizationJsonLd(): Record<string, unknown> {
     name: siteConfig.name,
     url: SITE_URL,
     description: siteConfig.description,
+    logo: LOGO,
+    image: socialImageUrl(SITE_URL),
     knowsAbout: [
       "AI engineering",
       "Workflow automation",
@@ -156,6 +203,7 @@ export function serviceJsonLd(input: {
       "@type": "Organization",
       name: siteConfig.name,
       url: SITE_URL,
+      logo: LOGO,
     },
     url: `${SITE_URL}${input.path}`,
   };
@@ -175,25 +223,59 @@ export function faqJsonLd(
   };
 }
 
-export function articleJsonLd(input: {  title: string;
+export function articleJsonLd(input: {
+  title: string;
   description: string;
   path: string;
+  /** Byline as displayed on the page. */
   author: string;
+  /**
+   * `Person` only when `author` is a named individual. A team byline is an
+   * Organization: emitting a team name as `Person` tells search engines a human
+   * wrote the article, which is a factual misrepresentation in machine-readable
+   * form — and it contradicted the team page's own "no ghost authors" rule.
+   */
+  authorType?: "Organization" | "Person";
   publishedAt: string;
+  modifiedAt?: string;
+  cardPath?: string;
 }): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: input.title,
     description: input.description,
-    author: { "@type": "Person", name: input.author },
+    /* Required for Article rich results — without an image Google will not
+       render the article treatment at all. */
+    image: [socialImageUrl(SITE_URL, input.cardPath)],
+    author: {
+      "@type": input.authorType ?? "Organization",
+      name: input.author,
+      url: SITE_URL,
+    },
     datePublished: input.publishedAt,
-    publisher: { "@type": "Organization", name: siteConfig.name },
+    dateModified: input.modifiedAt ?? input.publishedAt,
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: SITE_URL,
+      /* Required by Google for article rich results. */
+      logo: LOGO,
+    },
     mainEntityOfPage: `${SITE_URL}${input.path}`,
   };
 }
 
-/** Interactive tools (ROI calculator, readiness assessment) as products. */
+/**
+ * Interactive tools (ROI calculator, readiness assessment) as products.
+ *
+ * Note on `aggregateRating`: Google's SoftwareApplication rich result asks for
+ * `aggregateRating` or `review` in addition to `offers`. Neither is emitted,
+ * deliberately — this site has no genuine ratings or reviews, and inventing
+ * them to win a rich snippet would be fabricated endorsement data on a site
+ * whose stated position is "no hype metrics". The markup below is accurate
+ * about what the page is; it is simply not eligible for the rating treatment.
+ */
 export function softwareJsonLd(input: {
   name: string;
   description: string;
@@ -206,11 +288,12 @@ export function softwareJsonLd(input: {
     description: input.description,
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
-    offers: { "@type": "Offer", price: "0" },
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     provider: {
       "@type": "Organization",
       name: siteConfig.name,
       url: SITE_URL,
+      logo: LOGO,
     },
     url: `${SITE_URL}${input.path}`,
   };

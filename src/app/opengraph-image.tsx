@@ -1,91 +1,26 @@
 import { ImageResponse } from "next/og";
+import { OgCard } from "@/components/og/OgCard";
+import { OG_CONTENT_TYPE, OG_SIZE } from "@/lib/social-image";
+import { siteConfig } from "@/data/site";
 
-export const alt = "VANTIQ SYSTEMS — AI Engineering & Automation for the Enterprise";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+/**
+ * Default social card for every route without its own.
+ *
+ * This route is what `buildMetadata` points at when a page has no per-page
+ * card, which is what makes `og:image` present on all 51 indexable routes.
+ */
+export const alt = `${siteConfig.name} — ${siteConfig.tagline}`;
+export const size = OG_SIZE;
+export const contentType = OG_CONTENT_TYPE;
 
 export default function OpengraphImage() {
   return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          backgroundColor: "#0a0b0e",
-          backgroundImage:
-            "radial-gradient(700px 340px at 12% -10%, rgba(46,107,246,0.22), transparent 65%), radial-gradient(560px 300px at 92% 12%, rgba(0,229,168,0.12), transparent 60%)",
-          color: "#f4f2ec",
-          padding: 72,
-          fontFamily: "sans-serif",
-          position: "relative",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "3px solid #2e6bf6",
-              borderRadius: 12,
-              fontSize: 36,
-              fontWeight: 700,
-              color: "#2e6bf6",
-            }}
-          >
-            V
-          </div>
-          <div style={{ display: "flex", fontSize: 30, fontWeight: 700, letterSpacing: 10 }}>
-            VANTIQ SYSTEMS
-          </div>
-          <div
-            style={{
-              display: "flex",
-              width: 12,
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: "#00e5a8",
-              marginLeft: 4,
-            }}
-          />
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            fontSize: 76,
-            fontWeight: 700,
-            lineHeight: 1.05,
-            letterSpacing: -2,
-            maxWidth: 980,
-          }}
-        >
-          AI Engineering &amp; Automation for the Enterprise
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            borderTop: "2px solid rgba(244,242,236,0.12)",
-            paddingTop: 28,
-          }}
-        >
-          <div style={{ display: "flex", fontSize: 26, color: "#8b93a3" }}>
-            Architecture · Agents · Automation · Operations
-          </div>
-          <div style={{ display: "flex", fontSize: 26, fontWeight: 700, color: "#2e6bf6" }}>
-            Model-agnostic. Architecture-first.
-          </div>
-        </div>
-      </div>
-    ),
-    { ...size },
+    <OgCard
+      kicker="Enterprise AI engineering"
+      title={siteConfig.tagline}
+      footerLeft="Architecture · Agents · Automation · Operations"
+      footerRight="Model-agnostic. Architecture-first."
+    />,
+    { ...OG_SIZE },
   );
 }
