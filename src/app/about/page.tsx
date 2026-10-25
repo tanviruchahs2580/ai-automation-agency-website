@@ -4,6 +4,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
 import { engineeringPrinciples } from "@/data/architecture";
 import { buildMetadata } from "@/lib/seo";
+import { capitalize, countWord } from "@/lib/text";
 
 export const metadata = buildMetadata({
   title: "About",
@@ -95,7 +96,7 @@ export default function AboutPage() {
         <div className="container-x">
           <SectionHeader
             eyebrow="Team expertise"
-            title="Senior engineers across eight disciplines."
+            title={`Senior engineers across ${capitalize(countWord(disciplines.length))} disciplines.`}
             lead="We staff engagements with people who have shipped production systems before — and we publish capability, not headcount vanity metrics."
             id="expertise-heading"
           />
@@ -123,7 +124,7 @@ export default function AboutPage() {
         <div className="container-x">
           <SectionHeader
             eyebrow="Working with us"
-            title="Four commitments we will not trade away."
+            title={`${capitalize(countWord(commitments.length))} commitments we will not trade away.`}
             id="standards-heading"
           />
           <div className="mt-10 grid gap-10 md:grid-cols-2">

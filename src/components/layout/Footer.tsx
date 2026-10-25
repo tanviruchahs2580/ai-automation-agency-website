@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { footerColumns, legalLinks, contact } from "@/data/site";
+import { contact, footerColumns, legalLinks, siteConfig } from "@/data/site";
 import { Wordmark } from "@/components/layout/Wordmark";
 
 export function Footer() {
@@ -62,7 +62,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-line pt-6 md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-faint">
-            © {year} VANTIQ SYSTEMS. All rights reserved.
+            © {year} {siteConfig.name}. All rights reserved.
           </p>
           <p className="mono-label text-faint">
             Architecture first · Vendors second

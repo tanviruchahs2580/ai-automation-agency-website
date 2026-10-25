@@ -1,3 +1,4 @@
+import { siteConfig } from "@/data/site";
 import { insights } from "@/data/insights";
 import { SITE_URL } from "@/lib/seo";
 import { escapeXml } from "@/lib/xml";
@@ -19,7 +20,7 @@ export async function GET() {
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${escapeXml("VANTIQ SYSTEMS — Insights")}</title>
+    <title>${escapeXml(`${siteConfig.name} — Insights`)}</title>
     <link>${escapeXml(`${SITE_URL}/insights`)}</link>
     <description>${escapeXml("Engineering notes, not thought leadership.")}</description>
     <language>en-us</language>

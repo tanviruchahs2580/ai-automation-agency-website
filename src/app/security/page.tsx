@@ -5,6 +5,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SecurityGovernance } from "@/components/home/SecurityGovernance";
 import { ComplianceStamp } from "@/components/scenes/ComplianceStamp";
+import { complianceLegend, securityPageStamps } from "@/data/compliance";
 import { contact } from "@/data/site";
 import { buildMetadata } from "@/lib/seo";
 
@@ -24,7 +25,7 @@ const practices = [
   {
     title: "Form security",
     detail:
-      "Server-side schema validation on every submission, per-IP rate limiting, honeypot bot traps and input sanitisation. Client validation is UX only — never trusted.",
+      "Server-side schema validation on every submission, per-IP rate limiting, honeypot bot traps and input sanitization. Client validation is UX only — never trusted.",
   },
   {
     title: "Secrets discipline",
@@ -139,16 +140,15 @@ export default function SecurityPage() {
             it is held.
           </p>
           <ul className="mt-8 flex flex-wrap gap-3">
-            <li>
-              <ComplianceStamp label="SOC 2 controls" status="Mapped · In progress" />
-            </li>
-            <li>
-              <ComplianceStamp label="ISO 27001" status="Mapped · In progress" />
-            </li>
-            <li>
-              <ComplianceStamp label="GDPR" status="Ready" />
-            </li>
+            {securityPageStamps.map((stamp) => (
+              <li key={stamp.label}>
+                <ComplianceStamp label={stamp.label} status={stamp.status} />
+              </li>
+            ))}
           </ul>
+          <p className="mt-5 border-t border-line pt-4 text-[11px] leading-relaxed text-faint">
+            {complianceLegend}
+          </p>
         </div>
       </section>
 

@@ -1,3 +1,4 @@
+import { siteConfig } from "@/data/site";
 import { PageHero } from "@/components/layout/PageHero";
 import { DraftBanner } from "@/components/ui/DraftBanner";
 import { buildMetadata } from "@/lib/seo";
@@ -5,7 +6,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata = buildMetadata({
   title: "Privacy Policy",
   description:
-    "How VANTIQ SYSTEMS handles personal data submitted through this website.",
+    `${siteConfig.name} handles personal data submitted through this website.`,
   path: "/privacy",
 });
 

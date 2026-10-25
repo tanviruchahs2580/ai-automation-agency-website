@@ -41,7 +41,7 @@ export const technologyCategories: TechnologyCategory[] = [
       { name: "RAG", detail: "Permission-aware retrieval pipelines" },
       { name: "Vector databases", detail: "pgvector, dedicated engines as needed" },
       { name: "Agent frameworks", detail: "Orchestration with bounded autonomy" },
-      { name: "MCP", detail: "Standardised tool connectivity" },
+      { name: "MCP", detail: "Standardized tool connectivity" },
       { name: "Model routing", detail: "Cost- and capability-aware gateways" },
       { name: "Evaluation", detail: "Golden datasets & regression gates" },
       { name: "Observability", detail: "Tracing, metrics and drift detection" },

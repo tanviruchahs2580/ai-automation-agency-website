@@ -1,11 +1,26 @@
 /**
- * Locale helpers — i18n scaffold (§11).
+ * Locale helpers.
  *
- * Only `en` ships today, but every date/number format goes through these
- * helpers with an explicit locale (never bare `.toLocaleString()`), message
- * keys live in `src/messages/<locale>.json`, and layout is RTL-safe
- * (logical properties, `dir`-agnostic flex). Adding a locale = add a
- * messages file + a `[locale]` segment (see `src/lib/i18n.md`).
+ * Only `en-US` ships, and that is a decision rather than an oversight: this is a
+ * single-language launch, and a half-wired message catalogue is worse than none.
+ * An earlier version of this scaffold claimed `src/messages/<locale>.json` held
+ * the UI strings; nothing imported it, and its contents had drifted away from
+ * the copy that actually rendered — including a third wording of the
+ * "example architecture" disclosure that `BRAND-GUIDE.md` then named as
+ * approved. The dead catalogue is gone.
+ *
+ * What remains is the part that was real and load-bearing:
+ *
+ *  - every date and number goes through `formatDate` / `formatNumberIntl` with
+ *    an explicit locale — never a bare `.toLocaleString()`, which resolves
+ *    against the visitor's environment and renders differently per machine;
+ *  - shared disclosure copy lives in `src/data/disclaimers.ts` with the same
+ *    "one home, enforced by a test" rule as the brand name;
+ *  - layout uses logical properties and direction-agnostic flex, so an RTL
+ *    locale needs no CSS changes.
+ *
+ * `src/lib/i18n.md` describes the migration path and exactly what remains
+ * unverified.
  */
 
 export const defaultLocale = "en-US" as const;

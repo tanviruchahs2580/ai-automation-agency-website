@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
 import { engineeringPrinciples } from "@/data/architecture";
 import { buildMetadata } from "@/lib/seo";
+import { capitalize, countWord } from "@/lib/text";
 
 export const metadata = buildMetadata({
   title: "Our Approach",
@@ -43,7 +44,7 @@ export default function ApproachPage() {
       <PageHero
         eyebrow="Approach"
         title="Engineering discipline, applied to intelligent systems."
-        lead="AI doesn't remove the need for engineering rigour — it raises the price of lacking it. This is how we work."
+        lead="AI doesn't remove the need for engineering rigor — it raises the price of lacking it. This is how we work."
         breadcrumbs={[
           { name: "Home", path: "/" },
           { name: "Approach", path: "/approach" },
@@ -54,7 +55,7 @@ export default function ApproachPage() {
         <div className="container-x">
           <SectionHeader
             eyebrow="Principles"
-            title="Ten commitments we can be measured against."
+            title={`${capitalize(countWord(engineeringPrinciples.length))} commitments we can be measured against.`}
             id="principles-heading"
           />
           <ol className="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">

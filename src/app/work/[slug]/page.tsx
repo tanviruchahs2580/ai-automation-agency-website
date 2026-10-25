@@ -2,11 +2,15 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
-import { ExampleBadge } from "@/components/ui/Accordion";
+import { ExampleBadge } from "@/components/ui/ExampleBadge";
 import { Reveal } from "@/components/ui/Reveal";
 import { QuoteRail } from "@/components/scenes/QuoteRail";
 import { caseStudies, getCaseStudy } from "@/data/case-studies";
+import { siteConfig } from "@/data/site";
 import { buildMetadata } from "@/lib/seo";
+import { cardPath } from "@/lib/social-image";
+import { truncateAtWord } from "@/lib/text";
+import { disclaimers } from "@/data/disclaimers";
 
 export function generateStaticParams() {
   return caseStudies.map((c) => ({ slug: c.slug }));
@@ -21,9 +25,18 @@ export async function generateMetadata({
   const study = getCaseStudy(slug);
   if (!study) return {};
   return buildMetadata({
-    title: `${study.title} — Reference Architecture`,
-    description: study.challenge.slice(0, 155),
+    /*
+      Colon, not an em dash. The title used to be
+      "Invoice Processing Operations — Reference Architecture", and
+      `buildMetadata` appends " — VANTIQ", so the search result read
+      "…— Reference Architecture — VANTIQ": three em-dashed clauses, 61
+      characters, no hierarchy.
+    */
+    title: `${study.title}: Reference Architecture`,
+    // Word-boundary truncation; a raw slice(0, 155) ended mid-word.
+    description: truncateAtWord(study.challenge, 155),
     path: `/work/${study.slug}`,
+    cardPath: cardPath("work", study.slug),
   });
 }
 
@@ -72,7 +85,16 @@ export default async function CaseStudyPage({
   return (
     <>
       <PageHero
-        eyebrow={`Work — ${study.industry}`}
+        eyebrow={
+          /*
+            Names the industry and what kind of document this is. It used to
+            read "Work — Manufacturing", repeating the "Work" crumb directly
+            above it.
+          */
+          study.isExampleArchitecture
+            ? `${study.industry} — Reference architecture`
+            : study.industry
+        }
         title={study.title}
         lead={study.challenge}
         breadcrumbs={[
@@ -80,7 +102,9 @@ export default async function CaseStudyPage({
           { name: "Work", path: "/work" },
           { name: study.title, path: `/work/${study.slug}` },
         ]}
-        actions={<ExampleBadge />}
+        /* Driven by the record, not hard-coded, so a verified engagement would
+           not be labelled an example. */
+        actions={study.isExampleArchitecture ? <ExampleBadge /> : undefined}
       />
 
       <article className="container-x section-y max-w-5xl">
@@ -95,7 +119,7 @@ export default async function CaseStudyPage({
 
         <QuoteRail
           quote={study.intervention[0] ?? study.challenge}
-          attribution="VANTIQ engineering notes"
+          attribution={`${siteConfig.name} engineering notes`}
         />
 
         <div className="divider-top mt-16 pt-16">
@@ -139,14 +163,14 @@ export default async function CaseStudyPage({
           <Block heading="Monitoring & evaluation" items={study.monitoring} />
         </div>
 
-        <div className="divider-top mt-16 rounded-lg border border-accent/30 bg-accent/5 p-6 pt-6">
-          <p className="text-sm leading-relaxed text-muted">
-            <strong className="text-ink">Honesty note:</strong> this is an example
-            architecture demonstrating our engineering method. Outcome metrics are
-            deliberately omitted — published results will only ever come from
-            verifiable engagements.
-          </p>
-        </div>
+        {study.isExampleArchitecture && (
+          <div className="divider-top mt-16 rounded-lg border border-accent/30 bg-accent/5 p-6 pt-6">
+            <p className="text-sm leading-relaxed text-muted">
+              <strong className="text-ink">Honesty note:</strong>{" "}
+              {disclaimers.exampleArchitectureNote}
+            </p>
+          </div>
+        )}
       </article>
 
       <CtaSection

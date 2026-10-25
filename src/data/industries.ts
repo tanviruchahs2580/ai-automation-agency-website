@@ -67,7 +67,7 @@ export const industries: Industry[] = [
     ],
     useCases: [
       {
-        title: "Patient intake digitisation",
+        title: "Patient intake digitization",
         description:
           "Forms, documents and eligibility checks processed before the appointment.",
       },
@@ -145,7 +145,7 @@ export const industries: Industry[] = [
     ],
     opportunities: [
       "Tiered customer support with agent handoffs",
-      "Product description and localisation pipelines with brand review",
+      "Product description and localization pipelines with brand review",
       "Returns triage and refund decisioning with approval limits",
       "Competitive monitoring digests for merchandising",
     ],
@@ -273,7 +273,7 @@ export const industries: Industry[] = [
       "Application completeness checking and routing",
       "Student service assistants grounded in official policies",
       "Curriculum material versioning assistance",
-      "Alumni communications personalisation with approval",
+      "Alumni communications personalization with approval",
     ],
     useCases: [
       {
@@ -379,7 +379,7 @@ export const industries: Industry[] = [
     kpis: [
       "Billable ratio",
       "Turnaround on standard deliverables",
-      "Realisation rate",
+      "Realization rate",
       "Knowledge reuse rate",
     ],
     /* Sectors whose reference architectures carry a matching industry label
@@ -457,7 +457,7 @@ export const industries: Industry[] = [
       {
         title: "Multilingual enquiry triage",
         description:
-          "Requests categorised and routed; sensitive cases escalated immediately.",
+          "Requests categorized and routed; sensitive cases escalated immediately.",
       },
     ],
     architectureNotes: [

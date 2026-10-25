@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { siteConfig } from "@/data/site";
 import { Button } from "@/components/ui/Button";
 import { HeroInstrument } from "@/components/scenes/HeroInstrument";
 import { GridLines } from "@/components/ui/GridLines";
@@ -25,7 +26,7 @@ export function Hero() {
             <span className="text-gradient">cannot afford guesswork.</span>
           </h1>
           <p className="lead mt-6">
-            VANTIQ Systems designs, engineers, and operates the systems that
+            {siteConfig.proseName} designs, engineers, and operates the systems that
             make AI trustworthy enough to run your operations — from first
             architecture to production, with governance built in.
           </p>

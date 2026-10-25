@@ -1,7 +1,9 @@
+import { siteConfig } from "@/data/site";
+import { methodology } from "@/data/disclaimers";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { ROICalculator } from "@/components/calculators/ROICalculator";
-import { JsonLd } from "@/components/ui/Accordion";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { buildMetadata, softwareJsonLd } from "@/lib/seo";
 import { Suspense } from "react";
 
@@ -17,7 +19,7 @@ export default function RoiCalculatorPage() {
     <>
       <JsonLd
         data={softwareJsonLd({
-          name: "VANTIQ ROI Calculator",
+          name: `${siteConfig.shortName} ROI Calculator`,
           description:
             "Estimate the annual cost of manual processes and the potential return from automation.",
           path: "/roi-calculator",
@@ -59,7 +61,7 @@ export default function RoiCalculatorPage() {
             <ul className="mt-4 space-y-2 text-sm leading-relaxed text-muted">
               <li>
                 Weekly labour hours = employees × tasks/week × hours/task;
-                annualised over 48 working weeks at salary ÷ 2,080 hourly cost.
+                annualized over 48 working weeks at salary ÷ 2,080 hourly cost.
               </li>
               <li>
                 Annual manual cost adds error/rework cost (tasks × cost per task)
@@ -75,9 +77,7 @@ export default function RoiCalculatorPage() {
               </li>
             </ul>
             <p className="mt-5 border-t border-line pt-4 text-xs leading-relaxed text-faint">
-              Disclaimer: this calculator provides an indicative estimate and is
-              not a financial guarantee. Real business cases require process-level
-              measurement — which is part of every discovery we run.
+              {methodology.roi}
             </p>
           </details>
         </div>

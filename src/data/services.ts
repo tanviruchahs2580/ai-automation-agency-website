@@ -150,12 +150,12 @@ export const services: Service[] = [
     slug: "software-engineering",
     title: "Software Engineering",
     summary:
-      "Custom web platforms, SaaS products and system modernisation built to production standards — typed, tested, observable.",
+      "Custom web platforms, SaaS products and system modernization built to production standards — typed, tested, observable.",
     problem:
       "Legacy systems block every AI ambition. And new software built without engineering discipline becomes tomorrow's legacy.",
     deliverables: [
       "New products from discovery through GA",
-      "Modernisation of critical legacy applications",
+      "Modernization of critical legacy applications",
       "API platforms and integration layers",
       "Internal tools your teams actually adopt",
     ],
@@ -175,7 +175,7 @@ export const services: Service[] = [
     },
     capabilities: [
       "Greenfield product development",
-      "Legacy modernisation & replatforming",
+      "Legacy modernization & replatforming",
       "API and integration engineering",
       "Performance and scalability work",
       "Engineering enablement for in-house teams",
