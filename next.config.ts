@@ -15,6 +15,19 @@ import { PHASE_PRODUCTION_BUILD } from "next/constants";
  * Warnings, not errors: a production build is still a valid artefact, and CI
  * must not fail on absent production secrets.
  */
+/**
+ * Next evaluates the config function more than once per build, so each warning
+ * is emitted once per process rather than once per evaluation — otherwise the
+ * same two lines appear twice in every deploy log and read as two problems.
+ */
+const warned = new Set<string>();
+
+function warnOnce(key: string, message: string) {
+  if (warned.has(key)) return;
+  warned.add(key);
+  console.warn(message);
+}
+
 function warnOnProductionMisconfiguration(phase: string) {
   if (phase !== PHASE_PRODUCTION_BUILD) return;
   if (process.env.CI && !process.env.VERCEL) return;
@@ -26,7 +39,8 @@ function warnOnProductionMisconfiguration(phase: string) {
     "";
 
   if (!origin) {
-    console.warn(
+    warnOnce(
+      "site-url",
       "\n[config] NEXT_PUBLIC_SITE_URL is not set. Canonical URLs, og:url and " +
         "sitemap.xml will resolve to http://localhost:3000, which deindexes the " +
         "site. Set it to the production origin (e.g. https://example.com).\n",
@@ -34,7 +48,8 @@ function warnOnProductionMisconfiguration(phase: string) {
   }
 
   if (!process.env.NEXT_PUBLIC_BRAND_NAME?.trim()) {
-    console.warn(
+    warnOnce(
+      "brand",
       "\n[config] NEXT_PUBLIC_BRAND_NAME is not set, so the placeholder brand " +
         "name is being published. The placeholder also collides with an existing " +
         "enterprise AI vendor — see the brand note in src/data/site.ts and " +
