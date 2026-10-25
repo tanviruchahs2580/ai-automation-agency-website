@@ -51,10 +51,27 @@ a text background.
 - Motion: `prefers-reduced-motion` disables all non-essential animation
   (`globals.css` global kill-switch + per-component static fallbacks).
 - Touch targets: 44px minimum (buttons, icon-buttons, nav toggle, inputs).
-- Live regions: ROI `aria-live="polite"` result panel, readiness assessment
-  announcements, intake wizard step transitions, console event feed
+- Live regions: the ROI calculator's debounced one-sentence summary, the
+  search result count, the insights filter count, the readiness counter, the
+  restored-draft notice and the intake server error. The ROI *results panel* is
+  deliberately not a live region (every metric recomputes per keystroke, so a
+  polite queue announced stale numbers for seconds and could not be interrupted)
+  and the intake wizard announces a step change by moving focus to the step
+  heading rather than by re-announcing the whole step.
   (`aria-live="polite"` on the resolved-event line only — counters are
   `aria-live="off"` to avoid screen-reader spam).
 - Automated: Playwright + axe-core suite (`e2e/a11y.spec.ts`) asserts zero
-  serious/critical violations on `/`, `/start-a-project`, `/insights`,
-  `/roi-calculator` plus skip-link keyboard order.
+  violations above *minor* impact on `/`, `/start-a-project`, `/insights`,
+  `/roi-calculator`, a 16-route sweep in dark, a light-theme pass and the open
+  search dialog — plus skip-link and keyboard order. Minor-impact rules are
+  excluded deliberately; they are style preferences rather than barriers.
+- Automated: `e2e/a11y.spec.ts` "document structure" runs the best-practice
+  rules the WCAG tag set excludes — heading order, landmark coverage, duplicate
+  ids — across 20 routes. Those are the rules that let `h1 → h3` and duplicate
+  `id="vantiq-grid"` ship unnoticed.
+- Automated: `src/lib/__tests__/contrast.test.ts` computes WCAG ratios from
+  `globals.css` itself and is the authoritative contrast record. It exists
+  because axe cannot evaluate gradient backgrounds (it reports them as
+  "incomplete", never a violation — which is how the primary CTA shipped at
+  2.89:1) and does not implement 1.4.11 non-text contrast at all. **Do not
+  duplicate its numbers here**; run the test.

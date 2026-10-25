@@ -1,4 +1,5 @@
 import { PageHero } from "@/components/layout/PageHero";
+import { Button } from "@/components/ui/Button";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { Reveal } from "@/components/ui/Reveal";
 import { InsightsExplorer } from "@/components/insights/InsightsExplorer";
@@ -23,9 +24,10 @@ export default function InsightsPage() {
           { name: "Home", path: "/" },
           { name: "Insights", path: "/insights" },
         ]}
+        actions={<Button href="/start-a-project">Start a Project</Button>}
       />
 
-      <section className="section-y">
+      <section className="section-y" aria-labelledby="insights-heading">
         <div className="container-x">
           <InsightsExplorer insights={insights} categories={insightCategories} />
 

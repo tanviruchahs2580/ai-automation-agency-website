@@ -1,31 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
-const CONSENT_KEY = "vantiq-cookie-consent";
-
-/**
- * Storage access is wrapped: browsers in strict privacy modes (and
- * enterprise policy) throw SecurityError on localStorage, and an unguarded
- * throw here would leave the banner stuck on screen with dead buttons.
- * A failed read is treated as "no choice recorded yet".
- */
-function readConsent(): string | null {
-  try {
-    return window.localStorage.getItem(CONSENT_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function writeConsent(value: "accepted" | "declined"): void {
-  try {
-    window.localStorage.setItem(CONSENT_KEY, value);
-  } catch {
-    /* Preference is not persisted; the banner simply reappears next visit. */
-  }
-}
+import { useEffect, useRef, useState } from "react";
+import { readConsent, writeConsent } from "@/lib/consent";
 
 /**
  * Cookie preference banner.
@@ -38,11 +15,16 @@ function writeConsent(value: "accepted" | "declined"): void {
  * accessibility tree and tab order rather than after the footer.
  *
  * Copy mirrors /cookie-policy: no analytics provider is wired up
- * (src/lib/analytics.ts dispatches to a hook point only), so the banner must
- * not ask consent for tracking that does not exist.
+ * (src/lib/analytics.ts tracks nothing without one, and is consent-gated when one
+ * is added), so the banner must not ask consent for tracking that does not exist.
+ *
+ * This banner writes the preference that `src/lib/analytics.ts` reads. Both use
+ * the storage key from `src/lib/consent.ts` so the two cannot disagree about
+ * whether a visitor consented.
  */
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Reading localStorage once on mount to decide banner visibility is
@@ -51,13 +33,45 @@ export function CookieConsent() {
     if (!readConsent()) setVisible(true);
   }, []);
 
+  /*
+    Publish the banner's own height so fixed controls in the same corner can sit
+    above it instead of underneath it. Measured rather than hard-coded, and kept
+    in sync with a ResizeObserver, so it stays correct when the copy wraps to an
+    extra line, when the user zooms, or at narrow widths where the banner is
+    nearly full-bleed.
+  */
+  useEffect(() => {
+    if (!visible) return;
+    const card = cardRef.current;
+    const root = document.documentElement;
+    if (!card) return;
+
+    const publish = () => {
+      root.style.setProperty(
+        "--consent-offset",
+        `${card.offsetHeight + 24}px`,
+      );
+    };
+    publish();
+
+    const observer =
+      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(publish);
+    observer?.observe(card);
+
+    return () => {
+      observer?.disconnect();
+      root.style.removeProperty("--consent-offset");
+    };
+  }, [visible]);
+
   if (!visible) return null;
 
   return (
     <div
+      ref={cardRef}
       role="region"
       aria-label="Cookie preference"
-      className="fixed bottom-4 right-4 z-[90] w-[calc(100%-2rem)] max-w-sm rounded-xl border border-line bg-surface/95 p-5 shadow-2xl backdrop-blur-md sm:bottom-6 sm:right-6"
+      className="fixed bottom-4 end-4 z-[90] w-[calc(100%-2rem)] max-w-sm rounded-xl border border-line bg-surface/95 p-5 shadow-2xl backdrop-blur-md sm:bottom-6 sm:end-6"
     >
       <p className="mono-label uppercase text-faint">Cookies</p>
       <p className="mt-2 text-[13px] leading-relaxed text-muted">

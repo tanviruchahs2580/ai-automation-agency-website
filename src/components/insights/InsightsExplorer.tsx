@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Insight } from "@/types/content";
 import { InsightCard } from "@/components/ui/Card";
+import type { ChipHue } from "@/components/ui/Chip";
 import { Spotlight } from "@/components/ui/Spotlight";
 import {
   RevealStagger,
@@ -41,8 +42,19 @@ export function InsightsExplorer({
 
   return (
     <div>
+      {/*
+        Section heading for the article list. Card titles are h3, so without an
+        h2 here the document outline ran h1 → h3 and heading-based navigation
+        skipped the content entirely (see `solutions/page.tsx`). No count in the
+        label: the visible set changes as the visitor filters, so a number baked
+        into a server-rendered heading would go stale. The live result count
+        below carries the number for assistive tech.
+      */}
+      <h2 id="insights-heading" className="h-section">
+        All articles
+      </h2>
       <div
-        className="mb-10 flex flex-wrap items-center gap-2"
+        className="mb-10 mt-8 flex flex-wrap items-center gap-2"
         role="group"
         aria-label="Filter articles by category"
       >
@@ -80,12 +92,7 @@ export function InsightsExplorer({
                 byline={insight.author}
                 readTime={`${formatDate(insight.publishedAt, "en-US", { year: "numeric", month: "short", day: "numeric" })} · ${readingTimeMinutes(insight)} min read`}
                 href={`/insights/${insight.slug}`}
-                patternSeed={insight.category}
-                patternHue={
-                  (["brass", "signal", "sky", "amber", "accent"] as const)[
-                    [...insight.category].reduce((a, c) => a + c.charCodeAt(0), 0) % 5
-                  ]
-                }
+                categoryHue={hueForCategory(insight.category)}
               />
             </Spotlight>
           </RevealStaggerItem>
@@ -93,6 +100,18 @@ export function InsightsExplorer({
       </RevealStagger>
     </div>
   );
+}
+
+/**
+ * Category hue for the card rule. Derived from the category name so a new
+ * category picks a stable colour without anyone maintaining a lookup table, and
+ * clamped to the five hues the design system defines.
+ */
+function hueForCategory(category: string): ChipHue {
+  const hues = ["brass", "signal", "sky", "amber", "accent"] as const;
+  const index =
+    [...category].reduce((sum, char) => sum + char.charCodeAt(0), 0) % hues.length;
+  return hues[index] ?? "brass";
 }
 
 function FilterChip({

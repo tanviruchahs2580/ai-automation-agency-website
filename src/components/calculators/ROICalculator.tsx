@@ -12,6 +12,7 @@ import {
   industryPresets,
 } from "@/data/roi-presets";
 import { MetricsPulse } from "@/components/scenes/MetricsPulse";
+import { disclaimers } from "@/data/disclaimers";
 
 /**
  * ROI calculator with progressive disclosure (§14):
@@ -70,6 +71,37 @@ export function ROICalculator() {
   }, [params]);
 
   const results = useMemo(() => computeRoi(inputs), [inputs]);
+
+  /*
+    Debounced, single-line summary for assistive technology.
+
+    The result panel used to be one large `aria-live="polite"` region, and every
+    metric in it is recomputed from `inputs` on each keystroke — so typing a
+    four-digit salary queued four announcements of roughly a dozen numbers each.
+    A polite queue cannot be interrupted, so the user kept hearing stale results
+    well after they stopped typing. One sentence, sent after a pause, is the
+    useful announcement; the panel itself is now ordinary content that can be
+    read on demand.
+  */
+  const [liveSummary, setLiveSummary] = useState("");
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const savings = formatCurrency(Math.max(0, results.estimatedAnnualSavings));
+      const roi =
+        results.estimatedRoiPercent === null
+          ? "not available"
+          : `${Math.round(results.estimatedRoiPercent)} percent`;
+      const payback =
+        results.paybackMonths === null
+          ? "not available"
+          : `${results.paybackMonths.toFixed(1)} months`;
+      setLiveSummary(
+        `Estimate updated. Annual savings ${savings}, return on investment ${roi}, payback period ${payback}.`,
+      );
+    }, 700);
+    return () => clearTimeout(id);
+  }, [results]);
 
   const markUsed = () => {
     if (!touched) {
@@ -137,7 +169,7 @@ export function ROICalculator() {
               id="roi-industry"
               value={industry}
               onChange={(e) => onIndustryChange(e.target.value)}
-              className="mt-1.5 min-h-11 w-full rounded-md border border-line bg-surface2 px-3 py-2 text-sm focus:border-accent"
+              className="mt-1.5 min-h-11 w-full rounded-md border border-field bg-surface2 px-3 py-2 text-sm focus:border-accent"
             >
               {industryPresets.map((preset) => (
                 <option key={preset.value} value={preset.value}>
@@ -145,6 +177,17 @@ export function ROICalculator() {
                 </option>
               ))}
             </select>
+            {/*
+              The assumption is stated where it is applied, not only in a comment
+              in the data module. These percentages are our editable starting
+              points, and a visitor who reads "assumes 60% automation" beside a
+              sector name will otherwise take it for a published sector figure.
+            */}
+            <p className="mt-2 text-[11px] leading-relaxed text-faint">
+              {industryPresets.length} sector starting assumptions, each one
+              editable below. They are our estimates for an initial run, not
+              published benchmark data.
+            </p>
           </div>
           <NumberField
             id="roi-employees"
@@ -217,13 +260,23 @@ export function ROICalculator() {
         )}
 
         <p className="mt-5 border-t border-line pt-4 text-[11px] leading-relaxed text-faint">
-          This calculator provides an indicative estimate based entirely on your
-          inputs. It is not a financial guarantee. Assumptions: 48 working weeks,
-          salary converted to an hourly cost over 2,080 hours.
+          {disclaimers.estimateNote}
         </p>
       </form>
 
-      <div className="lg:col-span-6" aria-live="polite">
+      {/*
+        The accessible announcement: one sentence, debounced, in its own live
+        region. `role="status"` implies `aria-live="polite"`.
+
+        `data-testid` is the stable hook for tests. The previous attempt to test
+        this panel targeted `[aria-live="polite"]`, which meant the test was
+        coupled to the exact defect the audit had flagged.
+      */}
+      <p className="sr-only" role="status" data-testid="roi-live-summary">
+        {liveSummary}
+      </p>
+
+      <div className="lg:col-span-6" data-testid="roi-results">
         <div className="card-surface h-full p-6 md:p-8">
           <p className="mono-label uppercase text-faint">Estimated outcome</p>
 
@@ -291,7 +344,7 @@ export function ROICalculator() {
             onClick={() =>
               track(AnalyticsEvent.CtaClick, { location: "roi-calculator" })
             }
-            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-strong sm:w-auto"
+            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-press sm:w-auto"
           >
             Validate These Numbers With An Engineer
           </Link>
@@ -329,7 +382,7 @@ function NumberField({
       </label>
       <div className="relative mt-1.5">
         {suffix === "$" && (
-          <span aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-faint">$</span>
+          <span aria-hidden="true" className="absolute start-3 top-1/2 -translate-y-1/2 text-sm text-faint">$</span>
         )}
         <input
           id={id}
@@ -341,10 +394,10 @@ function NumberField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={(e) => onBlur(Number(e.target.value))}
-          className="min-h-11 w-full rounded-md border border-line bg-surface2 px-3 py-2 font-mono text-sm tabular-nums focus:border-accent"
+          className="min-h-11 w-full rounded-md border border-field bg-surface2 px-3 py-2 font-mono text-sm tabular-nums focus:border-accent"
         />
         {(suffix === "%" || suffix === "h") && (
-          <span aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-faint">
+          <span aria-hidden="true" className="absolute end-3 top-1/2 -translate-y-1/2 text-xs text-faint">
             {suffix}
           </span>
         )}

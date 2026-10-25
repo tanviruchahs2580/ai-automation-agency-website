@@ -1,4 +1,5 @@
 import { PageHero } from "@/components/layout/PageHero";
+import { Button } from "@/components/ui/Button";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { Reveal } from "@/components/ui/Reveal";
 import { CaseStudyCard } from "@/components/ui/Card";
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/RevealStagger";
 import { caseStudies } from "@/data/case-studies";
 import { buildMetadata } from "@/lib/seo";
+import { disclaimers } from "@/data/disclaimers";
 
 export const metadata = buildMetadata({
   title: "Work & Reference Architectures",
@@ -28,23 +30,34 @@ export default function WorkPage() {
           { name: "Home", path: "/" },
           { name: "Work", path: "/work" },
         ]}
+        actions={<Button href="/start-a-project">Start a Project</Button>}
       />
 
-      <section className="section-y">
+      <section className="section-y" aria-labelledby="work-heading">
         <div className="container-x">
-          <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {/* See `solutions/page.tsx` — same h1 → h3 outline gap, same fix. */}
+          <h2 id="work-heading" className="h-section">
+            All reference architectures
+          </h2>
+          <RevealStagger className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {caseStudies.map((study) => (
               <RevealStaggerItem key={study.slug}>
                 <Spotlight className="h-full">
                   <CaseStudyCard
-                    eyebrow="Example architecture"
+                    /* From the record, so a verified study is not labelled an
+                       example (see components/ui/ExampleBadge.tsx). */
+                    eyebrow={
+                      study.isExampleArchitecture
+                        ? disclaimers.exampleArchitectureLabel
+                        : "Verified engagement"
+                    }
                     industry={study.industry}
                     title={study.title}
                     before={study.before[0] ?? "Manual process"}
                     after={study.after[0] ?? "Engineered system"}
+                    layers={study.architecture}
                     meta={`${study.architecture.length} layers · ${study.security.length} controls`}
                     href={`/work/${study.slug}`}
-                    diagramSeed={study.slug}
                   />
                 </Spotlight>
               </RevealStaggerItem>

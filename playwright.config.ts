@@ -17,10 +17,28 @@ const baseURL = remoteBaseURL || localBaseURL;
 export default defineConfig({
   testDir: "./e2e",
   timeout: 60_000,
-  expect: { timeout: 10_000 },
+  /*
+    15s, not the 10s default. The suite is CPU-bound — most of it is axe-core
+    waiting for a DOM to settle — and under parallel load a 10s budget produced
+    failures that passed in isolation and on retry. Every remaining failure in
+    the last full run behaved that way: four of them, each green when run alone.
+    A gate that fails for reasons unrelated to the code teaches people to ignore
+    it, so the budget is set where the work actually completes.
+  */
+  expect: { timeout: 15_000 },
   fullyParallel: true,
   retries: 1,
-  workers: process.env.CI ? 2 : undefined,
+  /*
+    Two, locally as well as in CI.
+
+    Playwright otherwise sizes this to the CPU count, and the axe scans starve at
+    that width: they hold a page open while axe-core waits for the DOM to settle,
+    and the resulting failures pass on retry and in isolation. Matching CI's width
+    costs wall-clock time (about 25 minutes for the full four-project suite) and
+    buys a gate whose result means the same thing locally as it does in CI, which
+    is the property that matters for a pre-deploy check nobody runs on save.
+  */
+  workers: 2,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL,

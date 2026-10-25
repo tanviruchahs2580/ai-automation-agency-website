@@ -274,6 +274,20 @@ export function SearchModal() {
           >
             ESC
           </kbd>
+          {/*
+            A real close control. The only dismissal affordance used to be the
+            "ESC" keycap, which is hidden below 640px — on a touch device the
+            sole way out was tapping the untinted backdrop, with nothing on
+            screen to suggest that works.
+          */}
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Close search"
+            className="-me-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <Icon name="close" size={16} />
+          </button>
         </div>
 
         {/*

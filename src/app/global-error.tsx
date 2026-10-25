@@ -1,5 +1,7 @@
 "use client";
 
+import { siteConfig } from "@/data/site";
+
 import { useState } from "react";
 
 /**
@@ -48,7 +50,7 @@ export default function GlobalError({
               textTransform: "uppercase",
             }}
           >
-            VANTIQ SYSTEMS
+            {siteConfig.name}
           </p>
           <h1 style={{ fontSize: "1.8rem", margin: "1.1rem 0 0.6rem" }}>
             Something went wrong on our side.

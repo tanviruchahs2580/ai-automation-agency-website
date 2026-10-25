@@ -124,7 +124,7 @@ function Dropdown({
       {open && (
         <div
           id={menuId}
-          className="dropdown-in absolute left-0 top-full z-50 w-[19rem] overflow-hidden rounded-xl border border-line-strong bg-surface/95 shadow-overlay backdrop-blur-xl"
+          className="dropdown-in absolute start-0 top-full z-50 w-[19rem] overflow-hidden rounded-xl border border-line-strong bg-surface/95 shadow-overlay backdrop-blur-xl"
         >
           <Link
             href={item.href}
@@ -317,6 +317,25 @@ export function Navbar() {
           </Link>
         </div>
 
+        {/*
+          Compact primary CTA for the mobile header.
+
+          Every page family below /start-a-project previously had no visible
+          action on the first screen on a phone: the full-size CTA lives in the
+          desktop-only cluster (<lg:hidden), and the mobile menu has to be opened
+          first. Hidden below 380px, where the logo, this pill and the menu
+          button cannot all fit inside the 320px viewport — the horizontal
+          overflow check in `e2e/quality.spec.ts` asserts that at every width.
+        */}
+        <Link
+          href="/start-a-project"
+          aria-label="Start a Project"
+          onClick={() => track(AnalyticsEvent.CtaClick, { location: "nav-start-compact" })}
+          className="btn btn-primary ml-auto me-2 whitespace-nowrap rounded-md px-3.5 max-[379px]:hidden lg:hidden"
+        >
+          Start
+        </Link>
+
         <button
           ref={menuButtonRef}
           type="button"
@@ -452,7 +471,7 @@ function MobileDropdownSection({
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="mr-2 flex min-h-11 min-w-11 items-center justify-center rounded p-2 text-muted transition-colors hover:text-accent-strong"
+          className="me-2 flex min-h-11 min-w-11 items-center justify-center rounded p-2 text-muted transition-colors hover:text-accent-strong"
           aria-expanded={expanded}
           aria-controls={panelId}
           aria-label={`Show ${dropdown.label} options`}
@@ -465,7 +484,7 @@ function MobileDropdownSection({
         </button>
       </div>
       {expanded && (
-        <div id={panelId} className="ml-4 border-l border-line pl-3">
+        <div id={panelId} className="ms-4 border-s border-line ps-3">
           {(dropdown.children ?? []).map((child) => (
             <Link
               key={child.href}
