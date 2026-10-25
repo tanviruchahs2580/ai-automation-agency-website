@@ -27,7 +27,7 @@ export function TechnologyMap() {
                       className="flex items-baseline justify-between gap-4 py-2.5"
                     >
                       <dt className="shrink-0 font-mono text-sm">{item.name}</dt>
-                      <dd className="text-right text-xs text-muted">{item.detail}</dd>
+                      <dd className="text-end text-xs text-muted">{item.detail}</dd>
                     </div>
                   ))}
                 </dl>

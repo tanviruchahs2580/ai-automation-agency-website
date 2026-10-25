@@ -15,7 +15,7 @@ export function ProcessTimeline() {
 
         <ol className="relative mt-14 max-w-3xl space-y-2">
           {processPhases.map((phase, i) => (
-            <li key={phase.index} className="relative pl-14 sm:pl-20">
+            <li key={phase.index} className="relative ps-14 sm:ps-20">
               {i < processPhases.length - 1 && (
                 <span
                   aria-hidden="true"
@@ -24,7 +24,7 @@ export function ProcessTimeline() {
               )}
               <Reveal delay={i * 0.04}>
                 <div className="pb-8">
-                  <span className="mono-label absolute left-0 top-0 flex h-11 w-11 items-center justify-center rounded-full border border-accent/40 bg-canvas text-accent-strong sm:h-12 sm:w-12">
+                  <span className="mono-label absolute start-0 top-0 flex h-11 w-11 items-center justify-center rounded-full border border-accent/40 bg-canvas text-accent-strong sm:h-12 sm:w-12">
                     {phase.index}
                   </span>
                   <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">

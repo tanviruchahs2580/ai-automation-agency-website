@@ -2,13 +2,15 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
-import { Accordion, JsonLd } from "@/components/ui/Accordion";
+import { Accordion } from "@/components/ui/Accordion";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { DetailLayout, IncludesCard } from "@/components/layout/DetailLayout";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { getSolution, solutions } from "@/data/solutions";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
+import { cardPath } from "@/lib/social-image";
 
 export function generateStaticParams() {
   return solutions.map((s) => ({ slug: s.slug }));
@@ -26,6 +28,7 @@ export async function generateMetadata({
     title: solution.title,
     description: solution.summary,
     path: `/solutions/${solution.slug}`,
+    cardPath: cardPath("solutions", solution.slug),
   });
 }
 

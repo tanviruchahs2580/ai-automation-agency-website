@@ -26,7 +26,7 @@ export function OpportunityFinder() {
                 track(AnalyticsEvent.OpportunitySelect, { opportunity: o.id });
               }}
               className={cn(
-                "rounded-md border px-4 py-2.5 text-left text-sm transition-colors",
+                "rounded-md border px-4 py-2.5 text-start text-sm transition-colors",
                 selectedId === o.id
                   ? "border-accent bg-accent/15 text-accent-strong"
                   : "border-line bg-surface text-muted hover:border-line-strong hover:text-ink",
@@ -72,7 +72,7 @@ export function OpportunityFinder() {
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
                 href={`/solutions/${selected.solutionSlug}`}
-                className="inline-flex min-h-11 items-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+                className="inline-flex min-h-11 items-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-press"
               >
                 Explore this solution
               </Link>

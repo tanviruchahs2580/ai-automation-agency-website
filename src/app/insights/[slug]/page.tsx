@@ -3,11 +3,13 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
-import { JsonLd } from "@/components/ui/Accordion";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { ReadingProgress } from "@/components/ui/ReadingProgress";
 import { QuoteRail } from "@/components/scenes/QuoteRail";
 import { getInsight, insights, readingTimeMinutes } from "@/data/insights";
 import { articleJsonLd, buildMetadata } from "@/lib/seo";
+import { cardPath } from "@/lib/social-image";
+import { formatDate } from "@/lib/i18n";
 
 export function generateStaticParams() {
   return insights.map((i) => ({ slug: i.slug }));
@@ -27,6 +29,7 @@ export async function generateMetadata({
     path: `/insights/${insight.slug}`,
     ogType: "article",
     publishedTime: insight.publishedAt,
+    cardPath: cardPath("insights", insight.slug),
   });
 }
 
@@ -57,7 +60,10 @@ export default async function InsightPage({
           description: insight.excerpt,
           path: `/insights/${insight.slug}`,
           author: insight.author,
+          /* Team byline — an Organization, not a Person. */
+          authorType: "Organization",
           publishedAt: insight.publishedAt,
+          cardPath: cardPath("insights", insight.slug),
         })}
       />
 
@@ -68,7 +74,14 @@ export default async function InsightPage({
         breadcrumbs={[
           { name: "Home", path: "/" },
           { name: "Insights", path: "/insights" },
-          { name: insight.title.slice(0, 40), path: `/insights/${insight.slug}` },
+          /*
+            The full title, not a 40-character slice. The slice cut the visible
+            crumb mid-word — "Why most AI pilots never reach productio" — and it
+            propagated into BreadcrumbList structured data as well. The eyebrow
+            now renders on its own line, so a long crumb can no longer collide
+            with it, and the label is wrapped rather than truncated.
+          */
+          { name: insight.title, path: `/insights/${insight.slug}` },
         ]}
       />
 
@@ -82,14 +95,17 @@ export default async function InsightPage({
             >
               {insight.author}
             </Link>
+            {/*
+              The role used to be authored in the data and never rendered — one
+              of two fields (`Insight.authorRole`, `CaseStudy.
+              isExampleArchitecture`) that the content layer maintained but no
+              component read, so the data and the page could disagree silently.
+            */}
+            <span className="text-faint"> · {insight.authorRole}</span>
           </span>
           <span aria-hidden="true">·</span>
           <time dateTime={insight.publishedAt}>
-            {new Date(insight.publishedAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            {formatDate(insight.publishedAt)}
           </time>
           <span aria-hidden="true">·</span>
           <span>{readingTimeMinutes(insight)} min read</span>
@@ -98,7 +114,12 @@ export default async function InsightPage({
         {/* Table of contents */}
         <nav aria-label="Table of contents" className="mt-8 rounded-lg border border-line bg-surface p-5">
           <p className="mono-label uppercase text-faint">Contents</p>
-          <ol className="mt-2 space-y-1 text-sm">
+          {/*
+            `list-none`: the manual "01 ·" index is the numbering. As an
+            ordinary `<ol>` the browser also drew its own markers, so every row
+            read "01 · 1. No definition of 'working'".
+          */}
+          <ol className="mt-2 list-none space-y-1 text-sm">
             {insight.sections.map((section, i) => (
               <li key={section.heading}>
                 <a href={`#s-${i + 1}`} className="text-muted hover:text-accent-strong">
