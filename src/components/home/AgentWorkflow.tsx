@@ -28,7 +28,7 @@ export function AgentWorkflow() {
                   <p className="mt-2 text-sm leading-relaxed text-muted">
                     {stage.plain}
                   </p>
-                  <p className="mt-4 border-l-2 border-accent/50 pl-3 text-xs italic leading-relaxed text-muted">
+                  <p className="mt-4 border-s-2 border-accent/50 ps-3 text-xs italic leading-relaxed text-muted">
                     e.g. {stage.example}
                   </p>
                   <div className="mt-auto pt-5">

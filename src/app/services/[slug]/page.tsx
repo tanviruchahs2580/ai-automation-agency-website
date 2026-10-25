@@ -3,13 +3,15 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
-import { Accordion, JsonLd } from "@/components/ui/Accordion";
+import { Accordion } from "@/components/ui/Accordion";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { DetailLayout, IncludesCard } from "@/components/layout/DetailLayout";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { getService, services } from "@/data/services";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
+import { cardPath } from "@/lib/social-image";
 
 export function generateStaticParams() {
   return services.map((s) => ({ slug: s.slug }));
@@ -27,6 +29,7 @@ export async function generateMetadata({
     title: service.title,
     description: service.summary,
     path: `/services/${service.slug}`,
+    cardPath: cardPath("services", service.slug),
   });
 }
 
@@ -92,7 +95,7 @@ export default async function ServiceDetailPage({
                       <span>
                         <span className="block text-sm font-medium">
                           {step.phase}
-                          <span className="ml-2 font-mono text-xs font-normal text-faint">
+                          <span className="ms-2 font-mono text-xs font-normal text-faint">
                             {step.duration}
                           </span>
                         </span>

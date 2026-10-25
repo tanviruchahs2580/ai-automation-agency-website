@@ -1,3 +1,4 @@
+import { siteConfig } from "@/data/site";
 import type { ProjectBrief } from "@/lib/validation";
 
 /**
@@ -73,7 +74,7 @@ export async function sendBriefNotification(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: env.BRIEF_NOTIFICATION_FROM ?? "VANTIQ SYSTEMS <onboarding@resend.dev>",
+        from: env.BRIEF_NOTIFICATION_FROM ?? `${siteConfig.name} <onboarding@resend.dev>`,
         to: [env.BRIEF_NOTIFICATION_EMAIL],
         subject: `New project brief ${briefId} — ${brief.companyName}`,
         text: buildPlainText(briefId, brief),
