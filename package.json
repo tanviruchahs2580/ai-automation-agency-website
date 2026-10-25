@@ -2,7 +2,7 @@
   "name": "ai-automation-agency-website",
   "version": "1.0.0",
   "private": true,
-  "description": "VANTIQ SYSTEMS — enterprise AI engineering & automation company website",
+  "description": "Enterprise AI engineering & automation company website",
   "engines": {
     "node": ">=22"
   },
@@ -14,14 +14,19 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "check:budget": "node scripts/check-budget.mjs",
+    "check:rendered": "node scripts/check-rendered-html.mjs",
+    "check:deps": "npm audit --omit=dev --audit-level=high",
+    "check:rtl": "node scripts/check-rtl.mjs",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build && npm run check:rendered && npm run check:budget"
   },
   "dependencies": {
     "framer-motion": "^12.23.0",
-    "next": "^16.3.8",
+    "next": "^16.4.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "zod": "^3.25.0"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
@@ -34,7 +39,7 @@
     "eslint-config-next": "^16.3.2",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.8.0",
-    "vitest": "^3.2.0"
+    "vitest": "^5.0.5"
   },
   "allowScripts": {
     "esbuild@0.28.2": true,

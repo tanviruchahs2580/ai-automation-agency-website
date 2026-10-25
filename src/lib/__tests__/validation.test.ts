@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { projectBriefSchema, recommendedNextStep } from "@/lib/validation";
+import { recommendedNextStep } from "@/lib/intake";
+import {
+  MAX_BRIEF_BYTES,
+  MAX_FIELD_LENGTH,
+  projectBriefSchema,
+} from "@/lib/validation";
 
 const validBrief = {
   companyName: "Acme Manufacturing",
@@ -44,15 +49,25 @@ describe("projectBriefSchema", () => {
     expect(parsed.success).toBe(false);
   });
 
-  it("rejects honeypot-filled submissions", () => {
+  it("accepts a filled honeypot at the schema layer", () => {
+    /*
+      Changed deliberately. Constraining this field to `max(0)` rejected bots
+      with a 422 whose `issues` named the field and echoed Zod's own message
+      ("Too big: expected string to have <=0 characters") — telling a script
+      exactly which trap it hit, on an endpoint whose every other error was
+      rewritten into plain prose. The schema now accepts any value and the route
+      returns an ordinary receipt without notifying anyone, so a bot learns
+      nothing. The rejection behaviour is asserted at the route level, in
+      `api-project-brief.test.ts`.
+    */
     const parsed = projectBriefSchema.safeParse({
       ...validBrief,
       companyWebsite: "spam.example",
     });
-    expect(parsed.success).toBe(false);
+    expect(parsed.success).toBe(true);
   });
 
-  it("strips control characters from input (sanitisation)", () => {
+  it("strips control characters from input (sanitization)", () => {
     const parsed = projectBriefSchema.safeParse({
       ...validBrief,
       problem: `Valid problem statement with control char\u0007 embedded inside.`,
@@ -91,6 +106,49 @@ describe("projectBriefSchema", () => {
       companySize: "51 to 250",
     });
     expect(parsed.success).toBe(false);
+  });
+
+  it("accepts the largest brief the field limits allow", () => {
+    const parsed = projectBriefSchema.safeParse({
+      ...validBrief,
+      problem: "p".repeat(MAX_FIELD_LENGTH),
+      currentWorkflow: "w".repeat(MAX_FIELD_LENGTH),
+      desiredOutcome: "o".repeat(2000),
+      existingSoftware: "s".repeat(500),
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects a field one character over its limit", () => {
+    // Expressed against the constant rather than a literal, so raising the limit
+    // cannot leave the boundary untested.
+    const parsed = projectBriefSchema.safeParse({
+      ...validBrief,
+      problem: "p".repeat(MAX_FIELD_LENGTH + 1),
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it("bounds every field at or below the transport cap", () => {
+    /*
+      The API rejects bodies larger than MAX_BRIEF_BYTES before parsing, so the
+      cap has to be above the largest brief the schema will ever accept —
+      otherwise a legitimate submission at the field limits would be refused by
+      the transport before validation could run. Both numbers are asserted so
+      changing either one alone fails here rather than in production.
+    */
+    const largest = {
+      ...validBrief,
+      problem: "p".repeat(MAX_FIELD_LENGTH),
+      currentWorkflow: "w".repeat(MAX_FIELD_LENGTH),
+      desiredOutcome: "o".repeat(2000),
+      existingSoftware: "s".repeat(500),
+    };
+    const bytes = new TextEncoder().encode(JSON.stringify(largest)).byteLength;
+    expect(bytes).toBeLessThan(MAX_BRIEF_BYTES);
+    // Pinned, because the figure is quoted in LAUNCH-CHECKLIST.md and a bare
+    // lower bound ("≥16 KiB") would keep passing if the cap were raised tenfold.
+    expect(MAX_BRIEF_BYTES).toBe(64 * 1024);
   });
 });
 
