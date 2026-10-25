@@ -2,10 +2,19 @@ name: CI
 
 # ---------------------------------------------------------------------------
 # Continuous Integration pipeline.
-# CD (production deploy) is handled by the Vercel GitHub integration, which
-# auto-deploys the `main` branch to Production on every successful push.
-# This workflow guarantees that only code which passes lint, unit tests,
-# a production build, type-checking and full cross-engine E2E is shipped.
+#
+# Scope of the guarantee, stated accurately: this workflow fails the build on
+# anything it checks, and the branch-protection rule on `main` makes its status
+# a required check. It does NOT, by itself, prevent a deploy — CD is Vercel's
+# GitHub integration, which deploys `main` on push. Previous wording here
+# claimed the workflow "guarantees that only code which passes ... is shipped",
+# which was not true of any mechanism in this repository. To make it true, gate
+# the Vercel project on this check (Vercel → Settings → Git → Ignored Build
+# Step, or a deployment-protection rule) — the comment cannot do it from here.
+#
+# What runs: production-dependency audit, lint, unit tests, production build,
+# type-checking, rendered-output invariants, performance budgets, then full
+# cross-engine E2E.
 # ---------------------------------------------------------------------------
 
 on:
@@ -26,7 +35,7 @@ env:
 
 jobs:
   quality:
-    name: Lint · Test · Build · Typecheck
+    name: Audit · Lint · Test · Build · Typecheck · Gates
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -43,7 +52,7 @@ jobs:
         run: npm ci
 
       - name: Audit production dependencies
-        run: npm audit --omit=dev --audit-level=high
+        run: npm run check:deps
 
       - name: Lint
         run: npm run lint
@@ -51,11 +60,17 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Type check
+        run: npm run typecheck
+
       - name: Production build
         run: npm run build
 
-      - name: Type check
-        run: npm run typecheck
+      - name: Rendered-output invariants
+        run: npm run check:rendered
+
+      - name: JavaScript and CSS budgets
+        run: npm run check:budget
 
   e2e:
     name: E2E (Playwright)
@@ -91,6 +106,9 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+      - name: Rendered-output invariants
+        run: npm run check:rendered
 
       - name: Run E2E tests
         run: npx playwright test

@@ -1,8 +1,22 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+/**
+ * Waits for the client tree to mount before interacting. The intake wizard has
+ * its own `data-hydrated` marker for the same reason; this is the document-level
+ * equivalent, used by the tests that click a control straight after `goto`.
+ */
+async function waitForHydration(page: Page) {
+  await page.waitForFunction(
+    () => document.documentElement.dataset.hydrated === "true",
+    undefined,
+    { timeout: 30_000 },
+  );
+}
 
 test.describe("interactive tools", () => {
   test("ROI calculator computes estimated savings from inputs", async ({ page }) => {
     await page.goto("/roi-calculator");
+    await waitForHydration(page);
     await page.getByLabel("Current headcount on manual ops").fill("50");
     // Progressive disclosure: advanced inputs sit behind "Refine this estimate".
     await page.getByRole("button", { name: /refine this estimate/i }).click();
@@ -10,16 +24,35 @@ test.describe("interactive tools", () => {
     await page.getByLabel("Hours per task (manual)").fill("1");
     await page.getByLabel("Tasks per employee / week").fill("10");
 
-    const live = page.locator('[aria-live="polite"]').filter({
-      hasText: "Estimated outcome",
-    });
-    await expect(live.getByText("Est. annual savings")).toBeVisible();
+    /*
+      Located structurally, not by `aria-live`.
 
-    const savings = live
+      The results panel used to be one big `aria-live="polite"` region, and this
+      test found it through that attribute — so it was asserting the very thing
+      the accessibility audit asked to remove. Every metric in that panel is
+      recomputed from `inputs` on each keystroke, so the polite queue announced
+      roughly a dozen numbers per typed digit and could not be interrupted.
+      The live region is now a single debounced sentence, asserted separately
+      below, and the panel is ordinary content.
+
+      `aria-live="off"` is explicit because that is the deliberate decision, not
+      an omission: the panel must not be a live region.
+    */
+    const panel = page
+      .locator('[data-testid="roi-results"]')
+      .filter({ hasText: "Estimated outcome" });
+    await expect(panel.getByText("Est. annual savings")).toBeVisible();
+
+    const savings = panel
       .locator("dd, div")
       .filter({ hasText: /\$[\d,]+/ })
       .first();
     await expect(savings).toContainText("$");
+
+    /* The debounced summary is the accessible announcement. */
+    const summary = page.getByRole("status").filter({ hasText: "Estimate updated" });
+    await expect(summary).toContainText("Annual savings");
+    await expect(summary).toContainText("payback period");
   });
 
   test("readiness assessment completes and shows a score", async ({ page }) => {

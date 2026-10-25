@@ -1,0 +1,23 @@
+# Review ownership.
+#
+# Listed so that GitHub routes review requests to the right person and so the
+# repository states who is accountable for the areas that carry real risk.
+#
+# Note: this file is advisory as the repository is configured today.
+# Branch protection on `main` requires the CI checks and blocks force pushes and
+# deletions, but `require_code_owner_reviews` is *off*, so CODEOWNERS does not
+# gate a merge. Turn it on in Settings → Branches if that is wanted — with a
+# single owner it adds a self-approval step rather than a second pair of eyes,
+# which is why it is off.
+
+* @tanviruchahs2580
+
+# Paths where a mistake is expensive. These are worth a careful read rather
+# than a skim, and they are the reason this file exists at all.
+/src/app/api/ @tanviruchahs2580
+/src/lib/validation.ts @tanviruchahs2580
+/src/lib/client-ip.ts @tanviruchahs2580
+/src/lib/rate-limit.ts @tanviruchahs2580
+/src/lib/brief-notification.ts @tanviruchahs2580
+/next.config.ts @tanviruchahs2580
+/.github/workflows/ @tanviruchahs2580
