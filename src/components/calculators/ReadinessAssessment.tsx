@@ -6,6 +6,7 @@ import { readinessQuestions } from "@/data/readiness-questions";
 import { answerScale, scoreReadiness } from "@/lib/readiness";
 import { AnalyticsEvent, track } from "@/lib/analytics";
 import { CountUp } from "@/components/ui/CountUp";
+import { disclaimers } from "@/data/disclaimers";
 import { cn } from "@/lib/utils";
 
 export function ReadinessAssessment() {
@@ -65,7 +66,7 @@ export function ReadinessAssessment() {
         <button
           type="button"
           onClick={start}
-          className="mt-7 inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+          className="mt-7 inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-press"
         >
           Start the Assessment
         </button>
@@ -135,15 +136,14 @@ export function ReadinessAssessment() {
         </div>
 
         <p className="mt-5 text-[11px] leading-relaxed text-faint">
-          Scores are indicative estimates derived from self-reported answers.
-          A validated assessment requires workshops with your teams.
+          {disclaimers.readinessNote}
         </p>
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/start-a-project"
             onClick={() => track(AnalyticsEvent.CtaClick, { location: "readiness-result" })}
-            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-strong"
+            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-press"
           >
             Discuss My Result
           </Link>
@@ -154,7 +154,7 @@ export function ReadinessAssessment() {
               setIndex(0);
               setFinished(false);
             }}
-            className="inline-flex min-h-11 items-center justify-center rounded-md border border-line-strong px-5 py-2.5 text-sm hover:border-accent"
+            className="inline-flex min-h-11 items-center justify-center rounded-md border border-field px-5 py-2.5 text-sm hover:border-accent"
           >
             Retake
           </button>
@@ -216,10 +216,10 @@ export function ReadinessAssessment() {
                 */
                 aria-pressed={selected}
                 className={cn(
-                  "flex min-h-11 items-center justify-between rounded-md border px-4 py-2.5 text-left text-sm transition-colors",
+                  "flex min-h-11 items-center justify-between rounded-md border px-4 py-2.5 text-start text-sm transition-colors",
                   selected
                     ? "border-accent bg-accent/10 text-accent-strong"
-                    : "border-line bg-surface2 hover:border-line-strong",
+                    : "border-field bg-surface2 hover:border-accent",
                 )}
               >
                 {label}

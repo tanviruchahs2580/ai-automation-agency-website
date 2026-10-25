@@ -75,6 +75,7 @@ export function Button({
           data-cta-id={dataCtaId}
         >
           {content}
+          <span className="sr-only"> (opens in a new tab)</span>
         </a>
       );
     }

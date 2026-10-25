@@ -15,7 +15,7 @@ export function BeforeAfter() {
           onClick={() => setShowAfter(false)}
           aria-pressed={!showAfter}
           className={cn(
-            "mono-label rounded border px-4 py-2 uppercase",
+            "mono-label inline-flex min-h-11 items-center rounded border px-4 uppercase",
             !showAfter
               ? "border-warn/50 bg-warn/10 text-warn"
               : "border-line text-muted hover:text-ink",
@@ -29,7 +29,7 @@ export function BeforeAfter() {
           onClick={() => setShowAfter(true)}
           aria-pressed={showAfter}
           className={cn(
-            "mono-label rounded border px-4 py-2 uppercase",
+            "mono-label inline-flex min-h-11 items-center rounded border px-4 uppercase",
             showAfter
               ? "border-ok/50 bg-ok/10 text-ok"
               : "border-line text-muted hover:text-ink",
@@ -43,7 +43,7 @@ export function BeforeAfter() {
       </div>
 
       <div className="overflow-hidden rounded-lg border border-line">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-start text-sm">
           <caption className="sr-only">
             Comparison of a manual process versus an engineered automated process
           </caption>
@@ -63,7 +63,7 @@ export function BeforeAfter() {
                 <th scope="row" className="px-5 py-3 font-medium">{pair.area}</th>
                 <td
                   className={cn(
-                    "px-5 py-3 transition-opacity duration-500",
+                    "px-5 py-3 transition-colors duration-300",
                     showAfter ? "text-faint" : "text-warn/90",
                   )}
                 >
@@ -71,7 +71,7 @@ export function BeforeAfter() {
                 </td>
                 <td
                   className={cn(
-                    "px-5 py-3 transition-opacity duration-500",
+                    "px-5 py-3 transition-colors duration-300",
                     showAfter ? "text-ok" : "text-faint",
                   )}
                 >

@@ -1,4 +1,5 @@
 import { PageHero } from "@/components/layout/PageHero";
+import { Button } from "@/components/ui/Button";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { CapabilityCard } from "@/components/ui/Card";
 import { Spotlight } from "@/components/ui/Spotlight";
@@ -30,11 +31,25 @@ export default function SolutionsPage() {
           { name: "Home", path: "/" },
           { name: "Solutions", path: "/solutions" },
         ]}
+        actions={<Button href="/start-a-project">Start a Project</Button>}
       />
 
-      <section className="section-y">
+      <section className="section-y" aria-labelledby="solutions-heading">
         <div className="container-x">
-          <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {/*
+            A visible section heading between the page h1 and the card grid.
+
+            The grid *is* this page's content, and every card title is an h3, so
+            without an h2 the document outline ran h1 → h3 on five index routes.
+            Heading-based navigation (the H key in NVDA/JAWS, the VoiceOver
+            rotor) therefore jumped from the page title straight to the footer
+            CTA and the content was unreachable that way. axe flags this as
+            `heading-order`, and the CI scan was filtering that rule out.
+          */}
+          <h2 id="solutions-heading" className="h-section">
+            All solutions
+          </h2>
+          <RevealStagger className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {solutions.map((solution, i) => {
               const { icon, hue } = chipFor(solution.slug, i);
               return (

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { JsonLd } from "@/components/ui/Accordion";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { GridLines } from "@/components/ui/GridLines";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import { Reveal } from "@/components/ui/Reveal";
@@ -14,10 +14,26 @@ interface PageHeroProps {
 }
 
 /**
- * PageHero v3 — one label row (breadcrumb trail whose final crumb carries
- * the eyebrow when it duplicates it), compact vertical rhythm so content
- * starts inside the first viewport, aurora bleed + a deterministic schematic
- * strip keyed by the eyebrow. Copy and breadcrumb semantics untouched.
+ * PageHero — shared inner-page header.
+ *
+ * Two structural fixes over the previous version:
+ *
+ *  1. The eyebrow is no longer appended as a pseudo-crumb inside the
+ *     breadcrumb `<ol>`. It was rendered as another `<li>` of the same
+ *     `flex-wrap` list whenever it did not literally contain the final crumb,
+ *     which (a) made the *visible* breadcrumb disagree with the emitted
+ *     `BreadcrumbList` structured data — Google's breadcrumb guidance requires
+ *     the two to match — and (b) collided with long final crumbs. On
+ *     `/insights/[slug]` the crumb itself was already truncated to 40
+ *     characters, so the row overflowed and the article title was cut
+ *     mid-word ("…reach productio"). The eyebrow now sits on its own line,
+ *     where length cannot collide with anything.
+ *  2. The schematic strip is gone. It was five circles on a rule, positioned
+ *     exactly where users look for progress, and at narrow widths it read as a
+ *     half-completed stepper. It is replaced by a scale motif: an instrument
+ *     rule with tick marks and no state. Decorative, unambiguous, and closer to
+ *     the "Operator's Console" identity than a row of dots pretending to be a
+ *     control.
  */
 export function PageHero({
   eyebrow,
@@ -26,13 +42,20 @@ export function PageHero({
   breadcrumbs,
   actions,
 }: PageHeroProps) {
-  const last = breadcrumbs[breadcrumbs.length - 1];
-  // Kill the "HOME / WORK + eyebrow WORK" duplication: when the eyebrow
-  // already contains the final crumb, the crumb carries it.
-  const eyebrowCovered =
-    last != null &&
-    eyebrow.toLowerCase().includes(last.name.toLowerCase());
-  const seed = [...eyebrow].reduce((a, c) => a + c.charCodeAt(0), 0);
+  /*
+    Suppressed when the eyebrow merely restates the final crumb. On the index
+    pages the eyebrow is the section name and the crumb is that same name, so
+    rendering both produced "…/ Work" followed immediately by "Work". An earlier
+    version of this component avoided the duplication by folding the eyebrow into
+    the breadcrumb list, which made the *visible* trail disagree with the emitted
+    `BreadcrumbList` — this keeps them separate and simply omits the echo.
+
+    A `"Section — qualifier"` eyebrow still renders, because the qualifier is the
+    part worth reading ("Insight — Enterprise AI" under a long article title).
+  */
+  const last = breadcrumbs[breadcrumbs.length - 1]?.name.toLowerCase();
+  const eyebrowHead = eyebrow.split("—")[0]?.trim().toLowerCase() ?? "";
+  const echo = last !== undefined && eyebrowHead === last;
 
   return (
     <section className="relative overflow-hidden border-b border-line">
@@ -62,19 +85,12 @@ export function PageHero({
                 </li>
               );
             })}
-            {!eyebrowCovered && (
-              <li className="flex items-center gap-2">
-                <span aria-hidden="true" className="text-accent-bright">
-                  ·
-                </span>
-                <span className="text-accent-bright">{eyebrow}</span>
-              </li>
-            )}
           </ol>
         </nav>
         <Reveal>
-          <SchematicStrip seed={seed} />
-          <h1 className="h-display mt-5 max-w-4xl">{title}</h1>
+          <InstrumentRule />
+          {!echo && <p className="eyebrow mt-5">{eyebrow}</p>}
+          <h1 className="h-display mt-3 max-w-4xl">{title}</h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
             {lead}
           </p>
@@ -85,49 +101,30 @@ export function PageHero({
   );
 }
 
-/** Deterministic thin schematic motif — decorative, derived from the label. */
-function SchematicStrip({ seed }: { seed: number }) {
-  const nodes = [0, 1, 2, 3, 4].map((i) => ({
-    x: 8 + i * 46 + ((seed >> (i * 2)) % 12),
-    live: (seed + i) % 3 === 0,
-  }));
+/**
+ * Scale motif: a rule with regular ticks, reading as a measurement scale rather
+ * than a progress control. Purely decorative (`aria-hidden`, no state), and
+ * fixed at 1px so it never competes with the heading below it.
+ */
+function InstrumentRule() {
+  const ticks = Array.from({ length: 13 }, (_, i) => i * 20);
   return (
     <svg
       width="240"
-      height="20"
-      viewBox="0 0 240 20"
+      height="9"
+      viewBox="0 0 240 9"
       fill="none"
       aria-hidden="true"
-      className="opacity-80"
+      className="text-line-strong"
     >
-      <path
-        d={`M0 10 H240`}
-        stroke="var(--color-line-strong)"
-        strokeWidth="1"
-      />
-      {nodes.map((n, i) => (
-        <g key={i}>
-          <circle
-            cx={n.x}
-            cy={10}
-            r={n.live ? 3.5 : 2.5}
-            fill={n.live ? "var(--color-signal)" : "var(--color-surface2)"}
-            stroke={
-              n.live ? "var(--color-signal)" : "var(--color-line-strong)"
-            }
-            strokeWidth="1"
-          />
-          {n.live && (
-            <circle
-              cx={n.x}
-              cy={10}
-              r={6}
-              stroke="var(--color-signal)"
-              strokeWidth="1"
-              opacity="0.4"
-            />
-          )}
-        </g>
+      <path d="M0 0.5 H240" stroke="currentColor" strokeWidth="1" />
+      {ticks.map((x, i) => (
+        <path
+          key={x}
+          d={`M${x + 0.5} 0.5 v${i % 4 === 0 ? 8 : 4}`}
+          stroke="currentColor"
+          strokeWidth="1"
+        />
       ))}
     </svg>
   );

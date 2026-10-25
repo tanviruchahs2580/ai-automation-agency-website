@@ -1,4 +1,5 @@
 import { PageHero } from "@/components/layout/PageHero";
+import { Button } from "@/components/ui/Button";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { CapabilityCard } from "@/components/ui/Card";
 import { Spotlight } from "@/components/ui/Spotlight";
@@ -28,11 +29,27 @@ export default function ServicesPage() {
           { name: "Home", path: "/" },
           { name: "Services", path: "/services" },
         ]}
+        actions={<Button href="/start-a-project">Start a Project</Button>}
       />
 
-      <section className="section-y">
+      <section className="section-y" aria-labelledby="services-heading">
         <div className="container-x">
-          <RevealStagger className="grid gap-5 md:grid-cols-2">
+          {/* See `solutions/page.tsx` — same h1 → h3 outline gap, same fix. */}
+          <h2 id="services-heading" className="h-section">
+            All services
+          </h2>
+          {/*
+            Three columns at `lg`, matching `/solutions`. Both pages carry the
+            same card type with comparable copy, and the two-up grid here was an
+            unexplained break in the layout system.
+
+            The narrower column is also why the card footer now shows two
+            capability names instead of three: at three-up, three names wrapped
+            to a second line and left a dangling separator at the end of the
+            first. The footer was shortened to fit the new measure — that is a
+            deliberate content reduction, not a side effect of the grid change.
+          */}
+          <RevealStagger className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {services.map((service, i) => {
               const { icon, hue } = chipFor(service.slug, i);
               return (
@@ -45,7 +62,7 @@ export default function ServicesPage() {
                       hue={hue}
                       title={service.title}
                       description={service.summary}
-                      meta={service.capabilities.slice(0, 3).join(" · ")}
+                      meta={service.capabilities.slice(0, 2).join(" · ")}
                       href={`/services/${service.slug}`}
                     />
                   </Spotlight>

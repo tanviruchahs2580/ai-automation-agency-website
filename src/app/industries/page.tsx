@@ -1,4 +1,5 @@
 import { PageHero } from "@/components/layout/PageHero";
+import { Button } from "@/components/ui/Button";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { CapabilityCard } from "@/components/ui/Card";
 import { Spotlight } from "@/components/ui/Spotlight";
@@ -28,11 +29,16 @@ export default function IndustriesPage() {
           { name: "Home", path: "/" },
           { name: "Industries", path: "/industries" },
         ]}
+        actions={<Button href="/start-a-project">Start a Project</Button>}
       />
 
-      <section className="section-y">
+      <section className="section-y" aria-labelledby="industries-heading">
         <div className="container-x">
-          <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {/* See `solutions/page.tsx` — same h1 → h3 outline gap, same fix. */}
+          <h2 id="industries-heading" className="h-section">
+            All industries
+          </h2>
+          <RevealStagger className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {industries.map((industry, i) => {
               const { icon, hue } = chipFor(industry.slug, i);
               return (
