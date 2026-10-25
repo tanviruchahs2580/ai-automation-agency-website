@@ -184,14 +184,23 @@ spinning logos, hero-text parallax, autoplaying carousels, endless loaders.
 - 404/500: console-style operator errors with path / request ID / timestamp
   and a `mailto:engineering@` link.
 
-## 9. Budgets (non-negotiable)
+## 9. Budgets (enforced)
 
-LCP < 1.2s (home) · CLS < 0.05 · INP < 100ms · JS < 90KB gzip initial ·
-CSS < 24KB gzip · fonts < 180KB · 0 raster images ·
-Lighthouse 100×4 home, ≥95 key routes · axe zero violations.
+LCP < 1.2s (home) · CLS < 0.05 · INP < 100ms · **shared JS baseline < 165KB
+gzip** · **heaviest route < 185KB gzip** · CSS < 20KB gzip · fonts < 150KB ·
+0 raster images · Lighthouse 100×4 home, ≥95 key routes · axe zero violations.
 
-Enforcement: SSG everywhere, `next/dynamic` below the fold,
-`optimizePackageImports` for Framer Motion, self-hosted subset fonts.
+Enforcement: `npm run check:budget` reads the build's own route diagnostics and
+gzips every chunk each route loads on first paint. It runs in CI after every
+build, and it fails the build. `npm run check:rendered` runs alongside it for
+the rendered-output invariants. Neither is advisory.
+
+Optimisations in place: SSG everywhere, `LazyMotion` in place of the full motion
+build, `optimizePackageImports` for Framer Motion, `LazyMotion` with the
+`domAnimation` feature set (the full build shipped projection, drag and layout
+code this site never uses), self-hosted subset fonts deduplicated to one file
+per family, and the intake vocabulary split out of the zod module so the
+validator never reaches the browser.
 
 ### Measured status (2026-10-05, production build, local `next start`)
 
@@ -200,15 +209,29 @@ Enforcement: SSG everywhere, `next/dynamic` below the fold,
 | LCP < 1.2s (home) | 544ms (worst of 5 routes; `/solutions` 356ms, `/insights` 316ms) | met |
 | CLS < 0.05 | 0.0000 – 0.0245 across 5 routes | met |
 | INP < 100ms | not field-measured (no CrUX/lab INP tooling offline) | pending field data |
-| JS < 90KB gzip initial | **765KB raw** (~193KB gzip est.) on `/` | **over budget** |
-| CSS < 24KB gzip | 11.4KB gzip | met |
-| fonts < 180KB | 147KB loaded per route | met |
+| shared JS baseline < 165KB gzip | 157.0KB gzip on all 23 routes | met (`npm run check:budget`) |
+| heaviest route < 185KB gzip | 176.9KB gzip on `/` | met (`npm run check:budget`) |
+| CSS < 20KB gzip | 12.2KB gzip | met (`npm run check:budget`) |
+| fonts < 150KB | ~106KB loaded per route (one file per family after dedup; two faces preloaded) | met |
 | 0 raster images | 0 raster bytes on all routes | met |
-| axe zero serious/critical | 0 on key routes (Playwright axe suite, 3 engines) | met |
+| axe zero violations above minor impact | 0 across 20 route scans + light theme + open dialog (Playwright axe suite) | met |
+| document structure (best-practice rules) | 0 across 20 routes | met (`e2e/a11y.spec.ts`) |
+| rendered-output invariants | 0 violations across 53 documents | met (`npm run check:rendered`) |
 | Lighthouse 100×4 / ≥95 | not run — `lighthouse` CLI unavailable offline | pending (use pagespeed.web.dev, see LAUNCH-CHECKLIST §3.2) |
 
-The JS target predates React 19 + Next 16 + Framer Motion; ~190KB gzip is the
-runtime floor for this stack as bundled. Treat it as a tracked optimization
-item rather than a defect: LCP and CLS are already inside budget with 2×
+### Why the old 90KB figure is gone
+
+The previous target (JS < 90KB gzip initial) was unreachable by construction:
+React 19 plus the Next.js App Router client runtime exceed it before a single
+line of application code is counted. Keeping it meant the budget table reported
+`over budget` on a number no version of this stack could hit, and the one
+summary that claimed budgets were met simply omitted the JavaScript row.
+
+The enforced budgets above are measured, and the baseline is split from the
+per-route figure so a regression stays visible. Measured composition at the
+time of writing (gzip): react-dom + scheduler 71.7KB · app router runtime ~5KB ·
+framer-motion `domAnimation` ~56KB · shared client UI ~24KB.
+
+The old text continued: ~190KB gzip is the runtime floor for this stack as bundled. LCP and CLS are already inside budget with 2×
 headroom. Reduce only through route-level `next/dynamic` and chunk auditing —
 never by vendoring or patching framework code.
