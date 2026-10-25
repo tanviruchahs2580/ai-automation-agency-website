@@ -24,7 +24,7 @@ export const solutions: Solution[] = [
     ],
     architecture: [
       "Business goal & policy definition",
-      "Orchestrator routing work across specialised agents",
+      "Orchestrator routing work across specialized agents",
       "Tool layer connected to CRM, ERP, ticketing and documents",
       "Knowledge layer with retrieval over your approved sources",
       "Human approval checkpoints for high-risk actions",
@@ -261,7 +261,7 @@ export const solutions: Solution[] = [
       {
         question: "Can you take over an existing codebase?",
         answer:
-          "Yes. Engagements often start with a technical audit that produces a stabilisation plan before new feature work begins.",
+          "Yes. Engagements often start with a technical audit that produces a stabilization plan before new feature work begins.",
       },
     ],
   },

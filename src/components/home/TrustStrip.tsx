@@ -10,7 +10,7 @@ const capabilities = [
   { name: "AI Engineering", detail: "Agents · RAG · Copilots" },
   { name: "Automation", detail: "Processes · Documents · Integrations" },
   { name: "Agent Systems", detail: "Orchestration · Tool governance" },
-  { name: "Software", detail: "Platforms · SaaS · Modernisation" },
+  { name: "Software", detail: "Platforms · SaaS · Modernization" },
   { name: "Data", detail: "Pipelines · Knowledge infrastructure" },
   { name: "Security", detail: "Isolation · Auditability · Governance" },
 ];
@@ -27,7 +27,7 @@ export function TrustStrip() {
         />
       </div>
       <div className="marquee border-t border-line pb-10 pt-8">
-        <div className="marquee-track gap-4 pr-4">
+        <div className="marquee-track gap-4 pe-4">
           {[0, 1].map((copy) => (
             <ul
               key={copy}

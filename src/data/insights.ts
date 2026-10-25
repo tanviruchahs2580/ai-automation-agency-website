@@ -1,3 +1,4 @@
+import { teamByline } from "@/data/site";
 import { slugify } from "@/lib/utils";
 import type { Insight } from "@/types/content";
 
@@ -6,7 +7,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "Why most AI pilots never reach production",
     excerpt:
       "The gap between demo and production is architectural, not intellectual. Here are the five failure modes we see most often — and what closes each one.",
-    author: "VANTIQ Systems Engineering Team", // PLACEHOLDER authorship
+    author: teamByline, // placeholder authorship — defined in src/data/site.ts
     authorRole: "AI Engineering",
     category: "Enterprise AI",
     tags: ["production", "architecture", "evaluation"],
@@ -55,7 +56,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "Designing agent tools: least privilege in practice",
     excerpt:
       "An agent is only as safe as the tools it can reach. A practical framework for scoping, validating and monitoring tool access.",
-    author: "VANTIQ Systems Engineering Team",
+    author: teamByline,
     authorRole: "AI Security",
     category: "Agentic Systems",
     tags: ["agents", "security", "tools"],
@@ -90,7 +91,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "RAG without the hype: what retrieval actually fixes",
     excerpt:
       "Retrieval-augmented generation grounds models in your content. It doesn't fix reasoning, freshness or permissions by itself. An honest breakdown.",
-    author: "VANTIQ Systems Engineering Team",
+    author: teamByline,
     authorRole: "AI Engineering",
     category: "AI Engineering",
     tags: ["rag", "retrieval", "knowledge"],
@@ -102,7 +103,7 @@ const raw: Array<Omit<Insight, "slug">> = [
         heading: "What RAG genuinely solves",
         paragraphs: [
           "Grounding: answers based on documents that exist, with citations users can verify. For enterprise knowledge, this alone justifies the infrastructure.",
-          "It also reduces memorisation pressure on the model — factual accuracy shifts from weights to retrievable evidence that can be audited and corrected.",
+          "It also reduces memorization pressure on the model — factual accuracy shifts from weights to retrievable evidence that can be audited and corrected.",
         ],
       },
       {
@@ -125,7 +126,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "The economics of model routing",
     excerpt:
       "Sending every token to the most capable model is the most expensive way to run AI. Routing by task changes unit economics dramatically.",
-    author: "VANTIQ Systems Engineering Team",
+    author: teamByline,
     authorRole: "AI Economics",
     category: "AI Economics",
     tags: ["cost", "routing", "models"],
@@ -160,7 +161,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "Prompt injection: honest threats, honest defenses",
     excerpt:
       "You cannot fully prevent prompt injection today. You can architect systems where attempts fail safely. Here's our control hierarchy.",
-    author: "VANTIQ Systems Engineering Team",
+    author: teamByline,
     authorRole: "AI Security",
     category: "AI Security",
     tags: ["security", "prompt-injection"],
@@ -195,7 +196,7 @@ const raw: Array<Omit<Insight, "slug">> = [
     title: "Choosing what to automate first",
     excerpt:
       "A sequencing method for automation roadmaps: volume × variance × verifiability. Why boring processes make the best first projects.",
-    author: "VANTIQ Systems Engineering Team",
+    author: teamByline,
     authorRole: "Automation",
     category: "Automation",
     tags: ["roadmap", "strategy", "process"],

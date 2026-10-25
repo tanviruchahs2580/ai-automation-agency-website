@@ -114,7 +114,7 @@ export function ExitIntentSave() {
     <div
       role="dialog"
       aria-label="Draft saved"
-      className="fixed bottom-6 left-1/2 z-[90] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-xl border border-line bg-surface p-5 shadow-2xl"
+      className="fixed inset-x-0 bottom-6 z-[90] mx-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-line bg-surface p-5 shadow-2xl"
     >
       <p className="mono-label uppercase text-faint">Before you go</p>
       <p className="mt-2 text-sm leading-relaxed">

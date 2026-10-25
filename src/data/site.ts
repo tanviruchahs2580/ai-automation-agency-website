@@ -2,10 +2,85 @@ import type { LinkItem } from "@/types/content";
 
 /**
  * PLACEHOLDER BRAND DATA.
+ *
  * The brand/legal entity form and any real contact channels must be supplied
  * before launch — see LAUNCH-CHECKLIST.md §1. Contact values are env-driven so
  * launch configuration never requires a code change.
+ *
+ * ⚠ The name below is a placeholder. "Vantiq" is also an existing enterprise AI
+ * vendor, so shipping under it unmodified carries a trademark and credibility
+ * risk. Set `NEXT_PUBLIC_BRAND_NAME` at deploy time to replace it everywhere.
+ *
+ * "Everywhere" means every user-facing string in `src/`: this module is the only
+ * source for the name in application code, `brand.test.ts` fails if a literal
+ * reappears, and the three forms are derived from one value so a rename cannot
+ * leave a stale suffix on page titles. It does not include files that are not
+ * application copy — `LICENSE` names the copyright holder, and the E2E suite
+ * asserts the site title against this config. `next.config.ts` prints a build
+ * warning when a production build still has the placeholder in place.
+ *
+ * Three forms exist, each with exactly one role. Using the right one
+ * deliberately is what keeps them from drifting into accidental variants, which
+ * is what the audit found (three capitalizations across ten hard-coded files):
+ *
+ *   name       — the lockup: logo, copyright line, structured data, image alt
+ *   proseName  — the brand inside a sentence, where all-caps reads as shouting
+ *   shortName  — tight spaces: the " — VANTIQ" suffix on page titles
+ *
+ * `src/lib/__tests__/brand.test.ts` fails if a literal brand string appears
+ * anywhere in `src/` outside this module.
  */
+const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "VANTIQ SYSTEMS";
+
+/**
+ * Title-cases the tail of a brand name for use in a sentence.
+ *
+ * `"VANTIQ SYSTEMS"` → `"VANTIQ Systems"`, so the lockup can stay set in caps
+ * while prose does not shout. Tokens of three characters or fewer that are
+ * already all-caps are left alone, because those are acronyms: an "ABC AI Ltd"
+ * brand must not become "ABC Ai Ltd".
+ */
+function proseToken(token: string): string {
+  if (token.length <= 3 && token === token.toUpperCase()) return token;
+  return token.charAt(0).toUpperCase() + token.slice(1).toLowerCase();
+}
+
+/**
+ * Derives the three brand forms from one value.
+ *
+ * Exported so `brand.test.ts` can exercise the derivation directly instead of
+ * asserting against whichever value the environment happens to hold — the
+ * previous version had `shortName: "VANTIQ"` hard-coded beside two env-driven
+ * fields, so setting `NEXT_PUBLIC_BRAND_NAME` to anything else produced
+ * "Acme Robotics" in the lockup with "VANTIQ" still suffixed to every page
+ * title, and failed the brand test suite.
+ */
+export function deriveBrandForms(rawName: string) {
+  const tokens = rawName.trim().split(/\s+/);
+  const [head = "", ...tail] = tokens;
+  return {
+    name: rawName.trim(),
+    proseName: [head, ...tail.map(proseToken)].join(" "),
+    shortName: head,
+  };
+}
+
+const brandForms = deriveBrandForms(BRAND_NAME);
+
+export const siteConfig = {
+  ...brandForms,
+  tagline: "AI Engineering & Automation for the Enterprise",
+  description:
+    "We design, engineer and operate intelligent automation systems that connect your people, software, data and workflows — from first architecture to production.",
+  locale: "en_US",
+} as const;
+
+/**
+ * Shared byline for every article published under the engineering team rather
+ * than a named individual. Derived rather than retyped, so the six article
+ * records cannot drift from the team page.
+ */
+export const teamByline = `${siteConfig.proseName} Engineering Team`;
 
 /**
  * Primary navigation, in display order.
@@ -86,7 +161,7 @@ export const siteNav: NavItem[] = [
       {
         label: "Software Engineering",
         href: "/services/software-engineering",
-        description: "Platforms, SaaS, modernisation",
+        description: "Platforms, SaaS, modernization",
       },
       {
         label: "Data & AI Infrastructure",

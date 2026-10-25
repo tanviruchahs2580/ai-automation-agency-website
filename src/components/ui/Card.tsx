@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Chip, type ChipHue } from "@/components/ui/Chip";
 import type { IconName } from "@/components/ui/Icon";
-import { DiagramThumb } from "@/components/ui/DiagramThumb";
 
 const shell =
   "card-surface card-pad flex h-full flex-col transition-[border-color,transform,box-shadow]";
@@ -18,6 +17,57 @@ function Meta({ children }: { children: ReactNode }) {
       {children}
     </p>
   );
+}
+
+/**
+ * The spine of a reference architecture, as real content.
+ *
+ * This replaces a decorative SVG "diagram" that drew four unnamed nodes and a
+ * curve seeded from the slug. The audit found the three case-study cards
+ * carrying visually identical thumbnails — the seed only nudged node positions
+ * by a few pixels — so the motif looked like data without being any, which is
+ * worse than no graphic at all on a site whose position is "evidence over
+ * hype". These are the architecture's own first layers, so the three cards are
+ * now genuinely different from each other and each one tells you something the
+ * title does not.
+ */
+function LayerStack({ layers }: { layers: readonly string[] }) {
+  const shown = layers.slice(0, 3);
+  const remaining = layers.length - shown.length;
+
+  return (
+    <ol className="mb-5 space-y-1.5">
+      {shown.map((layer, i) => (
+        <li key={layer} className="flex items-baseline gap-2.5">
+          <span className="mono-label shrink-0 text-accent-bright" aria-hidden="true">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <span className="truncate text-xs text-muted">{layer}</span>
+        </li>
+      ))}
+      {remaining > 0 && (
+        <li className="mono-label ps-[1.6rem] text-faint">
+          + {remaining} more {remaining === 1 ? "layer" : "layers"}
+        </li>
+      )}
+    </ol>
+  );
+}
+
+/** Maps a chip hue to its CSS custom property. */
+function hueVar(hue: ChipHue): string {
+  switch (hue) {
+    case "signal":
+      return "var(--color-signal)";
+    case "brass":
+      return "var(--color-brass)";
+    case "sky":
+      return "var(--color-info)";
+    case "amber":
+      return "var(--color-warn)";
+    default:
+      return "var(--color-accent)";
+  }
 }
 
 /** Capability card — chip / eyebrow / title / 3-line description / mono footer. */
@@ -76,33 +126,30 @@ export function CapabilityCard({
   );
 }
 
-/** Case study card — diagram / eyebrow / industry / title / before-after / footer. */
+/** Case study card — architecture spine / eyebrow / before-after / footer. */
 export function CaseStudyCard({
   eyebrow,
   industry,
   title,
   before,
   after,
+  layers,
   meta,
   href,
-  diagramSeed,
 }: {
   eyebrow: string;
   industry: string;
   title: string;
   before: string;
   after: string;
+  /** The architecture's own layer labels, shown as the card's spine. */
+  layers: readonly string[];
   meta?: ReactNode;
   href: string;
-  diagramSeed?: string;
 }) {
   return (
     <Link href={href} className={cn(shell, "group p-6")}>
-      {diagramSeed && (
-        <div className="mb-5">
-          <DiagramThumb seed={diagramSeed} />
-        </div>
-      )}
+      <LayerStack layers={layers} />
       <div className="flex items-baseline justify-between gap-3">
         <Eyebrow>{eyebrow}</Eyebrow>
         <span className="mono-label text-faint">{industry}</span>
@@ -123,7 +170,7 @@ export function CaseStudyCard({
   );
 }
 
-/** Insight card — cover pattern / eyebrow / serif title / 2-line dek / byline. */
+/** Insight card — category rule / eyebrow / serif title / 2-line dek / byline. */
 export function InsightCard({
   eyebrow,
   title,
@@ -131,8 +178,7 @@ export function InsightCard({
   byline,
   readTime,
   href,
-  patternSeed,
-  patternHue = "brass",
+  categoryHue = "brass",
 }: {
   eyebrow: string;
   title: string;
@@ -140,62 +186,36 @@ export function InsightCard({
   byline: string;
   readTime: string;
   href: string;
-  patternSeed?: string;
-  patternHue?: ChipHue;
+  /** Hue for the category rule, derived from the article's category. */
+  categoryHue?: ChipHue;
 }) {
   return (
-    <Link href={href} className={cn(shell, "group overflow-hidden p-0")}>
-      {patternSeed && <CoverPattern seed={patternSeed} hue={patternHue} />}
-      <div className="flex flex-1 flex-col p-6 pt-5">
-        <Eyebrow>{eyebrow}</Eyebrow>
-        <h3 className="h-card mt-3 font-editorial text-xl">{title}</h3>
-        <p className="mt-3 line-clamp-2 flex-1 text-sm leading-relaxed text-muted">
-          {dek}
-        </p>
-        <p className="mono-label mt-5 border-t border-line pt-4 text-faint">
-          {byline} · {readTime}
-        </p>
-      </div>
+    <Link href={href} className={cn(shell, "group p-6")}>
+      {/*
+        A category rule, not a cover pattern. The pattern this replaces was an
+        SVG band drawn with `preserveAspectRatio="xMidYMid slice"` inside a
+        wider, flatter container, so it scaled up and cropped its own baseline
+        and rendered as an empty strip with a stray hairline across it —
+        measured as flat luminance across the band, with no bars visible at any
+        width. Rather than repair decoration, the card now carries a
+        hue-coded rule: it reads at every card width, and the colour states the
+        article's category, which is real information.
+      */}
+      <span
+        aria-hidden="true"
+        className="mb-4 block h-[3px] w-full rounded-full"
+        style={{
+          background: `linear-gradient(to right, ${hueVar(categoryHue)}, transparent 72%)`,
+        }}
+      />
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h3 className="h-card-editorial mt-3">{title}</h3>
+      <p className="mt-3 line-clamp-2 flex-1 text-sm leading-relaxed text-muted">
+        {dek}
+      </p>
+      <p className="mono-label mt-5 border-t border-line pt-4 text-faint">
+        {byline} · {readTime}
+      </p>
     </Link>
-  );
-}
-
-/** Thin deterministic cover band keyed by tag — decorative, hue-semantic. */
-function CoverPattern({ seed, hue }: { seed: string; hue: ChipHue }) {
-  const hash = [...seed].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 13);
-  const bars = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
-    const h = Math.max(0, Math.min(40, 10 + ((hash >> (i * 2)) % 22)));
-    return { x: 6 + i * 25, h, hot: (hash + i) % 4 === 0 };
-  });
-  const hueVar =
-    hue === "signal"
-      ? "var(--color-signal)"
-      : hue === "brass"
-        ? "var(--color-brass)"
-        : hue === "sky"
-          ? "var(--color-info)"
-          : hue === "amber"
-            ? "var(--color-warn)"
-            : "var(--color-accent)";
-  return (
-    <svg
-      viewBox="0 0 200 40"
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden="true"
-      className="h-10 w-full border-b border-line"
-    >
-      {bars.map((b, i) => (
-        <rect
-          key={i}
-          x={b.x}
-          y={40 - b.h}
-          width={9}
-          height={b.h}
-          rx={2}
-          fill={b.hot ? hueVar : "var(--color-line-strong)"}
-          opacity={b.hot ? 0.9 : 0.7}
-        />
-      ))}
-    </svg>
   );
 }

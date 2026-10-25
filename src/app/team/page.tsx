@@ -3,12 +3,12 @@ import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Reveal } from "@/components/ui/Reveal";
+import { siteConfig, teamByline } from "@/data/site";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
   title: "Team",
-  description:
-    "The VANTIQ Systems engineering team: how we work, what we publish under our shared byline, and how to reach us.",
+  description: `The ${siteConfig.proseName} engineering team: how we work, what we publish under our shared byline, and how to reach us.`,
   path: "/team",
 });
 
@@ -23,7 +23,7 @@ export default function TeamPage() {
       <PageHero
         eyebrow="Team"
         title="One engineering team, shared byline."
-        lead="Every article on this site is published as the VANTIQ Systems Engineering Team. No ghost authors, no stock faces."
+        lead={`Every article on this site is published as the ${teamByline}. No ghost authors, no stock faces.`}
         breadcrumbs={[
           { name: "Home", path: "/" },
           { name: "Team", path: "/team" },
@@ -54,10 +54,20 @@ export default function TeamPage() {
                 detail:
                   "Every system has a named owner through build and operation. Responsibility is assigned, not implied.",
               },
-            ].map((item) => (
+            ].map((item, i) => (
               <Reveal key={item.title}>
                 <div className="card-surface h-full p-6">
-                  <h2 className="h-card">{item.title}</h2>
+                  {/*
+                    h3, not h2: these sat at the same level as the section
+                    heading above them, so the page outline read as four peer
+                    sections instead of one section with three parts. The mono
+                    index also brings the card into line with every other card
+                    on the site, which all carry a numbered eyebrow.
+                  */}
+                  <p className="mono-label text-faint">
+                    {String(i + 1).padStart(2, "0")}
+                  </p>
+                  <h3 className="h-card mt-3">{item.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted">
                     {item.detail}
                   </p>

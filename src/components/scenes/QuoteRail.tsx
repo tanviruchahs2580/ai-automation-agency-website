@@ -12,7 +12,7 @@ export function QuoteRail({
   return (
     <aside
       aria-label="Pull quote"
-      className="my-8 border-l-2 border-brass pl-6"
+      className="my-8 border-s-2 border-brass ps-6"
     >
       <blockquote className="font-editorial text-xl italic leading-relaxed text-ink md:text-2xl">
         “{quote}”

@@ -6,12 +6,18 @@ import { CtaSection } from "@/components/layout/CtaSection";
 import { DetailLayout, IncludesCard } from "@/components/layout/DetailLayout";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { ComplianceStamp } from "@/components/scenes/ComplianceStamp";
+import {
+  complianceByIndustry,
+  complianceLegend,
+  defaultCompliance,
+} from "@/data/compliance";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { getIndustry, industries } from "@/data/industries";
 import { caseStudies } from "@/data/case-studies";
 import { hasIndustryPreset } from "@/data/roi-presets";
 import { buildMetadata } from "@/lib/seo";
+import { cardPath } from "@/lib/social-image";
 
 export function generateStaticParams() {
   return industries.map((i) => ({ slug: i.slug }));
@@ -29,35 +35,16 @@ export async function generateMetadata({
     title: `AI for ${industry.title}`,
     description: industry.summary,
     path: `/industries/${industry.slug}`,
+    cardPath: cardPath("industries", industry.slug),
   });
 }
 
-/**
- * Industry compliance posture — honest readiness labels, never certificates.
- * Regulated sectors name their frameworks; all others get the GDPR baseline.
- */
-const complianceByIndustry: Record<string, Array<{ label: string; status: string }>> = {
-  "financial-services": [
-    { label: "SOC 2 controls", status: "Mapped · In progress" },
-    { label: "Financial data handling", status: "Reviewed" },
-    { label: "GDPR", status: "Ready" },
-  ],
-  healthcare: [
-    { label: "HIPAA-aware delivery", status: "In progress" },
-    { label: "PHI redaction pipeline", status: "Ready" },
-    { label: "GDPR", status: "Ready" },
-  ],
-  government: [
-    { label: "Sovereign deployment", status: "Available" },
-    { label: "Audit-trail retention", status: "Ready" },
-    { label: "GDPR", status: "Ready" },
-  ],
-};
-
-const defaultCompliance = [
-  { label: "SOC 2 controls", status: "Mapped · In progress" },
-  { label: "GDPR", status: "Ready" },
-];
+/*
+  Industry compliance posture. Labels, statuses and the legend all come from
+  `@/data/compliance`, so this page cannot drift from `/security` — and the
+  previous "GDPR · Ready" status, which read as a statement about a legal
+  position rather than about engineering work, cannot come back.
+*/
 
 const nav = [
   { href: "#challenges", label: "Challenges" },
@@ -110,8 +97,13 @@ export default async function IndustryPage({
                     </li>
                   ))}
                 </ul>
+                {/*
+                  The legend is the point. A one-word status is only honest if the
+                  page states what it means, and "Mapped" is doing real work: it
+                  claims mapped controls and explicitly disclaims a certificate.
+                */}
                 <p className="mt-4 border-t border-line pt-4 text-[11px] leading-relaxed text-faint">
-                  Readiness labels, not certificates. Full posture in{" "}
+                  {complianceLegend} Full posture in{" "}
                   <a href="/security" className="underline underline-offset-4 hover:text-ink">
                     security
                   </a>
@@ -121,7 +113,7 @@ export default async function IndustryPage({
               {/*
                 Copy depends on whether this sector actually has a preset.
                 Every industry page used to promise "Industry benchmark preset
-                applied" while the calculator recognised only six of the twelve
+                applied" while the calculator recognized only six of the twelve
                 sectors, so the other six received the default assumption with
                 no indication that it was not sector-specific.
               */}

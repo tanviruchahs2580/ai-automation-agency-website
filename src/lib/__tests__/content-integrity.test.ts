@@ -3,7 +3,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import sitemap from "@/app/sitemap";
-import { footerColumns, siteNav } from "@/data/site";
+import { footerColumns, siteNav, teamByline } from "@/data/site";
 import { services } from "@/data/services";
 import { solutions } from "@/data/solutions";
 import { industries } from "@/data/industries";
@@ -13,11 +13,16 @@ import { opportunities } from "@/data/opportunities";
 import { readinessQuestions } from "@/data/readiness-questions";
 import {
   agentStages,
+  architectureLayers,
   beforeAfterPairs,
   engineeringPrinciples,
   processPhases,
   riskTiers,
 } from "@/data/architecture";
+import { technologyCategories } from "@/data/technology";
+import { intakeSteps } from "@/lib/intake";
+import { projectBriefSchema } from "@/lib/validation";
+import { relativeToSrc, sourceFiles, stripComments } from "./source-scan";
 import {
   defaultIndustryPreset,
   hasIndustryPreset,
@@ -67,6 +72,18 @@ function collectStrings(value: unknown, out: string[] = []): string[] {
   return out;
 }
 
+/**
+ * en-GB spellings, shared by the data-module audit and the source-wide one.
+ *
+ * Suffixes are spelled out rather than using a bare `optimis` stem, which would
+ * also flag legitimate words such as "optimism". The `-is(e|ed|es|ing|ation)`
+ * family is the part that matters: an earlier version listed six verbs by hand
+ * and missed every other one, so "system modernisation" sat beside "cost
+ * optimization" in the same file for months.
+ */
+const britishSpelling =
+  /\w+(?:is(?:e|ed|es|ing|ation|ations|ational)|behaviour\w*|colour\w*|defence\w*|judgement\w*|modelling|licence|whilst|amongst|rigour\w*|centre|fibre|metre|theatre)/i;
+
 const navigationHrefs = [
   ...siteNav.flatMap((item) => [
     item.href,
@@ -90,6 +107,15 @@ const allContentStrings = collectStrings([
   engineeringPrinciples,
   processPhases,
   riskTiers,
+  /*
+    Added after the audit found a coverage hole: the brand-voice, whitespace and
+    spelling audits simply did not read `technology.ts` or the ROI preset
+    labels, which is exactly where "Standardised" and "SaaS & technology" were
+    sitting unnoticed.
+  */
+  architectureLayers,
+  technologyCategories,
+  industryPresets,
 ]);
 
 afterEach(() => {
@@ -209,6 +235,26 @@ describe("copy hygiene", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("uses US English in page and component copy, not only in data modules", () => {
+    /*
+      The rule above reads `allContentStrings`, which is collected from the data
+      modules — so copy written directly in a page or component was never
+      checked. It was clean when this was added, by luck: the remediation pass
+      rewrote about twenty en-GB strings across both, and only the data half was
+      covered by a test.
+    */
+    const offenders: string[] = [];
+    for (const file of sourceFiles()) {
+      const relative = relativeToSrc(file);
+      if (relative.includes("__tests__") || relative.startsWith("lib/i18n")) continue;
+      const contents = stripComments(fs.readFileSync(file, "utf8"));
+      for (const line of contents.split("\n")) {
+        if (britishSpelling.test(line)) offenders.push(`${relative}: ${line.trim()}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
   it("passes the brand-voice forbidden-word audit", () => {
     const forbidden =
       /\b(leverage|synergize|supercharge|unlock|revolutionize|game-changing|cutting-edge|world-class|best-in-class|next-gen|robust|seamless|empower)\w*/i;
@@ -284,7 +330,7 @@ describe("insights", () => {
   it("uses one shared byline so the team page and articles agree", () => {
     const authors = new Set(insights.map((i) => i.author));
     expect(authors.size).toBe(1);
-    expect([...authors][0]).toBe("VANTIQ Systems Engineering Team");
+    expect([...authors][0]).toBe(teamByline);
   });
 });
 
@@ -380,5 +426,82 @@ describe("sitemap coverage", () => {
 
   it("has no duplicate URLs", () => {
     expect(new Set(sitemapPaths).size).toBe(sitemapPaths.length);
+  });
+});
+
+describe("derived counts and cross-references", () => {
+  it("every ROI preset label matches its industry title", () => {
+    /*
+      Retyped labels drifted: the preset list said "SaaS & technology" and the
+      industry page said "SaaS & Technology", so the same sector appeared under
+      two capitalisations depending on the route the visitor took.
+    */
+    for (const preset of industryPresets) {
+      const industry = industries.find((i) => i.slug === preset.value);
+      expect(industry, `preset ${preset.value} has no industry`).toBeDefined();
+      expect(preset.label).toBe(industry!.title);
+    }
+  });
+
+  it("resolves the default preset by slug, not by array position", () => {
+    expect(defaultIndustryPreset.value).toBe("saas-technology");
+    /*
+      The default used to be `industryPresets[5]`, so reordering or removing an
+      entry silently changed which industry every visitor landed on. What must
+      hold now is that the default *is* the record found by its slug, whatever
+      index that record occupies.
+    */
+    const bySlug = industryPresets.find(
+      (preset) => preset.value === defaultIndustryPreset.value,
+    );
+    expect(bySlug).toBe(defaultIndustryPreset);
+    expect(defaultIndustryPreset.label).toBe("SaaS & Technology");
+  });
+
+  it("gives every industry preset a plausible automation rate", () => {
+    for (const preset of industryPresets) {
+      expect(preset.automationRate).toBeGreaterThan(0);
+      expect(preset.automationRate).toBeLessThanOrEqual(95);
+    }
+  });
+
+  it("keeps intake step fields in step with the brief schema", () => {
+    /*
+      The wizard's step list moved out of the component so the hosting page can
+      state the step count from data. That only works if the field names stay
+      real: a renamed field would leave a step that validates nothing.
+    */
+    const known = new Set([
+      ...Object.keys(projectBriefSchema.shape),
+      // Never persisted, never validated on a step: honeypot + consent handled
+      // explicitly.
+      "companyWebsite",
+    ]);
+    for (const step of intakeSteps) {
+      expect(step.title.length).toBeGreaterThan(0);
+      expect(step.fields.length).toBeGreaterThan(0);
+      for (const field of step.fields) {
+        expect(known, `${step.title} references unknown field "${field}"`).toContain(
+          field,
+        );
+      }
+    }
+  });
+
+  it("validates every schema field on exactly one step", () => {
+    const assigned = intakeSteps.flatMap((step) => [...step.fields]);
+    const duplicates = assigned.filter((field, i) => assigned.indexOf(field) !== i);
+    expect(duplicates).toEqual([]);
+  });
+
+  it("ships at least four architecture layers with unique ids", () => {
+    // The `/technology` heading derives its count from this array.
+    expect(architectureLayers.length).toBeGreaterThanOrEqual(4);
+    const ids = architectureLayers.map((layer) => layer.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const layer of architectureLayers) {
+      expect(layer.guarantee.length).toBeGreaterThan(20);
+      expect(layer.technical.length).toBeGreaterThan(20);
+    }
   });
 });

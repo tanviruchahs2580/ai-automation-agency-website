@@ -2,7 +2,9 @@ import { PageHero } from "@/components/layout/PageHero";
 import { ProjectIntake } from "@/components/forms/ProjectIntake";
 import { ExitIntentSave } from "@/components/forms/ExitIntentSave";
 import { Reveal } from "@/components/ui/Reveal";
+import { intakeSteps } from "@/lib/intake";
 import { buildMetadata } from "@/lib/seo";
+import { capitalize, countWord } from "@/lib/text";
 
 export const metadata = buildMetadata({
   title: "Start a Project",
@@ -35,7 +37,7 @@ export default function StartAProjectPage() {
       <PageHero
         eyebrow="Start a project"
         title="Tell us what you're trying to build."
-        lead="Seven short steps. The more context you give, the sharper our first response — your answers go through secure server-side validation and are never shared."
+        lead={`${capitalize(countWord(intakeSteps.length))} short steps. The more context you give, the sharper our first response — your answers go through secure server-side validation and are never shared.`}
         breadcrumbs={[
           { name: "Home", path: "/" },
           { name: "Start a Project", path: "/start-a-project" },

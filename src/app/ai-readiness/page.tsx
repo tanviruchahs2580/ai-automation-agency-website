@@ -1,11 +1,14 @@
+import { siteConfig } from "@/data/site";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
 import { ReadinessAssessment } from "@/components/calculators/ReadinessAssessment";
 import { Reveal } from "@/components/ui/Reveal";
-import { JsonLd } from "@/components/ui/Accordion";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { readinessCategories } from "@/lib/readiness";
 import { readinessQuestions } from "@/data/readiness-questions";
 import { buildMetadata, softwareJsonLd } from "@/lib/seo";
+import { capitalize, countWord } from "@/lib/text";
+import { methodology } from "@/data/disclaimers";
 
 export const metadata = buildMetadata({
   title: "AI Readiness Assessment",
@@ -19,7 +22,7 @@ export default function AiReadinessPage() {
     <>
       <JsonLd
         data={softwareJsonLd({
-          name: "VANTIQ AI Readiness Assessment",
+          name: `${siteConfig.shortName} AI Readiness Assessment`,
           description:
             "Ten-question assessment scoring process, data, infrastructure, opportunity and governance readiness for AI.",
           path: "/ai-readiness",
@@ -28,7 +31,7 @@ export default function AiReadinessPage() {
       <PageHero
         eyebrow="AI readiness"
         title="Get your AI readiness score."
-        lead="Ten questions across five dimensions of readiness. Two minutes, no personal data collected, honest output — including when you're not ready yet."
+        lead={`${capitalize(countWord(readinessQuestions.length))} questions across ${countWord(readinessCategories.length)} dimensions of readiness. Two minutes, no personal data collected, honest output — including when you're not ready yet.`}
         breadcrumbs={[
           { name: "Home", path: "/" },
           { name: "AI Readiness", path: "/ai-readiness" },
@@ -62,9 +65,7 @@ export default function AiReadinessPage() {
               ))}
             </dl>
             <p className="mt-6 rounded border border-warn/30 bg-warn/5 px-4 py-3 text-xs leading-relaxed text-warn/90">
-              Indicative estimates based on self-reported answers — not an audited
-              methodology. A validated assessment requires workshops with your
-              teams, which is exactly what we do first on real engagements.
+              {methodology.readiness}
             </p>
           </Reveal>
           <Reveal delay={0.08}>

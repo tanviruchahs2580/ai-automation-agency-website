@@ -29,6 +29,11 @@ say *"they build trustworthy AI systems that run business operations."*
   "drive efficiency".
 - **Sparse** — fewer words, more whitespace; every sentence earns its place.
 
+All disclosure copy lives in `src/data/disclaimers.ts`. Never retype one: the
+same caveat previously appeared in four wordings across badge, card, catalogue
+and this guide, and `src/lib/__tests__/disclaimers.test.ts` now fails if a
+disclosure string appears anywhere else in `src/`.
+
 **Mandatory pattern:** specific number → timeframe → constraint.
 *"Cut incident MTTR by 40–60% within one quarter, without replacing your
 existing stack."*
@@ -51,7 +56,7 @@ mechanical zero.
 | Do | Don't |
 |---|---|
 | "Estimate based on your inputs. Not a guarantee." | "Guaranteed 5× ROI" |
-| "Example architecture — illustrative, not a client system." | Fake client logos, invented metrics |
+| "Example architecture — not a client engagement" (`disclaimers.exampleArchitectureBadge`) | Fake client logos, invented metrics |
 | "Reviewed controls for SOC 2 / ISO 27001 readiness." | "Fully certified" (unless true) |
 | "Including when AI is the wrong tool." | "AI for everything" |
 | Mono labels, sentence case, periods on full sentences only | Exclamation marks, title-case headlines |

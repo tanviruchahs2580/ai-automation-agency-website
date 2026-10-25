@@ -233,3 +233,66 @@ export const engineeringPrinciples = [
     detail: "Code, infrastructure definitions and knowledge transfer to you. Always.",
   },
 ];
+
+/**
+ * The six architecture layers rendered by the `ArchitectureLandscape` scene.
+ *
+ * Content, not component internals — the scene used to own this array, which
+ * meant the `/technology` page could not state how many layers it renders and
+ * had to repeat the number by hand. It said "twelve" at one point while the
+ * component rendered six, and the page now derives both counts from data.
+ *
+ * Not to be confused with `platformLayers` on `/technology`, which describes
+ * the seven components of a deployed stack (router, orchestrator, tools, RAG,
+ * memory, evaluation, observability). These layers describe a system's shape;
+ * the platform stack describes what is installed. The page states that
+ * relationship explicitly, because a reader meeting "six" and "seven" on the
+ * same screen reasonably reads it as an error.
+ */
+export interface ArchitectureLayer {
+  id: string;
+  label: string;
+  /** What this layer guarantees in business terms. */
+  guarantee: string;
+  /** How it is implemented, shown as the mono note. */
+  technical: string;
+}
+
+export const architectureLayers: ArchitectureLayer[] = [
+  {
+    id: "goal",
+    label: "Business Goal",
+    guarantee: "Every layer below moves a named metric — never technology for its own sake.",
+    technical: "Objectives encoded as measurable targets that evaluation suites assert on every release.",
+  },
+  {
+    id: "orchestration",
+    label: "Orchestration",
+    guarantee: "Work follows your process, with retries, timeouts, and escalation paths built in.",
+    technical: "State machines coordinating agents, retries, timeouts and escalation paths.",
+  },
+  {
+    id: "agents",
+    label: "AI Agents",
+    guarantee: "Judgment-heavy steps run around the clock — inside scoped, reviewable bounds.",
+    technical: "Specialized agents with scoped prompts, memory policies and per-task model routing.",
+  },
+  {
+    id: "tools",
+    label: "Tools",
+    guarantee: "Agents touch your systems with least-privilege credentials and approval gates.",
+    technical: "Schema-validated tool registry; consequential actions queue for human sign-off.",
+  },
+  {
+    id: "knowledge",
+    label: "Knowledge",
+    guarantee: "Answers cite your approved content — never invented facts.",
+    technical: "Permission-aware retrieval over vector and keyword indexes with freshness SLAs.",
+  },
+  {
+    id: "governance",
+    label: "Governance",
+    guarantee: "Policy compliance is structural and auditable — every decision leaves a trace.",
+    technical: "Guardrails, PII redaction, RBAC and policy-as-code applied at runtime.",
+  },
+];

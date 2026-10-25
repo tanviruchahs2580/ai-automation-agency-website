@@ -1,4 +1,5 @@
 import { caseStudies } from "@/data/case-studies";
+import { disclaimers } from "@/data/disclaimers";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { CaseStudyCard } from "@/components/ui/Card";
 import { Spotlight } from "@/components/ui/Spotlight";
@@ -24,14 +25,14 @@ export function CaseStudiesPreview() {
             <RevealStaggerItem key={study.slug}>
               <Spotlight className="h-full">
                 <CaseStudyCard
-                  eyebrow="Example architecture"
+                  eyebrow={disclaimers.exampleArchitectureLabel}
                   industry={study.industry}
                   title={study.title}
                   before={study.before[0] ?? "Manual process"}
                   after={study.after[0] ?? "Engineered system"}
+                  layers={study.architecture}
                   meta={`${study.architecture.length} layers · ${study.security.length} controls`}
                   href={`/work/${study.slug}`}
-                  diagramSeed={study.slug}
                 />
               </Spotlight>
             </RevealStaggerItem>

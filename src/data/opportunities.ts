@@ -82,9 +82,9 @@ export const opportunities: Opportunity[] = [
   {
     id: "modernize-legacy",
     label: "Modernize legacy systems",
-    recommendedSystem: "Modernisation Program",
+    recommendedSystem: "Modernization Program",
     summary:
-      "Strangler-pattern modernisation that adds APIs and automation around legacy cores without big-bang risk.",
+      "Strangler-pattern modernization that adds APIs and automation around legacy cores without big-bang risk.",
     flow: ["Legacy Audit", "Interface Layer", "Automated Workflows", "Data Sync", "Incremental Cutover"],
     solutionSlug: "ai-software",
     serviceSlug: "software-engineering",
