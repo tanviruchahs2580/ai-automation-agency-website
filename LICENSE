@@ -1,0 +1,33 @@
+Copyright (c) 2026 VANTIQ SYSTEMS. All rights reserved.
+
+PROPRIETARY AND CONFIDENTIAL.
+
+This repository is published for reference and review. No licence, express or
+implied, is granted to copy, modify, distribute, sublicense, or use any part of
+this software, its source code, its written content, its diagrams, its brand
+assets or its visual design, in whole or in part, without prior written
+permission from the copyright holder.
+
+Specifically, and without limitation:
+
+- The written content — service descriptions, solution architectures, industry
+  analyses, reference architectures and articles — is original work and may not
+  be reproduced or adapted.
+- The brand name, wordmark, colour system, typography system and the design
+  tokens in `src/app/globals.css` are brand assets.
+- The generated diagrams and scenes (`src/components/scenes/`,
+  `src/components/og/`) are original artwork.
+
+Viewing this repository, and using it as a reference for evaluating the
+copyright holder's services, is permitted. Copying it into another product,
+website or codebase is not.
+
+Third-party dependencies remain under their own licences; see `package.json`
+and the respective packages in `node_modules`.
+
+If the intent is to release any part of this work under an open-source licence,
+replace this file with that licence rather than adding one alongside it — an
+ambiguous combination is worse than either choice.
+
+Contact: see the contact channels configured for this site
+(`NEXT_PUBLIC_CONTACT_EMAIL`).
