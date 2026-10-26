@@ -28,7 +28,16 @@ permissions:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Supersede PR runs, never a run on main.
+  #
+  # Superseding is right for a pull request: a newer push makes the previous run
+  # pointless, and re-running is cheap. It is wrong for main, which is the deploy
+  # branch — cancelling there means a merged commit's E2E pass never completed.
+  # That happened on the merge of #19: a concurrent Dependabot run on main took
+  # the concurrency slot and cancelled the E2E job, so the deployed commit was
+  # verified only by the pull request's run. Identical trees (both
+  # 6f18c6e5), so the coverage was real — but that was luck, not design.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
   NEXT_TELEMETRY_DISABLED: "1"
