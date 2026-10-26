@@ -184,13 +184,72 @@ async function hydrate(page) {
   const draft = await page.getByText(/legal review required/i).first().isVisible().catch(() => false);
   record("legal page shows the pending-review banner", draft);
 
-  /* 10. Social card actually resolves as an image. */
-  const ogUrl = await page.goto(`${BASE}/insights`).then(() =>
-    page.locator('meta[property="og:image"]').getAttribute("content"),
-  );
-  const ogResponse = await page.request.get(ogUrl);
-  const ogType = ogResponse.headers()["content-type"] ?? "";
-  record("social card resolves as an image", ogResponse.status() === 200 && ogType.includes("image"), `${ogResponse.status()} ${ogType}`);
+  /* 10. Exactly one call to action in the header, and it says what it does.
+   *
+   * This started as a bug report: the header showed a compact "Start" pill beside
+   * the desktop cluster's "Start a Project", because the pill's `lg:hidden` was
+   * silently ignored (`.btn` declared `display` in unlayered CSS, which outranks
+   * Tailwind's layers). The pill is gone and the cascade is fixed; this asserts
+   * the outcome at every width, so a second header CTA cannot come back unnoticed.
+   */
+  for (const [label, width] of [["desktop", 1440], ["tablet", 900], ["mobile", 412], ["narrow", 320]]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+    await hydrate(page).catch(() => {});
+    const headerCtas = await page.evaluate(() => {
+      const header = document.querySelector("header");
+      if (!header) return null;
+      return [...header.querySelectorAll("a")].filter((a) => {
+        const rect = a.getBoundingClientRect();
+        const style = getComputedStyle(a);
+        return (
+          /start-a-project/i.test(a.getAttribute("href") || "") &&
+          rect.width > 0 &&
+          rect.height > 0 &&
+          style.visibility !== "hidden"
+        );
+      }).map((a) => (a.innerText || "").trim().replace(/\s+/g, " "));
+    });
+    const ok =
+      headerCtas !== null &&
+      (headerCtas.length === 0 ||
+        (headerCtas.length === 1 && headerCtas[0] === "Start a Project"));
+    record(
+      `one header CTA at ${label} (${width}px)`,
+      ok,
+      headerCtas === null ? "no header" : headerCtas.length ? JSON.stringify(headerCtas) : "none (menu + hero carry it)",
+    );
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  /* 11. Social card actually resolves as an image.
+   *
+   * The page advertises an absolute URL built from the site's canonical origin,
+   * which on a local build is `http://localhost:3000` (the fallback) while the
+   * server under test may be on another port. Fetching the advertised URL
+   * directly therefore failed with ECONNREFUSED and crashed the harness — the
+   * harness's bug, not the site's. It now fetches the advertised *path* from the
+   * base under test and reports the advertised origin, so a canonical mismatch is
+   * visible in the output instead of being an unhandled rejection.
+   */
+  await page.goto(`${BASE}/insights`, { waitUntil: "networkidle" });
+  const advertised = await page.locator('meta[property="og:image"]').getAttribute("content");
+  let ogOk = false;
+  let ogDetail = "no og:image meta tag";
+  if (advertised) {
+    try {
+      const parsed = new URL(advertised);
+      const response = await page.request.get(`${BASE}${parsed.pathname}${parsed.search}`, {
+        failOnStatusCode: false,
+      });
+      const type = response.headers()["content-type"] ?? "";
+      ogOk = response.status() === 200 && type.includes("image");
+      ogDetail = `${response.status()} ${type} · advertised origin ${parsed.origin}`;
+    } catch (error) {
+      ogDetail = `request failed: ${error.message}`;
+    }
+  }
+  record("social card resolves as an image", ogOk, ogDetail);
 
   await context.close();
 }

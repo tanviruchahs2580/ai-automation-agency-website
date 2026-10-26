@@ -318,24 +318,25 @@ export function Navbar() {
         </div>
 
         {/*
-          Compact primary CTA for the mobile header.
+          No compact CTA in the mobile header, deliberately.
 
-          Every page family below /start-a-project previously had no visible
-          action on the first screen on a phone: the full-size CTA lives in the
-          desktop-only cluster (<lg:hidden), and the mobile menu has to be opened
-          first. Hidden below 380px, where the logo, this pill and the menu
-          button cannot all fit inside the 320px viewport — the horizontal
-          overflow check in `e2e/quality.spec.ts` asserts that at every width.
+          It used to carry a short "Start" pill, on the argument that a phone had
+          no visible action until the menu was opened. Two problems with that:
+
+          1. It rendered at *every* width. The pill relied on `lg:hidden`, and
+             `.btn` declared `display` in unlayered CSS, which outranks Tailwind's
+             layers — so the utility did nothing and the header showed "Start"
+             beside the desktop cluster's "Start a Project" on wide screens. That
+             cascade hazard is now fixed in `globals.css` (display moved into
+             `@layer components`), but the duplication the pill created was the
+             real complaint.
+          2. It said "Start" while every other route into the funnel says "Start a
+             Project". Two labels for one action is its own small tax on clarity.
+
+          The action is not lost on mobile: every page family now has a primary
+          CTA in its hero, above the fold, and the menu carries a full-width
+          "Start a Project". What mobile loses is a second copy of it in the bar.
         */}
-        <Link
-          href="/start-a-project"
-          aria-label="Start a Project"
-          onClick={() => track(AnalyticsEvent.CtaClick, { location: "nav-start-compact" })}
-          className="btn btn-primary ml-auto me-2 whitespace-nowrap rounded-md px-3.5 max-[379px]:hidden lg:hidden"
-        >
-          Start
-        </Link>
-
         <button
           ref={menuButtonRef}
           type="button"
