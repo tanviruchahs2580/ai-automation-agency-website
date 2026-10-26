@@ -632,7 +632,6 @@ a.card-surface:hover,
 .chip {
   --chip-hue: var(--color-accent);
   --chip-bg: rgba(46, 107, 246, 0.12);
-  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 2.75rem;
@@ -710,7 +709,6 @@ a.card-surface:hover,
 }
 
 .marquee-track {
-  display: flex;
   width: max-content;
   animation: marquee-x 36s linear infinite;
 }
@@ -764,7 +762,6 @@ a.card-surface:hover,
 
 /* Interactive service rows (home) — expand on hover/focus, spring timing. */
 .service-row-grid {
-  display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows var(--duration-slow) var(--ease-spring);
 }
@@ -831,7 +828,6 @@ a.card-surface:hover,
 }
 
 .signal-dot {
-  display: inline-block;
   width: 4px;
   height: 4px;
   border-radius: 9999px;
@@ -851,7 +847,6 @@ a.card-surface:hover,
 }
 
 .signal-loader {
-  display: inline-flex;
   align-items: center;
   gap: 6px;
 }
@@ -970,10 +965,50 @@ a.card-surface:hover,
   transform-origin: right center;
 }
 
+/* ---------- Component display values, in the layer utilities can override -----
+ *
+ * These six classes used to declare `display` in unlayered CSS, and unlayered
+ * CSS beats every Tailwind layer. The consequence is that a display utility on
+ * the same element silently did nothing: `lg:hidden` on a `.btn` rendered the
+ * button at every width — which put two "start a project" CTAs side by side in
+ * the header — and `hidden` on the same element would have been ignored too.
+ *
+ * Only `display` moves into `@layer components`. Everything else these classes
+ * set stays unlayered, so nothing about their appearance changes; what changes is
+ * that a display utility now wins, which is what the author of `lg:hidden`
+ * always intended. `display-cascade.test.ts` asserts that no call site combines
+ * one of these classes with a display utility in a way that would rely on the
+ * old behaviour.
+ */
+@layer components {
+  .chip {
+    display: inline-flex;
+  }
+
+  .marquee-track {
+    display: flex;
+  }
+
+  .service-row-grid {
+    display: grid;
+  }
+
+  .signal-dot {
+    display: inline-block;
+  }
+
+  .signal-loader {
+    display: inline-flex;
+  }
+
+  .btn {
+    display: inline-flex;
+  }
+}
+
 /* ---------- Buttons (mirrors Button.tsx variants) ---------- */
 
 .btn {
-  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
