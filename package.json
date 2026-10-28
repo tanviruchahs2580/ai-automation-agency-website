@@ -24,7 +24,7 @@
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build && npm run check:rendered && npm run check:budget"
   },
   "dependencies": {
-    "framer-motion": "^12.23.0",
+    "framer-motion": "^14.6.0",
     "next": "^16.4.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
