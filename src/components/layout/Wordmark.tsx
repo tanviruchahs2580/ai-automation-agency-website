@@ -104,33 +104,35 @@ function ArkynonSymbol({ className, idBase }: { className?: string; idBase: stri
   );
 }
 
-/* Wordmark geometry — geometric uppercase, uniform 13-unit stroke on a 60-unit
-   cap height, drawn as strokes so the weight stays perfectly even. The A keeps
-   the approved orange counter accent (filled triangle). viewBox 0 0 336 64. */
+/* Wordmark geometry — geometric uppercase, uniform 16-unit stroke on a 54-unit
+   cap height, drawn as strokes so the weight stays perfectly even (bolded
+   after owner review: the 13-unit first draft read spindly and non-uniform at
+   header sizes). The A keeps the approved orange counter accent (filled
+   triangle). viewBox 0 0 368 64. */
 function ArkynonWordmark({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 336 64"
+      viewBox="0 0 368 64"
       fill="none"
       aria-hidden="true"
       className={className}
     >
-      <g stroke="currentColor" strokeWidth="13" strokeLinecap="butt" strokeLinejoin="miter">
+      <g stroke="currentColor" strokeWidth="16" strokeLinecap="butt" strokeLinejoin="miter">
         {/* A */}
-        <path d="M8 60 L31 6 L54 60" />
+        <path d="M8 60 L32 6 L56 60" />
         {/* R */}
-        <path d="M70 60 L70 6 L91 6 A14 14 0 0 1 91 34 L70 34 M91 34 L110 60" />
+        <path d="M72 60 L72 14 L96 14 A14 14 0 0 1 96 42 L72 42 M98 42 L118 60" />
         {/* K */}
-        <path d="M124 60 L124 6 M166 6 L130 34 M141 26 L168 60" />
+        <path d="M132 60 L132 6 M176 6 L138 36 M152 28 L180 60" />
         {/* Y */}
-        <path d="M180 6 L202 33 L224 6 M202 33 L202 60" />
+        <path d="M192 6 L214 33 L236 6 M214 33 L214 60" />
         {/* O — rounded-square ring, as in the reference */}
-        <rect x="241.5" y="12.5" width="29" height="41" rx="14.5" />
+        <rect x="258" y="14" width="34" height="38" rx="17" />
         {/* N */}
-        <path d="M286 60 L286 6 L330 60 L330 6" />
+        <path d="M314 60 L314 6 L356 60 L356 6" />
       </g>
       {/* the approved orange accent inside the A counter */}
-      <path d="M22.5 60 L31 42 L39.5 60 Z" fill="#f97e26" />
+      <path d="M20 60 L32 34 L44 60 Z" fill="#f97e26" />
     </svg>
   );
 }

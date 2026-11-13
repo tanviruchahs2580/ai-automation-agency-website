@@ -22,8 +22,8 @@ export function Hero() {
             <span>AI Engineering &amp; Automation — Architecture first</span>
           </p>
           <h1 className="text-hero">
-            The autonomous operations layer for enterprises that{" "}
-            <span className="text-key">cannot afford guesswork.</span>
+            Build the AI systems your business{" "}
+            <span className="text-key">actually needs.</span>
           </h1>
           <p className="lead mt-6">
             {siteConfig.proseName} designs, engineers, and operates the systems that
