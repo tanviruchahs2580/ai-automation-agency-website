@@ -166,31 +166,6 @@ const darkTokens = tokensFrom("@theme {");
 const lightTokens = new Map([...darkTokens, ...tokensFrom('[data-theme="light"] {')]);
 
 /**
- * Splits a comma-separated CSS value at top level only, so commas inside
- * `color-mix(...)` or `var(...)` do not split a single stop into fragments. A
- * regex cannot do this reliably: a negative lookahead for "comma not followed
- * by a closing paren" also fires on nested parentheses, which is exactly how an
- * earlier version of this test ended up trying to parse `color-mix(in srgb`.
- */
-function splitTopLevel(value: string): string[] {
-  const parts: string[] = [];
-  let depth = 0;
-  let current = "";
-  for (const char of value) {
-    if (char === "(") depth += 1;
-    else if (char === ")") depth -= 1;
-    if (char === "," && depth === 0) {
-      parts.push(current.trim());
-      current = "";
-      continue;
-    }
-    current += char;
-  }
-  if (current.trim()) parts.push(current.trim());
-  return parts;
-}
-
-/**
  * Extracts the resolved `background` value of every rule whose selector
  * matches, in a given theme. The Keystone `.btn-primary` is a solid token
  * fill; the Keystone identity keeps it that way (see the gradient guard
@@ -223,8 +198,6 @@ function inkOnAccent(tokens: TokenMap, themeName: "dark" | "light"): Rgb {
   }
   throw new Error(".ink-on-accent rule not found for theme " + themeName);
 }
-
-const WHITE: Rgb = { r: 255, g: 255, b: 255, a: 1 };
 
 /* ---------- assertions ---------- */
 

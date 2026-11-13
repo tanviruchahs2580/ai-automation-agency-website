@@ -344,7 +344,7 @@ export function ROICalculator() {
             onClick={() =>
               track(AnalyticsEvent.CtaClick, { location: "roi-calculator" })
             }
-            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-press sm:w-auto"
+            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium ink-on-accent transition-colors duration-150 hover:bg-accent-press sm:w-auto"
           >
             Validate These Numbers With An Engineer
           </Link>

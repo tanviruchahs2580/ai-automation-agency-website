@@ -64,29 +64,32 @@
 }
 
 @theme {
-  /* Design tokens — "Operator's Console" graphite system */
-  --color-canvas: #0a0b0e;
-  --color-surface: #10131a;
-  --color-surface2: #171b24;
-  --color-line: rgba(244, 242, 236, 0.09);
-  --color-line-strong: rgba(244, 242, 236, 0.16);
-  --color-ink: #f4f2ec;
-  --color-muted: #a3a9b4;
-  --color-faint: #7d8494; /* WCAG AA: >=4.5:1 on all surface tokens */
-  --color-accent: #2e6bf6;
-  --color-accent-strong: #5285ff;
-  --color-accent-bright: #9db4ff; /* small text on dark surfaces (AA ≥4.5) */
+  /* Design tokens — "Keystone" warm-ink system (ARKYON, 2026-11).
+     Copper is the single signal accent: the wedge that completes an arch.
+     Green stays strictly semantic (live/verified), never decorative. */
+  --color-canvas: #0f0d0c;
+  --color-surface: #171412;
+  --color-surface2: #221d1a;
+  --color-line: rgba(244, 240, 234, 0.09);
+  --color-line-strong: rgba(244, 240, 234, 0.16);
+  --color-ink: #f4f0ea;
+  --color-muted: #a8a19a;
+  --color-faint: #8d867e; /* WCAG AA: >=4.5:1 on all surface tokens */
+  --color-accent: #e0874a;
+  --color-accent-strong: #eda06b;
+  --color-accent-bright: #f2b98b; /* small text on dark surfaces (AA ≥4.5) */
   /* Pressed/hover fill for solid accent surfaces. Deliberately DARKER than
-     --color-accent, not lighter: white label text on #2e6bf6 already measures
-     4.62:1 — the tightest pass on the site — so any lighter hover state fails
-     WCAG AA. See .btn-primary and the `hover:bg-accent-press` utilities. */
-  --color-accent-press: #2456cc;
+     --color-accent, not lighter: the primary button pairs a near-black warm
+     ink label (#140d08) with the copper fill (#e0874a ≈ 6.2:1); any lighter
+     hover fill reduces that margin. See .btn-primary and the
+     `hover:bg-accent-press` utilities. */
+  --color-accent-press: #c96f33;
   /* Boundary of *interactive controls only*. WCAG 1.4.11 requires 3:1 against
      the adjacent colours to identify a control, which a 9%-alpha hairline
      cannot reach (it composites to ~1.2:1 on the field fill). This token
      composites to ≥3:1 against both the field fill and the page background, and
      is never used for decorative rules. */
-  --color-field: rgba(244, 242, 236, 0.4);
+  --color-field: rgba(244, 240, 234, 0.4);
   --color-ok: #34d399;
   --color-warn: #f5b73d;
   --color-critical: #f87171;
@@ -95,8 +98,8 @@
   /* Signature tokens — see DESIGN-SYSTEM.md §2 for usage rules */
   --color-signal: #00e5a8; /* live / verified / running ONLY */
   --color-brass: #b7a36a; /* considered / reviewed / curated ONLY */
-  --color-accent-glow: rgba(46, 107, 246, 0.18); /* halo, max 1 per viewport */
-  --color-grid-line: rgba(244, 242, 236, 0.04);
+  --color-accent-glow: rgba(224, 135, 74, 0.16); /* halo, max 1 per viewport */
+  --color-grid-line: rgba(244, 240, 234, 0.04);
 
   /* Radius scale — restrained enterprise geometry */
   --radius-md: 0.65rem;
@@ -156,31 +159,35 @@
 
 /* ---------- Light theme tokens (fully designed, not inverted) ---------- */
 [data-theme="light"] {
-  --color-canvas: #ffffff;
-  --color-surface: #f8f9fa;
-  --color-surface2: #e9ecef;
-  --color-line: rgba(0, 0, 0, 0.08);
-  --color-line-strong: rgba(0, 0, 0, 0.15);
-  --color-ink: #111827;
-  --color-muted: #374151;
-  /* Distinct from --color-muted. Both were #374151, which collapsed the
-     two-level text hierarchy into one level everywhere `faint` is used (about
-     30 call sites at 11–11.5px). #5b6472 keeps them distinguishable and still
-     measures 5.98:1 on white / 5.04:1 on --color-surface2. */
-  --color-faint: #5b6472;
-  --color-accent: #2563eb;
-  --color-accent-strong: #1d4ed8;
-  --color-accent-bright: #1d4ed8;
-  --color-accent-press: #1d4ed8;
-  --color-field: rgba(0, 0, 0, 0.45);
+  /* Warm paper, not clinical white: the Keystone identity reads as engineered
+     material (ink on paper), not as a SaaS dashboard. */
+  --color-canvas: #faf7f2;
+  --color-surface: #f2ede5;
+  --color-surface2: #e6dfd4;
+  --color-line: rgba(28, 20, 12, 0.1);
+  --color-line-strong: rgba(28, 20, 12, 0.18);
+  --color-ink: #1c1611;
+  --color-muted: #4d453c;
+  /* Distinct from --color-muted (two-level text hierarchy). #645b50 measures
+     6.28:1 on canvas / 5.77:1 on surface / 5.13:1 on surface2. */
+  --color-faint: #645b50;
+  --color-accent: #b45418;
+  --color-accent-strong: #93430f;
+  --color-accent-bright: #93430f;
+  --color-accent-press: #8f3e10;
+  /* Warm paper surfaces are darker than the old clinical grey, so the control
+     boundary needs more ink: 0.45 composites to 2.86:1 on canvas (fails WCAG
+     1.4.11); 0.6 measures 4.77:1 on canvas / 4.41:1 on surface2. Enforced by
+     contrast.test.ts. */
+  --color-field: rgba(28, 20, 12, 0.6);
   --color-ok: #047857;
   --color-warn: #92400e;
   --color-critical: #b91c1c;
   --color-info: #0369a1;
   --color-signal: #047857;
   --color-brass: #7a6230;
-  --color-accent-glow: rgba(37, 99, 235, 0.12);
-  --color-grid-line: rgba(0, 0, 0, 0.04);
+  --color-accent-glow: rgba(180, 84, 24, 0.12);
+  --color-grid-line: rgba(28, 20, 12, 0.045);
 }
 
 @layer base {
@@ -245,18 +252,18 @@
     background:
       radial-gradient(
         64rem 30rem at 50% -10%,
-        rgba(46, 107, 246, 0.065),
+        rgba(224, 135, 74, 0.055),
         transparent 62%
       ),
       radial-gradient(
         44rem 22rem at 108% 4%,
-        rgba(0, 229, 168, 0.03),
+        rgba(183, 163, 106, 0.03),
         transparent 58%
       ),
       linear-gradient(
         to bottom,
         transparent 82%,
-        rgba(10, 11, 14, 0.5) 100%
+        rgba(15, 13, 12, 0.5) 100%
       );
   }
 
@@ -264,29 +271,29 @@
     background:
       radial-gradient(
         64rem 30rem at 50% -10%,
-        rgba(37, 99, 235, 0.05),
+        rgba(180, 84, 24, 0.05),
         transparent 62%
       ),
       radial-gradient(
         44rem 22rem at 108% 4%,
-        rgba(4, 120, 87, 0.025),
+        rgba(122, 98, 48, 0.025),
         transparent 58%
       ),
       linear-gradient(
         to bottom,
         transparent 86%,
-        rgba(241, 243, 246, 0.7) 100%
+        rgba(250, 247, 242, 0.7) 100%
       );
   }
 
   ::selection {
-    background: rgba(46, 107, 246, 0.35);
+    background: rgba(224, 135, 74, 0.35);
     color: #fff;
   }
 
   [data-theme="light"] ::selection {
-    background: rgba(37, 99, 235, 0.22);
-    color: #111827;
+    background: rgba(180, 84, 24, 0.22);
+    color: #1c1611;
   }
 
   :focus-visible {
@@ -535,17 +542,17 @@ a.card-surface:hover,
   background:
     radial-gradient(
       42rem 22rem at 12% -6%,
-      rgba(46, 107, 246, 0.1),
+      rgba(224, 135, 74, 0.09),
       transparent 62%
     ),
     radial-gradient(
       34rem 20rem at 88% 8%,
-      rgba(0, 229, 168, 0.055),
+      rgba(183, 163, 106, 0.05),
       transparent 60%
     ),
     radial-gradient(
       50rem 26rem at 55% 110%,
-      rgba(46, 107, 246, 0.07),
+      rgba(224, 135, 74, 0.06),
       transparent 65%
     );
   -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
@@ -556,12 +563,12 @@ a.card-surface:hover,
   background:
     radial-gradient(
       42rem 22rem at 12% -6%,
-      rgba(37, 99, 235, 0.08),
+      rgba(180, 84, 24, 0.07),
       transparent 62%
     ),
     radial-gradient(
       34rem 20rem at 88% 8%,
-      rgba(4, 120, 87, 0.06),
+      rgba(122, 98, 48, 0.05),
       transparent 60%
     );
 }
@@ -601,7 +608,7 @@ a.card-surface:hover,
   transition: opacity var(--duration-base) var(--ease-out-soft);
   background: radial-gradient(
     15rem circle at var(--mx, 50%) var(--my, 50%),
-    rgba(82, 133, 255, 0.14),
+    rgba(237, 160, 107, 0.14),
     transparent 68%
   );
 }
@@ -610,28 +617,22 @@ a.card-surface:hover,
   opacity: 1;
 }
 
-/* Gradient text — accent → signal; darker stops in light theme. */
-.text-gradient {
-  background: linear-gradient(
-    100deg,
-    var(--color-accent-strong) 10%,
-    var(--color-signal) 90%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Key phrase — the one copper phrase in a headline. Solid colour, not a
+   gradient: a two-stop text gradient is decoration with no information, and
+   the Keystone identity signals with one hue. #eda06b on canvas ≈ 8.0:1 and
+   on paper the light-theme stop ≈ 6.6:1 — passes AA at any heading size. */
+.text-key {
+  color: var(--color-accent-strong);
 }
 
-[data-theme="light"] .text-gradient {
-  background: linear-gradient(100deg, #1d4ed8 10%, #047857 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
+[data-theme="light"] .text-key {
+  color: var(--color-accent-strong);
 }
 
 /* Icon chips — 40–44px, per-domain hue tint. Hues stay semantic. */
 .chip {
   --chip-hue: var(--color-accent);
-  --chip-bg: rgba(46, 107, 246, 0.12);
+  --chip-bg: rgba(224, 135, 74, 0.12);
   align-items: center;
   justify-content: center;
   width: 2.75rem;
@@ -664,7 +665,7 @@ a.card-surface:hover,
 }
 
 [data-theme="light"] .chip {
-  --chip-bg: rgba(37, 99, 235, 0.08);
+  --chip-bg: rgba(180, 84, 24, 0.08);
 }
 
 [data-theme="light"] .chip[data-hue="signal"] {
@@ -806,10 +807,12 @@ a.card-surface:hover,
   top: 0;
   bottom: 0;
   border-radius: inherit;
+  /* Copper ramp within one hue — a band on a scale is a value range, so it
+     stays monochrome rather than becoming a two-hue decoration. */
   background: linear-gradient(
     90deg,
     var(--color-accent-strong),
-    var(--color-signal)
+    var(--color-accent-press)
   );
 }
 
@@ -1026,49 +1029,60 @@ a.card-surface:hover,
 
 .btn-primary {
   /*
-    Top-lit surface: a soft vertical gradient plus an inner hairline highlight.
+    Keystone primary: a solid copper fill with a near-black warm-ink label —
+    the identity's signature control. Ink-on-copper measures ~6.2:1
+    (#140d08 on #e0874a), comfortably clearing WCAG AA (4.5:1) with room for
+    the hover state, unlike the previous white-on-blue pairing whose 4.62:1
+    was the tightest pass on the site.
 
-    Both stops are chosen so white 14px/500 label text clears WCAG AA (4.5:1)
-    at *every* point of the gradient, not just at the bottom. The previous
-    version lightened the top stop with `color-mix(… 88%, #fff)`, producing
-    rgb(103,148,255) = 2.89:1 and a mid-gradient value of 3.66:1 — the primary
-    call to action on every page failed AA, and no automated gate could see it
-    because axe cannot evaluate gradient backgrounds (it reports them as
-    "incomplete", never as a violation). Verified by
+    A solid fill, not a gradient: axe cannot evaluate gradient backgrounds
+    (it reports them as "incomplete", never as a violation), and the previous
+    gradient demonstrably shipped a 2.89:1 state before the contrast tests
+    caught it. A single token fill is checkable by construction. Verified by
     `src/lib/__tests__/contrast.test.ts`, which parses this rule out of the
-    stylesheet and asserts the ratio for every stop.
+    stylesheet and asserts the ratio.
   */
-  background: linear-gradient(to bottom, var(--color-accent), var(--color-accent-press));
-  color: #fff;
+  background: var(--color-accent);
+  color: #140d08;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
     0 1px 3px rgba(0, 0, 0, 0.28);
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
 }
 
 .btn-primary:hover {
-  /* Darkens rather than brightens — brightening broke AA. The hover affordance
-     is carried by the accent glow ring and the deeper fill. */
-  background: linear-gradient(
-    to bottom,
-    var(--color-accent-press),
-    color-mix(in srgb, var(--color-accent-press) 82%, #000)
-  );
+  /* Darkens rather than brightens — brightening erodes the ink-label ratio.
+     The hover affordance is carried by the accent glow ring and the deeper
+     fill (#c96f33 keeps ~5.5:1 against the same ink label). */
+  background: var(--color-accent-press);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1),
     0 1px 3px rgba(0, 0, 0, 0.3),
     0 0 0 4px var(--color-accent-glow);
 }
 
 [data-theme="light"] .btn-primary {
-  background: linear-gradient(to bottom, var(--color-accent), var(--color-accent-strong));
-  text-shadow: none;
+  background: var(--color-accent);
+  color: #fffaf4;
 }
 
 [data-theme="light"] .btn-primary:hover {
-  background: linear-gradient(to bottom, var(--color-accent-press), var(--color-accent-press));
+  background: var(--color-accent-press);
+}
+
+/* Label colour for text sitting directly on an accent fill.
+   The copper fill pairs with a near-black warm ink in dark theme (~6.2:1) and
+   with warm paper white in light theme (~4.7:1) — a fixed `text-white` cannot
+   straddle both themes, so every accent-filled control labels itself with this
+   class instead. Mirrors .btn-primary; kept as a separate utility for call
+   sites that size themselves with Tailwind rather than taking .btn. */
+.ink-on-accent {
+  color: #140d08;
+}
+
+[data-theme="light"] .ink-on-accent {
+  color: #fffaf4;
 }
 
 .btn-quiet {

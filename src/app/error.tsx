@@ -84,7 +84,7 @@ export default function RouteError({
           <button
             type="button"
             onClick={reset}
-            className="inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-press"
+            className="inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium ink-on-accent transition-colors duration-150 hover:bg-accent-press"
           >
             Try Again
           </button>

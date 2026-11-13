@@ -35,8 +35,8 @@ export default function GlobalError({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0a0b0e",
-          color: "#f4f2ec",
+          background: "#0f0d0c",
+          color: "#f4f0ea",
           fontFamily: "system-ui, -apple-system, sans-serif",
         }}
       >
@@ -46,7 +46,7 @@ export default function GlobalError({
               letterSpacing: "0.25em",
               fontSize: 12,
               fontWeight: 700,
-              color: "#7d8494",
+              color: "#8d867e",
               textTransform: "uppercase",
             }}
           >
@@ -55,7 +55,7 @@ export default function GlobalError({
           <h1 style={{ fontSize: "1.8rem", margin: "1.1rem 0 0.6rem" }}>
             Something went wrong on our side.
           </h1>
-          <p style={{ color: "#a3a9b4", lineHeight: 1.65, margin: 0 }}>
+          <p style={{ color: "#a8a19a", lineHeight: 1.65, margin: 0 }}>
             <span style={{ fontFamily: "monospace", fontSize: 13, color: "#f87171" }}>
               500 — server error.
             </span>
@@ -64,7 +64,7 @@ export default function GlobalError({
             {contactEmail ? (
               <>
                 Please try again — if it keeps happening, email{" "}
-                <a href={`mailto:${contactEmail}`} style={{ color: "#2e6bf6" }}>
+                <a href={`mailto:${contactEmail}`} style={{ color: "#eda06b" }}>
                   {contactEmail}
                 </a>{" "}
                 and we will follow up directly.
@@ -72,7 +72,7 @@ export default function GlobalError({
             ) : (
               <>
                 Please try again — if it keeps happening,{" "}
-                <a href="/start-a-project" style={{ color: "#2e6bf6" }}>
+                <a href="/start-a-project" style={{ color: "#eda06b" }}>
                   send us the reference below
                 </a>{" "}
                 through the project brief form.
@@ -83,7 +83,7 @@ export default function GlobalError({
             style={{
               marginTop: "1.2rem",
               fontSize: 12,
-              color: "#7d8494",
+              color: "#8d867e",
               fontFamily: "monospace",
             }}
           >
@@ -95,7 +95,7 @@ export default function GlobalError({
               style={{
                 marginTop: "1.2rem",
                 fontSize: 12,
-                color: "#7d8494",
+                color: "#8d867e",
                 fontFamily: "monospace",
               }}
             >
@@ -106,8 +106,8 @@ export default function GlobalError({
             onClick={reset}
             style={{
               marginTop: "1.8rem",
-              background: "#2e6bf6",
-              color: "#ffffff",
+              background: "#e0874a",
+              color: "#140d08",
               border: "none",
               borderRadius: 6,
               padding: "0.7rem 1.5rem",

@@ -5,14 +5,16 @@ import { cn } from "@/lib/utils";
 /**
  * Brand wordmark.
  *
- * The lockup is an abstract "precision bracket" mark (chevron + rule + signal
- * dot, accent stroked) beside the brand set in the display face, with any
- * trailing word set in mono.
+ * The lockup is the Keystone mark — an architectural arch with the keystone
+ * wedge seated at its apex — beside the brand set in the display face, with any
+ * trailing word set in mono. The keystone is the brand's whole argument in one
+ * glyph: the engineered piece that makes an unstable assembly hold.
  *
- * The mark is deliberately an abstract device rather than a letterform. It was
- * drawn to read as a "V", which meant that changing the brand name would have
+ * The mark is deliberately an abstract device rather than a letterform. The
+ * previous mark read as a "V", which meant changing the brand name would have
  * left a mark spelling the wrong letter next to it — the kind of coupling that
- * turns a rebrand into an illustration job instead of a config change.
+ * turns a rebrand into an illustration job instead of a config change. An arch
+ * names no letter and stays correct for any future rename.
  *
  * The name is read from `siteConfig`: the first word is display-set and the
  * remainder is mono, so any two-part name works without touching this file.
@@ -40,20 +42,15 @@ export function Wordmark({ compact = false }: { compact?: boolean }) {
         aria-hidden="true"
         className="relative transition-all duration-200"
       >
+        {/* Arch: pillars + shoulders, apex deliberately open for the wedge. */}
         <path
-          d="M5 6.5 16 25.5 27 6.5"
-          stroke="var(--color-accent)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          d="M6.5 26V17a9.5 9.5 0 0 1 5.94-8.81M19.56 8.19A9.5 9.5 0 0 1 25.5 17v9"
+          stroke="var(--color-muted)"
+          strokeWidth="2.2"
+          strokeLinecap="square"
         />
-        <path
-          d="M10.5 6.5h11"
-          stroke="var(--color-ink)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <circle cx="16" cy="25.5" r="2" fill="var(--color-signal)" />
+        {/* Keystone — the one copper element in the lockup. */}
+        <path d="M12.2 4h7.6l-1.4 5h-4.8z" fill="var(--color-accent)" />
       </svg>
       <span className="flex items-baseline gap-2">
         <span
