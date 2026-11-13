@@ -38,11 +38,15 @@ Date: 2026-11-13 · Branch `feat/arkyon-rebrand-frontend-v3` · base `27b566c` �
 
 ## 3. Owner decisions required before production release
 
-1. **Independent human review** of the final diff (gate above) — the only unsatisfied hard gate.
-2. **Push/PR authorisation** — the branch is local-only (D-09). On push, CI re-runs all gates.
-3. **Production deploy authorisation** (Vercel; merge → auto-deploy per current CD note in ci.yml).
-4. Pre-deploy environment inputs (names only): `NEXT_PUBLIC_SITE_URL` (production origin), `NEXT_PUBLIC_CONTACT_EMAIL`/`NEXT_PUBLIC_MEETING_LINK`, `RESEND_API_KEY`+`BRIEF_NOTIFICATION_EMAIL` (or intentionally receipt-only), `CSP_MODE=enforce` (recommended follow-up after preview validation), `NEXT_PUBLIC_LEGAL_REVIEWED` only after legal review.
-5. Standing owner items from the registers: legal review of policies (F-08), custom-domain decision (F-11), named-portfolio publication evidence (F-05), trademark counsel for the ARKYON name/mark (F-10).
+**Status update 2026-11-14:** the owner authorized execution of the release pipeline (D-16): push → PR → CI → merge → Vercel production deploy, with the independent-review gate waived knowingly (recorded as waiver, not PASS) and a live user-style functional test added as a release step. The items below therefore convert from *pending decisions* to *executed/recorded*:
+
+1. ~~Independent human review~~ → **WAIVED by owner, informed of BLOCKED status (D-16).**
+2. ~~Push/PR authorisation~~ → **AUTHORIZED (D-16)**; branch pushed, PR opened, CI gates must pass before merge.
+3. ~~Production deploy authorisation~~ → **AUTHORIZED (D-16)**; merge-to-main triggers Vercel production deploy (existing CD behaviour).
+4. Pre-deploy environment inputs (names only): `NEXT_PUBLIC_SITE_URL` (production origin), `NEXT_PUBLIC_CONTACT_EMAIL`/`NEXT_PUBLIC_MEETING_LINK`, `RESEND_API_KEY`+`BRIEF_NOTIFICATION_EMAIL` (or intentionally receipt-only), `CSP_MODE=enforce` (recommended follow-up after preview validation), `NEXT_PUBLIC_LEGAL_REVIEWED` only after legal review — **unchanged by this release; Vercel-side values remain the owner's, and none are modified by the pipeline.**
+5. Standing owner items from the registers: legal review of policies (F-08), custom-domain decision (F-11), named-portfolio publication evidence (F-05), trademark counsel for the ARKYON name/mark (F-10) — **remain open**, none block this deploy (DraftBanner + honest vocabulary keep the site truthful without them).
+
+Live post-deploy verification is recorded in RELEASE-RECORD (this folder) after execution: smoke results, honeypot-sink intake test, brand-surface checks, sync confirmation (codebase == git == GitHub == production commit).
 
 ## 4. What this release changes for visitors (summary)
 
