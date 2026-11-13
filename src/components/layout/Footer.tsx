@@ -20,7 +20,7 @@ export function Footer() {
       <div className="container-x relative py-14">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
-            <Wordmark />
+            <Wordmark variant="footer" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
               We design, build, deploy and operate intelligent systems that make
               businesses faster, safer and more autonomous.

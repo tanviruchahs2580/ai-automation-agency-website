@@ -74,11 +74,11 @@ export function OgCard({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            border: `3px solid ${ACCENT}`,
+            border: `3px solid #ff8a34`,
             borderRadius: 12,
             fontSize: 36,
             fontWeight: 700,
-            color: ACCENT,
+            color: "#ff8a34",
           }}
         >
           {siteConfig.name.charAt(0)}
@@ -86,12 +86,30 @@ export function OgCard({
         <div
           style={{
             display: "flex",
-            fontSize: 30,
-            fontWeight: 700,
-            letterSpacing: 10,
+            flexDirection: "column",
+            gap: 6,
           }}
         >
-          {siteConfig.name}
+          <div
+            style={{
+              display: "flex",
+              fontSize: 30,
+              fontWeight: 700,
+              letterSpacing: 10,
+            }}
+          >
+            {siteConfig.name}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 11,
+              letterSpacing: 4,
+              color: MUTED,
+            }}
+          >
+            AI ENGINEERING &amp; AUTOMATION
+          </div>
         </div>
       </div>
 
