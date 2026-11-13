@@ -23,8 +23,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0b0e" },
+    { media: "(prefers-color-scheme: light)", color: "#faf7f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f0d0c" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -41,12 +41,14 @@ export default function RootLayout({
           server'd dark markup never flashes for light-theme visitors, and
           records the platform so keyboard-shortcut hints can name a key that
           actually exists on the visitor's keyboard (⌘ vs Ctrl). Single source
-          of truth shared with ThemeToggle: localStorage["vantiq-theme"],
-          else OS preference, else dark.
+          of truth shared with ThemeToggle: localStorage["arkyon-theme"], with
+          a one-time fallback read of the pre-rename "vantiq-theme" key so an
+          existing visitor's theme survives the rename; else OS preference,
+          else dark.
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem("vantiq-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}d.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}try{document.documentElement.setAttribute("data-platform",/mac|iphone|ipad/i.test(navigator.userAgent)?"mac":"other")}catch(e){}})();`,
+            __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem("arkyon-theme");if(!t){t=localStorage.getItem("vantiq-theme")}if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}d.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}try{document.documentElement.setAttribute("data-platform",/mac|iphone|ipad/i.test(navigator.userAgent)?"mac":"other")}catch(e){}})();`,
           }}
         />
         {/*
@@ -76,7 +78,7 @@ export default function RootLayout({
       <body className="min-h-screen antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:text-white"
+          className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:ink-on-accent"
         >
           Skip to main content
         </a>

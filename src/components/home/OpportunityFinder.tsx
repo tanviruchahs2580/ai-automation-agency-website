@@ -72,7 +72,7 @@ export function OpportunityFinder() {
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
                 href={`/solutions/${selected.solutionSlug}`}
-                className="inline-flex min-h-11 items-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-press"
+                className="inline-flex min-h-11 items-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium ink-on-accent transition-colors hover:bg-accent-press"
               >
                 Explore this solution
               </Link>

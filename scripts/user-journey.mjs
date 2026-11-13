@@ -135,7 +135,7 @@ async function hydrate(page) {
   await page.getByRole("button", { name: /switch to light|switch to dark|theme/i }).first().click();
   await page.waitForTimeout(400);
   const theme = await page.evaluate(() => document.documentElement.dataset.theme);
-  const stored = await page.evaluate(() => localStorage.getItem("vantiq-theme"));
+  const stored = await page.evaluate(() => localStorage.getItem("arkyon-theme"));
   record("theme toggle switches and persists", theme === stored, `theme=${theme} stored=${stored}`);
 
   /*

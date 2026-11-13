@@ -7,7 +7,15 @@
  * and the failure mode is analytics running for someone who declined.
  */
 
-export const CONSENT_KEY = "vantiq-cookie-consent";
+export const CONSENT_KEY = "arkyon-cookie-consent";
+
+/**
+ * Key used before the 2026-11 ARKYON rename. Read once as a fallback so a
+ * returning visitor's recorded consent decision survives the rename — a bare
+ * key swap would silently reset every existing choice, which is a consent
+ * regression, not a rebrand.
+ */
+export const LEGACY_CONSENT_KEY = "vantiq-cookie-consent";
 
 export type ConsentValue = "accepted" | "declined";
 
@@ -18,7 +26,10 @@ export type ConsentValue = "accepted" | "declined";
  */
 export function readConsent(): string | null {
   try {
-    return window.localStorage.getItem(CONSENT_KEY);
+    return (
+      window.localStorage.getItem(CONSENT_KEY) ??
+      window.localStorage.getItem(LEGACY_CONSENT_KEY)
+    );
   } catch {
     return null;
   }

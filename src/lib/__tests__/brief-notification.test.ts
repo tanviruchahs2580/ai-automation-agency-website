@@ -25,8 +25,8 @@ const validBrief = projectBriefSchema.parse({
 
 const configuredEnv = {
   RESEND_API_KEY: "test-key",
-  BRIEF_NOTIFICATION_EMAIL: "hello@vantiqsystems.example",
-  BRIEF_NOTIFICATION_FROM: "VANTIQ SYSTEMS <briefs@vantiqsystems.example>",
+  BRIEF_NOTIFICATION_EMAIL: "hello@arkyon.example",
+  BRIEF_NOTIFICATION_FROM: "ARKYON <briefs@arkyon.example>",
 };
 
 const fetchMock = () =>

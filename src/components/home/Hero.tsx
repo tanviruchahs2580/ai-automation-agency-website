@@ -23,7 +23,7 @@ export function Hero() {
           </p>
           <h1 className="text-hero">
             The autonomous operations layer for enterprises that{" "}
-            <span className="text-gradient">cannot afford guesswork.</span>
+            <span className="text-key">cannot afford guesswork.</span>
           </h1>
           <p className="lead mt-6">
             {siteConfig.proseName} designs, engineers, and operates the systems that

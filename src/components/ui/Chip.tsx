@@ -4,48 +4,54 @@ export type ChipHue = "accent" | "signal" | "brass" | "sky" | "amber";
 
 /**
  * Domain presentation map — slug → icon chip identity.
- * Keys are identifiers, hues stay semantic (never random):
- * accent = primary capability · signal = live/autonomous · brass = curated/
- * governed · sky = data/interface · amber = operational/physical.
- * No user-facing copy lives here.
+ *
+ * Hue history: the map originally rotated five hues ("sky = data/interface",
+ * "amber = operational/physical", …). The 2026-11 design review correctly
+ * called that decoration: a hue code no visitor can decode, importing a blue
+ * that exists nowhere else in the Keystone palette. Card chips are now
+ * single-hue copper — the card numerals and mono labels already carry the
+ * structure, and the accent stays a signal. The hue field and type remain so
+ * a future genuinely-semantic use (e.g. state chips) has a home.
  */
 const bySlug: Record<string, { icon: IconName; hue: ChipHue }> = {
   // Services
   "ai-strategy": { icon: "compass", hue: "accent" },
-  "ai-engineering": { icon: "cpu", hue: "signal" },
-  automation: { icon: "workflow", hue: "amber" },
-  "software-engineering": { icon: "code", hue: "sky" },
-  "data-ai-infrastructure": { icon: "database", hue: "brass" },
+  "ai-engineering": { icon: "cpu", hue: "accent" },
+  automation: { icon: "workflow", hue: "accent" },
+  "software-engineering": { icon: "code", hue: "accent" },
+  "data-ai-infrastructure": { icon: "database", hue: "accent" },
   security: { icon: "shield", hue: "accent" },
-  "ai-operations": { icon: "gauge", hue: "signal" },
+  "ai-operations": { icon: "gauge", hue: "accent" },
   // Solutions
-  "ai-agents": { icon: "cpu", hue: "signal" },
-  "workflow-automation": { icon: "workflow", hue: "amber" },
-  "ai-software": { icon: "code", hue: "sky" },
+  "ai-agents": { icon: "cpu", hue: "accent" },
+  "workflow-automation": { icon: "workflow", hue: "accent" },
+  "ai-software": { icon: "code", hue: "accent" },
   "enterprise-ai": { icon: "layers", hue: "accent" },
-  "private-ai": { icon: "lock", hue: "brass" },
+  "private-ai": { icon: "lock", hue: "accent" },
   "ai-transformation": { icon: "compass", hue: "accent" },
   // Industries
   "financial-services": { icon: "bank", hue: "accent" },
-  healthcare: { icon: "health", hue: "signal" },
-  manufacturing: { icon: "factory", hue: "amber" },
-  retail: { icon: "cart", hue: "sky" },
-  logistics: { icon: "truck", hue: "brass" },
+  healthcare: { icon: "health", hue: "accent" },
+  manufacturing: { icon: "factory", hue: "accent" },
+  retail: { icon: "cart", hue: "accent" },
+  logistics: { icon: "truck", hue: "accent" },
   "saas-technology": { icon: "code", hue: "accent" },
-  agriculture: { icon: "globe", hue: "signal" },
-  education: { icon: "doc", hue: "sky" },
-  "real-estate": { icon: "bank", hue: "brass" },
+  agriculture: { icon: "globe", hue: "accent" },
+  education: { icon: "doc", hue: "accent" },
+  "real-estate": { icon: "bank", hue: "accent" },
   "professional-services": { icon: "users", hue: "accent" },
-  government: { icon: "shield", hue: "brass" },
-  energy: { icon: "gauge", hue: "amber" },
+  government: { icon: "shield", hue: "accent" },
+  energy: { icon: "gauge", hue: "accent" },
 };
 
-const fallbackHues: ChipHue[] = ["accent", "signal", "brass", "sky", "amber"];
+const fallbackHues: ChipHue[] = ["accent"];
 
 export function chipFor(slug: string, index = 0): { icon: IconName; hue: ChipHue } {
   return (
     bySlug[slug] ?? {
       icon: "layers" as IconName,
+      // Single accent hue until a genuinely semantic second hue exists (the
+      // index param is kept for call-site compatibility, not for rotation).
       hue: fallbackHues[index % fallbackHues.length],
     }
   );

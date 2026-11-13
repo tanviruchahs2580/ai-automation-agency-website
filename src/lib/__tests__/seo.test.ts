@@ -55,14 +55,14 @@ describe("SITE_URL resolution", () => {
   });
 
   it("prepends https:// to protocol-less production domains", async () => {
-    expect(await loadSiteUrl("vantiqsystems.com")).toBe(
-      "https://vantiqsystems.com",
+    expect(await loadSiteUrl("arkyon.example")).toBe(
+      "https://arkyon.example",
     );
   });
 
   it("keeps full origins untouched", async () => {
-    expect(await loadSiteUrl("https://vantiqsystems.com")).toBe(
-      "https://vantiqsystems.com",
+    expect(await loadSiteUrl("https://arkyon.example")).toBe(
+      "https://arkyon.example",
     );
     expect(await loadSiteUrl("http://localhost:3117")).toBe(
       "http://localhost:3117",
@@ -70,11 +70,11 @@ describe("SITE_URL resolution", () => {
   });
 
   it("strips trailing slashes, paths and queries via origin normalization", async () => {
-    expect(await loadSiteUrl("https://vantiqsystems.com/")).toBe(
-      "https://vantiqsystems.com",
+    expect(await loadSiteUrl("https://arkyon.example/")).toBe(
+      "https://arkyon.example",
     );
-    expect(await loadSiteUrl("https://vantiqsystems.com/some/path?x=1")).toBe(
-      "https://vantiqsystems.com",
+    expect(await loadSiteUrl("https://arkyon.example/some/path?x=1")).toBe(
+      "https://arkyon.example",
     );
   });
 
@@ -114,12 +114,12 @@ describe("SITE_URL platform fallback", () => {
 
   it("prefers an explicit NEXT_PUBLIC_SITE_URL over the platform variables", async () => {
     vi.resetModules();
-    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://vantiqsystems.com");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://arkyon.example");
     vi.stubEnv(
       "VERCEL_PROJECT_PRODUCTION_URL",
       "ai-automation-agency-website-lilac.vercel.app",
     );
     const mod = await import("@/lib/seo");
-    expect(mod.SITE_URL).toBe("https://vantiqsystems.com");
+    expect(mod.SITE_URL).toBe("https://arkyon.example");
   });
 });

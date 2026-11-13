@@ -55,7 +55,7 @@ export default async function SolutionPage({
       <JsonLd data={faqJsonLd(solution.faq)} />
 
       <PageHero
-        eyebrow={`Solution — ${solution.title}`}
+        eyebrow="Solution"
         title={solution.title}
         lead={solution.summary}
         breadcrumbs={[

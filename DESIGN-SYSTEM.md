@@ -1,21 +1,22 @@
-# VANTIQ Systems — Design System ("Operator's Console" → "Mission Control")
+# ARKYON — Design System ("Keystone")
 
-Version 3.0 · Status: active · Owner: frontend team.
+Version 4.0 · Status: active · Owner: frontend team.
 Single source of truth for tokens, components, motion, and usage rules.
-Companion: `BRAND-GUIDE.md` (voice, positioning, copy rules — unchanged).
+Companion: `BRAND-GUIDE.md` (voice, positioning, copy rules).
 
-> v3 ("Mission Control") is an evolution, not a replacement: same graphite
-> base and instrument-panel soul, plus light, depth, and life — aurora
-> atmosphere, film grain, glass instruments with cursor spotlight, semantic
-> icon chips, diagram thumbnails, gradient display text, magnetic CTAs,
-> scroll-linked scenes, and count-ups. Every addition is a token or utility;
-> no one-off magic numbers in components. Budgets unchanged (§7).
+> v4 ("Keystone", 2026-11) re-brands and re-tones v3 ("Mission Control"): the
+> structure, motion system, components and budgets carry over; the palette,
+> mark and signal language change. Warm-ink canvas replaces blue-black
+> graphite; **one copper accent** replaces the blue+green pair (green survives
+> strictly as the live/verified status hue); the tri-colour gradient headline
+> is retired for a single solid copper key phrase; the mark is an arch with
+> its keystone seated at the apex. Every change is a token or utility; no
+> one-off magic numbers in components. Budgets unchanged (§7).
 
-> Design language in three sentences: **"Operator's Console" treats the site
-> like a precision instrument panel — calm, dense where it matters, empty
-> where it doesn't.** Type carries the identity; color is reserved for state,
-> never decoration. Every page earns one screen-shot-able signature moment and
-> nothing more.
+> Design language in three sentences: **"Keystone" treats the site like an
+> engineered drawing set — warm ink, hairline precision, one copper signal.**
+> Type carries the identity; color is reserved for state, never decoration.
+> Every page earns one screen-shot-able signature moment and nothing more.
 
 ## 1. Principles (ranked — use to resolve conflicts)
 
@@ -36,35 +37,45 @@ Semantic set (preserved): `canvas, surface, surface2, line,
 line-strong, ink, muted, faint, accent, accent-strong, ok, warn,
 critical, info`.
 
-Signature additions:
+Keystone values (dark theme; light theme re-maps every token — warm paper
+`#faf7f2`, deep copper `#b45418` — it is fully designed, not inverted):
 
 | Token | Value (dark) | Rule |
 |---|---|---|
-| `--color-signal` | `#00E5A8` | **Live / verified / running states ONLY.** Never decoration. |
-| `--color-critical` | `#F87171` (kept) | **Real errors ONLY.** Never accent. |
-| `--color-brass` | `#B7A36A` | "Considered" states: pull-quotes, engineering notes, reviewed badges. |
-| `--color-accent-glow` | `rgba(46,107,246,.18)` | Halo behind hero numerals / wordmark, **max 1 per viewport**. |
-| `--color-grid-line` | `rgba(244,242,236,.04)` | Background grid (`<GridLines />`). |
+| `--color-canvas` | `#0f0d0c` | Warm near-black; **not** blue-black graphite. |
+| `--color-accent` | `#e0874a` | **Copper — the one signal accent.** Fills, marks, key phrases, CTA fills. |
+| `--color-accent-press` | `#c96f33` | Pressed/hover fill; darkens (never lightens) to protect the ink label ratio. |
+| `--color-accent-bright` | `#f2b98b` | Small copper text on dark surfaces (AA ≥4.5:1). |
+| `--color-ink` | `#f4f0ea` | Warm paper-white text. |
+| `--color-faint` | `#8d867e` | Tertiary text; ≥4.5:1 on every surface token (enforced by `contrast.test.ts`). |
+| `--color-signal` | `#00e5a8` | **Live / verified / running states ONLY.** Never decoration. |
+| `--color-brass` | `#b7a36a` | "Considered" states: pull-quotes, engineering notes, reviewed badges. |
+| `--color-accent-glow` | `rgba(224,135,74,.16)` | Halo behind hero numerals / wordmark, **max 1 per viewport**. |
+| `--color-grid-line` | `rgba(244,240,234,.04)` | Background grid (`<GridLines />`). |
+
+`.ink-on-accent` — the label colour for text on an accent fill (near-black
+warm ink `#140d08` in dark theme, warm white `#fffaf4` in light). A fixed
+`text-white` cannot straddle both themes against copper; every accent-filled
+control labels itself with this class or takes `.btn-primary`.
 
 Card borders use `--color-line` / `--color-line-strong`, not a dedicated
-grid-line token.
+grid-line token. Contrast for every token pair is machine-checked by
+`src/lib/__tests__/contrast.test.ts` — the stylesheet is parsed, resolved and
+computed against WCAG 2.2 ratios; the numbers are never duplicated into prose.
 
-Light theme re-maps every token (see `globals.css`); contrast re-verified in
-`src/lib/a11y-matrix.md`.
-
-### v3 atmosphere tokens & utilities (`globals.css`)
+### v4 atmosphere tokens & utilities (`globals.css`)
 
 | Utility | What | Rule |
 |---|---|---|
-| `.aurora-bleed` | Accent + signal radial mesh, masked vignette | Ambient only, ≤8% perceptual; light theme dims further |
+| `.aurora-bleed` | Copper + brass radial mesh, masked vignette | Ambient only, ≤8% perceptual; light theme dims further |
 | `.grain` / `::after` | 2–3% `feTurbulence` data-URI noise | Kills flat-digital feel; never over text-heavy prose |
 | `.spotlight` + `--mx/--my` | Cursor-following radial glow (`<Spotlight />` sets vars) | Interactive cards only; touch + reduced-motion skip |
-| `.text-gradient` | Accent → signal `background-clip` text | Display phrases only; darker stops in light theme |
-| `.chip` + `data-hue` | 44px icon chip, `accent/signal/brass/sky/amber` | Hues semantic per `Chip.tsx` map, never random |
+| `.text-key` | **Solid** `accent-strong` copper phrase | The one key phrase per headline. No text gradients — a two-stop gradient is decoration, and axe cannot evaluate one |
+| `.chip` + `data-hue` | 44px icon chip | **Single-hue copper on cards** (2026-11 review: a five-hue rotation was undecodable to visitors). The hue field remains for genuinely semantic state use |
 | `.marquee` / `.marquee-track` | 36s edge-masked loop, pause on hover | Reduced-motion static (explicit gate + global gate) |
 | `.diagram-live-path` | Signal dash-flow on one SVG path | Decorative paths only; explicit reduced-motion gate |
-| `.text-hero` | `clamp(3rem, 7vw + .5rem, 6rem)` display | Landing hero H1 only |
-| `.gauge-track` / `.gauge-band` | Range-band bars for illustrative metrics | Bands show ranges, never single animated numbers |
+| `.text-hero` | `clamp(2.5rem, 4.2vw + 1rem, 4.25rem)` display | Landing hero H1 only |
+| `.gauge-track` / `.gauge-band` | Range-band bars for illustrative metrics | Bands show ranges, never single animated numbers; band gradient stays within the copper ramp |
 | `.field-shake` | 220ms inline validation shake | Errors only, with `critical` color pairing |
 
 ## 3. Typography
@@ -111,12 +122,20 @@ uses the editorial serif.
 
 ## 5. Components (`src/components/ui/`)
 
-**Button** — three variants only: `primary` (accent bg, 4px glow on hover),
-`quiet` (1px `faint` border; hover fills `surface2`), `link` (text + mono
-arrow translating 2px on hover). 44px min target, 180ms `ease-out-soft`,
-2px accent focus ring at 2px offset. Forbidden: ghost, gradient, glow-pulse,
-icon+text primary. (`secondary`/`ghost` props remain as deprecated aliases
-of `quiet`/`link` so existing call sites keep working.)
+**Button** — three variants only: `primary` (solid copper fill, theme-aware
+ink label via the shared pairing; solid by design — a gradient label
+background is invisible to axe, and the previous gradient demonstrably shipped
+a 2.89:1 state before the contrast tests caught it), `quiet` (1px `faint`
+border; hover fills `surface2`), `link` (text + mono arrow translating 2px on
+hover). 44px min target, 180ms `ease-out-soft`, 2px accent focus ring at 2px
+offset. Forbidden: ghost, gradient, glow-pulse, icon+text primary.
+(`secondary`/`ghost` props remain as deprecated aliases of `quiet`/`link` so
+existing call sites keep working.)
+
+**Wordmark** — the keystone-in-arch mark (arch strokes in `muted`, keystone
+wedge in `accent`) beside the brand in the display face, read from
+`siteConfig`; `compact` shrinks 20% for the scroll-compressed navbar. The mark
+names no letter so a future rename never invalidates it.
 
 **Card** — three anatomies: capability (chip / eyebrow / title / 3-line /
 mono footer), case-study (diagram / eyebrow / industry / title /
@@ -203,6 +222,11 @@ per family, and the intake vocabulary split out of the zod module so the
 validator never reaches the browser.
 
 ### Measured status (2026-10-05, production build, local `next start`)
+
+> Historical baseline of the pre-rebrand build, kept for provenance. The
+> 2026-11 Keystone rebrand re-measures these after implementation — see
+> `docs/rebrand/2026-11/QA-REPORT.md` for the current numbers (budget gates
+> and rendered-HTML invariants re-verified green on the rebrand branch).
 
 | Budget | Measured | Status |
 | --- | --- | --- |

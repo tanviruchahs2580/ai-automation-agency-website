@@ -71,10 +71,12 @@ export function CookieConsent() {
       ref={cardRef}
       role="region"
       aria-label="Cookie preference"
-      className="fixed bottom-4 end-4 z-[90] w-[calc(100%-2rem)] max-w-sm rounded-xl border border-line bg-surface/95 p-5 shadow-2xl backdrop-blur-md sm:bottom-6 sm:end-6"
+      className="fixed bottom-4 end-4 z-[90] w-[calc(100%-2rem)] max-w-sm rounded-xl border border-line bg-surface/95 p-4 shadow-2xl backdrop-blur-md sm:bottom-6 sm:end-6 sm:p-5"
     >
       <p className="mono-label uppercase text-faint">Cookies</p>
-      <p className="mt-2 text-[13px] leading-relaxed text-muted">
+      {/* Compact on phones (the banner overlays the page's only first-screen
+          CTA there — every pixel of height matters), full size from sm up. */}
+      <p className="mt-1.5 text-xs leading-snug text-muted sm:mt-2 sm:text-[13px] sm:leading-relaxed">
         This site sets no advertising or analytics cookies today, and stores
         this preference in your browser only. If analytics are enabled later,
         your answer here decides whether they run. See the{" "}
@@ -86,7 +88,7 @@ export function CookieConsent() {
         </Link>{" "}
         for details.
       </p>
-      <div className="mt-4 flex gap-2">
+      <div className="mt-3 flex gap-2 sm:mt-4">
         <button
           type="button"
           onClick={() => {

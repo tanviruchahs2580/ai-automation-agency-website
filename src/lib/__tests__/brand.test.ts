@@ -7,15 +7,30 @@ import { deriveBrandForms, siteConfig, teamByline } from "@/data/site";
  * Brand single-source-of-truth.
  *
  * The audit found the placeholder name written out longhand in ten non-test
- * files, in three different capitalisations ("VANTIQ SYSTEMS", "VANTIQ
- * Systems", "VANTIQ") with no rule saying which belonged where. Renaming the
- * company — which is a launch blocker, because the placeholder collides with an
- * existing enterprise AI vendor — was a find-and-replace across the app.
+ * files, in three different capitalisations, with no rule saying which belonged
+ * where. It was retired on 2026-11 when the owner confirmed `ARKYON` as the
+ * public brand (a rename that had to preserve visitor state — storage keys
+ * gained legacy read-fallbacks — while removing every active brand literal).
  *
  * These tests make the config module the only permitted home for the name, so
- * that stays true after the rename, and keep the three forms consistent with
- * each other so one cannot be changed without the others.
+ * that stays true after the rename, keep the three forms consistent with each
+ * other so one cannot be changed without the others, and keep the retired
+ * placeholder name out of active source (it survives only in dated historical
+ * records and these fixtures).
  */
+
+/**
+ * The active brand, matched case-sensitively as a word so namespaced
+ * localStorage / DOM keys (`arkyon-theme`, `arkyon:intake-draft:v1`) are not
+ * flagged: they are behavioural keys, not user-facing brand copy.
+ */
+const ACTIVE_BRAND_PATTERN = /\b(?:ARKYON|Arkyon)\b/;
+/**
+ * The retired placeholder, same word-boundary logic. Lower-case legacy storage
+ * keys (`vantiq-theme`, read once as a fallback) are deliberately still
+ * permitted — they exist so visitor state survives the rename.
+ */
+const RETIRED_BRAND_PATTERN = /\b(?:VANTIQ|Vantiq)\b/;
 
 const SRC = path.join(process.cwd(), "src");
 const BRAND_MODULE = path.join("data", "site.ts");
@@ -120,13 +135,7 @@ describe("brand name has one home", () => {
 
       const contents = stripComments(readFileSync(file, "utf8"));
       contents.split("\n").forEach((line, index) => {
-        /*
-          Matches the brand as a word: "VANTIQ" or "Vantiq". Lower-case
-          `vantiq-theme` / `vantiq-cookie-consent` are namespaced localStorage
-          and DOM keys, which are not user-facing brand copy and are not
-          matched by a case-sensitive word-boundary test.
-        */
-        if (/\b(?:VANTIQ|Vantiq)\b/.test(line)) {
+        if (ACTIVE_BRAND_PATTERN.test(line)) {
           offenders.push(`${relative}:${index + 1}: ${line.trim()}`);
         }
       });
@@ -136,6 +145,43 @@ describe("brand name has one home", () => {
       offenders,
       `Brand name written literally. Import siteConfig from "@/data/site" instead:\n${offenders.join("\n")}`,
     ).toEqual([]);
+  });
+
+  it("the retired placeholder name does not return to active source", () => {
+    const offenders: string[] = [];
+
+    for (const file of sourceFiles(SRC)) {
+      const relative = path.relative(SRC, file);
+      if (relative === BRAND_MODULE) continue;
+      /* Fixtures asserting the retirement itself are the legitimate home. */
+      if (relative.includes("__tests__")) continue;
+
+      const contents = stripComments(readFileSync(file, "utf8"));
+      contents.split("\n").forEach((line, index) => {
+        if (RETIRED_BRAND_PATTERN.test(line)) {
+          offenders.push(`${relative}:${index + 1}: ${line.trim()}`);
+        }
+      });
+    }
+
+    expect(
+      offenders,
+      `Retired brand name found in active source (legacy storage keys stay allowed):\n${offenders.join("\n")}`,
+    ).toEqual([]);
+  });
+
+  it("the public brand is exactly ARKYON", () => {
+    // The test environment never sets NEXT_PUBLIC_BRAND_NAME, so this asserts
+    // the shipped default. A future env-configured rename must update this
+    // fixture deliberately rather than silently.
+    //
+    // For a single-word brand every derived form is the exact name: the
+    // derivation deliberately never title-cases the head token (an acronym
+    // brand must not become "Arkyon" in prose), so the exact-name rule holds
+    // in every surface, including sentences.
+    expect(siteConfig.name).toBe("ARKYON");
+    expect(siteConfig.proseName).toBe("ARKYON");
+    expect(siteConfig.shortName).toBe("ARKYON");
   });
 
   it("the three forms agree with the configured name", () => {
@@ -162,10 +208,10 @@ describe("brand name has one home", () => {
       proseName: "ACME Robotics",
       shortName: "ACME",
     });
-    expect(deriveBrandForms("VANTIQ SYSTEMS")).toEqual({
-      name: "VANTIQ SYSTEMS",
-      proseName: "VANTIQ Systems",
-      shortName: "VANTIQ",
+    expect(deriveBrandForms("NORTHWIND LABS")).toEqual({
+      name: "NORTHWIND LABS",
+      proseName: "NORTHWIND Labs",
+      shortName: "NORTHWIND",
     });
     // Acronyms in the tail survive: "ABC AI Ltd" must not become "ABC Ai Ltd".
     expect(deriveBrandForms("ABC AI Ltd").proseName).toBe("ABC AI Ltd");

@@ -66,7 +66,7 @@ export function ReadinessAssessment() {
         <button
           type="button"
           onClick={start}
-          className="mt-7 inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-press"
+          className="mt-7 inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium ink-on-accent transition-colors hover:bg-accent-press"
         >
           Start the Assessment
         </button>
@@ -143,7 +143,7 @@ export function ReadinessAssessment() {
           <Link
             href="/start-a-project"
             onClick={() => track(AnalyticsEvent.CtaClick, { location: "readiness-result" })}
-            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-press"
+            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium ink-on-accent hover:bg-accent-press"
           >
             Discuss My Result
           </Link>

@@ -63,13 +63,17 @@ const popularItems: SearchItem[] = popularHrefs
   .map((href) => searchItems.find((item) => item.href === href))
   .filter((item): item is SearchItem => Boolean(item));
 
-const RECENT_KEY = "vantiq-recent-searches";
+const RECENT_KEY = "arkyon-recent-searches";
+/** Pre-rename key, read once so existing visitors keep their recent searches. */
+const LEGACY_RECENT_KEY = "vantiq-recent-searches";
 
 /** localStorage throws in strict privacy modes; history is best-effort. */
 function readRecent(): SearchItem[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]") as unknown;
+    const stored =
+      localStorage.getItem(RECENT_KEY) ?? localStorage.getItem(LEGACY_RECENT_KEY);
+    const raw = JSON.parse(stored ?? "[]") as unknown;
     if (!Array.isArray(raw)) return [];
     return raw
       .filter((href): href is string => typeof href === "string")
@@ -109,11 +113,13 @@ export function SearchModal() {
   const remember = useCallback((item: SearchItem) => {
     setOpen(false);
     try {
-      const raw = JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]") as unknown;
-      const stored = Array.isArray(raw)
+      const stored =
+        localStorage.getItem(RECENT_KEY) ?? localStorage.getItem(LEGACY_RECENT_KEY);
+      const raw = JSON.parse(stored ?? "[]") as unknown;
+      const hrefs = Array.isArray(raw)
         ? raw.filter((href): href is string => typeof href === "string")
         : [];
-      const next = [item.href, ...stored.filter((h) => h !== item.href)].slice(0, 4);
+      const next = [item.href, ...hrefs.filter((h) => h !== item.href)].slice(0, 4);
       localStorage.setItem(RECENT_KEY, JSON.stringify(next));
     } catch {
       /* recent history is best-effort */

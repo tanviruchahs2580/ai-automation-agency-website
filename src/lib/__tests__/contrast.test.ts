@@ -166,127 +166,96 @@ const darkTokens = tokensFrom("@theme {");
 const lightTokens = new Map([...darkTokens, ...tokensFrom('[data-theme="light"] {')]);
 
 /**
- * Splits a comma-separated CSS value at top level only, so commas inside
- * `color-mix(...)` or `var(...)` do not split a single stop into fragments. A
- * regex cannot do this reliably: a negative lookahead for "comma not followed
- * by a closing paren" also fires on nested parentheses, which is exactly how an
- * earlier version of this test ended up trying to parse `color-mix(in srgb`.
+ * Extracts the resolved `background` value of every rule whose selector
+ * matches, in a given theme. The Keystone `.btn-primary` is a solid token
+ * fill; the Keystone identity keeps it that way (see the gradient guard
+ * below), so unlike the previous gradient-based parser this returns one
+ * colour per rule.
  */
-function splitTopLevel(value: string): string[] {
-  const parts: string[] = [];
-  let depth = 0;
-  let current = "";
-  for (const char of value) {
-    if (char === "(") depth += 1;
-    else if (char === ")") depth -= 1;
-    if (char === "," && depth === 0) {
-      parts.push(current.trim());
-      current = "";
-      continue;
-    }
-    current += char;
-  }
-  if (current.trim()) parts.push(current.trim());
-  return parts;
-}
-
-/** Every declaration of `background:` inside rules whose selector matches. */
-function backgroundStops(selector: string, tokens: TokenMap): Array<{ stop: Rgb; label: string }> {
-  const results: Array<{ stop: Rgb; label: string }> = [];
+function backgroundFills(selector: string, tokens: TokenMap): Array<{ fill: Rgb; label: string }> {
+  const results: Array<{ fill: Rgb; label: string }> = [];
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const ruleRegex = new RegExp(`([^{}]*${escaped}[^{}]*)\\{([^}]*)\\}`, "g");
   for (const rule of CSS.matchAll(ruleRegex)) {
-    const declaration = /background:\s*linear-gradient\(([^;]+)\);/.exec(rule[2]!);
+    const declaration = /background:\s*([^;]+);/.exec(rule[2]!);
     if (!declaration) continue;
-    const stops = splitTopLevel(declaration[1]!);
-    // First stop is the direction ("to bottom"); the rest are colours.
-    for (const stop of stops.slice(1)) {
-      results.push({
-        stop: parseColourValue(stop, tokens),
-        label: `${rule[1]!.trim()} → ${stop}`,
-      });
-    }
+    results.push({
+      fill: parseColourValue(declaration[1]!.trim(), tokens),
+      label: `${rule[1]!.trim()} → ${declaration[1]!.trim()}`,
+    });
   }
   return results;
 }
 
-const WHITE: Rgb = { r: 255, g: 255, b: 255, a: 1 };
+/** Label colour for text on an accent fill — the theme's ink-on-accent token. */
+function inkOnAccent(tokens: TokenMap): Rgb {
+  const value = tokens.get("--color-ink-on-accent");
+  if (!value) throw new Error("--color-ink-on-accent token not found");
+  return parseColourValue(value, tokens);
+}
 
 /* ---------- assertions ---------- */
 
-describe("primary button contrast (WCAG AA, white label text)", () => {
+describe("primary button contrast (WCAG AA, ink-on-copper label)", () => {
   const AA_NORMAL_TEXT = 4.5;
 
-  /*
-    `.btn-primary` is defined by a base rule, a `:hover` rule and two
-    light-theme overrides. Each rule is evaluated against the token set of the
-    theme it belongs to — evaluating a light override under dark tokens resolves
-    `var(--color-accent-strong)` to the dark value (#5285ff, 3.41:1) and reports
-    a failure that no browser would ever render. Every rule in its own theme is
-    the complete set.
-  */
   const rulesByTheme = [
-    { themeName: "dark", tokens: darkTokens, isLightRule: false },
-    { themeName: "light", tokens: lightTokens, isLightRule: true },
+    { themeName: "dark", tokens: darkTokens },
+    { themeName: "light", tokens: lightTokens },
   ] as const;
 
-  for (const { themeName, tokens, isLightRule } of rulesByTheme) {
-    it(`${themeName} theme: every gradient stop clears 4.5:1 against white`, () => {
-      const stops = backgroundStops("btn-primary", tokens).filter((rule) =>
-        isLightRule ? rule.label.includes("data-theme") : !rule.label.includes("data-theme"),
-      );
+  for (const { themeName, tokens } of rulesByTheme) {
+    it(`${themeName} theme: label clears 4.5:1 on the resting and hover fills`, () => {
+      /*
+        The base .btn-primary rules are unsuffixed and read theme tokens, so
+        they apply in BOTH themes — that is the point of tokenising the fill.
+        Light-only overrides would join them under the light token set; dark
+        evaluation excludes light-scoped rules. (There are currently no
+        light-only .btn-primary rules at all.)
+      */
+      const allRules = backgroundFills("btn-primary", tokens);
+      const fills =
+        themeName === "light"
+          ? allRules
+          : allRules.filter((rule) => !rule.label.includes("data-theme"));
 
       /*
-        Assert *which* rules were found, not merely that some were.
-
-        `expect(stops.length).toBeGreaterThan(0)` passed on a mutated stylesheet
-        where the resting-state declaration had been replaced with a flat red:
-        the `:hover` rule alone kept the count above zero, so deleting the button's
-        real gradient would have gone unnoticed. The count and the presence of an
-        unsuffixed rule are both pinned now, which means removing or renaming the
-        base declaration fails here.
+        Assert *which* rules were found, not merely that some were: the base
+        rule must be present unsuffixed, alongside its :hover override.
       */
-      const selectors = stops.map((rule) => rule.label.split(" → ")[0]!);
+      const selectors = fills.map((rule) => rule.label.split(" → ")[0]!);
       expect(
         selectors.some((selector) => !selector.includes(":")),
         `no unsuffixed .btn-primary rule parsed for ${themeName}; got ${selectors.join(" | ")}`,
       ).toBe(true);
       expect(
-        stops.length,
-        `${themeName} .btn-primary gradient stops: ${selectors.join(" | ")}`,
+        fills.length,
+        `${themeName} .btn-primary fills: ${selectors.join(" | ")}`,
       ).toBeGreaterThanOrEqual(2);
 
-      for (const { stop, label } of stops) {
-        const ratio = contrast(WHITE, stop);
-        expect(ratio, `${label} measured ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(
+      const label = inkOnAccent(tokens);
+      for (const { fill, label: desc } of fills) {
+        const ratio = contrast(label, fill);
+        expect(ratio, `${desc} label ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(
           AA_NORMAL_TEXT,
         );
       }
     });
   }
 
-  it("accent-strong is not used as a solid fill behind white text", () => {
+  it(".btn-primary is a solid fill — no gradient returns", () => {
     /*
-      #5285ff measures 3.41:1 against white. It is a legitimate *text* colour on
-      a dark canvas (5.77:1) and the bug was using it as a background. This
-      asserts the distinction holds: no dark-theme gradient stop may resolve to
-      it.
+      The pre-Keystone button was a two-stop gradient whose lightest state
+      measured 2.89:1 against its label, and axe could not see it: gradient
+      backgrounds are reported as "incomplete", never as violations. The
+      solid token fill is checkable by construction, and this guard keeps it
+      that way — reintroducing a gradient on the primary CTA fails here
+      before it can fail a visitor.
     */
-    const accentStrong = parseColour(darkTokens.get("--color-accent-strong")!);
-    expect(contrast(WHITE, accentStrong)).toBeLessThan(AA_NORMAL_TEXT);
-    const darkRulesOnly = backgroundStops("btn-primary", darkTokens).filter(
-      (rule) => !rule.label.includes("data-theme"),
+    const gradientRules = [...CSS.matchAll(/[^{}]*btn-primary[^{}]*\{[^}]*\}/g)].filter(
+      (rule) => /background:\s*linear-gradient/.test(rule[0]),
     );
-    expect(darkRulesOnly.length).toBeGreaterThan(0);
-    for (const { stop, label } of darkRulesOnly) {
-      /* All three channels, not just red: comparing `r` alone let any colour
-         with a different red channel through, which is nearly all of them. */
-      const sameColour =
-        Math.round(stop.r) === accentStrong.r &&
-        Math.round(stop.g) === accentStrong.g &&
-        Math.round(stop.b) === accentStrong.b;
-      expect(sameColour, `${label} resolves to --color-accent-strong`).toBe(false);
-    }
+    expect(gradientRules.map((rule) => rule[0].slice(0, 120))).toEqual([]);
   });
 });
 

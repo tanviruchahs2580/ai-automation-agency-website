@@ -26,7 +26,10 @@ export function ThemeToggle() {
       const next = t === "dark" ? "light" : "dark";
       document.documentElement.setAttribute("data-theme", next);
       try {
-        localStorage.setItem("vantiq-theme", next);
+        // Same key the pre-paint script reads (see app/layout.tsx). The old
+        // "vantiq-theme" value is read once by the script as a fallback, so an
+        // existing visitor's theme survives the 2026-11 rename.
+        localStorage.setItem("arkyon-theme", next);
       } catch {
         /* private mode — theme simply won't persist */
       }

@@ -16,10 +16,10 @@ import { siteConfig } from "@/data/site";
  * that Next uses only if a page ever stops setting its own.
  */
 
-const INK = "#f4f2ec";
-const MUTED = "#8b93a3";
-const ACCENT = "#2e6bf6";
-const SIGNAL = "#00e5a8";
+/* Keystone palette, inlined (Satori has no CSS custom properties). */
+const INK = "#f4f0ea";
+const MUTED = "#a8a19a";
+const ACCENT = "#e0874a";
 
 /**
  * Headline size by character count. A fixed 76px looked right for the site
@@ -58,9 +58,9 @@ export function OgCard({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        backgroundColor: "#0a0b0e",
+        backgroundColor: "#0f0d0c",
         backgroundImage:
-          "radial-gradient(700px 340px at 12% -10%, rgba(46,107,246,0.22), transparent 65%), radial-gradient(560px 300px at 92% 12%, rgba(0,229,168,0.12), transparent 60%)",
+          "radial-gradient(700px 340px at 12% -10%, rgba(224,135,74,0.2), transparent 65%), radial-gradient(560px 300px at 92% 12%, rgba(183,163,106,0.1), transparent 60%)",
         color: INK,
         padding: 72,
         fontFamily: "sans-serif",
@@ -93,16 +93,6 @@ export function OgCard({
         >
           {siteConfig.name}
         </div>
-        <div
-          style={{
-            display: "flex",
-            width: 12,
-            height: 12,
-            borderRadius: 6,
-            backgroundColor: SIGNAL,
-            marginLeft: 4,
-          }}
-        />
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
@@ -137,7 +127,7 @@ export function OgCard({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-end",
-          borderTop: "2px solid rgba(244,242,236,0.12)",
+          borderTop: "2px solid rgba(244,240,234,0.12)",
           paddingTop: 28,
         }}
       >

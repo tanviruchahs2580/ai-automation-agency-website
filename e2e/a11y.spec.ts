@@ -170,7 +170,7 @@ test.describe("accessibility (axe, WCAG 2.2 A/AA)", () => {
     // localStorage is the theme's single source of truth; setting it here is
     // what the pre-paint script reads, so the scan cannot silently run dark.
     await page.addInitScript(() =>
-      window.localStorage.setItem("vantiq-theme", "light"),
+      window.localStorage.setItem("arkyon-theme", "light"),
     );
     await page.emulateMedia({ reducedMotion: "reduce" });
 

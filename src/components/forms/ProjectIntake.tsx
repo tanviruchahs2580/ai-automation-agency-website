@@ -65,8 +65,13 @@ const steps = intakeSteps;
  * Draft persistence — the wizard restores an in-progress submission after an
  * accidental refresh or navigation. Consent is intentionally never restored
  * (must be re-affirmed) and the honeypot field is never persisted.
+ *
+ * The pre-rename "vantiq:intake-draft:v1" key is read as a one-time fallback
+ * (shared with ExitIntentSave) so an in-progress draft survives the 2026-11
+ * rename; new writes always go to the current key.
  */
-const DRAFT_STORAGE_KEY = "vantiq:intake-draft:v1";
+const DRAFT_STORAGE_KEY = "arkyon:intake-draft:v1";
+const LEGACY_DRAFT_STORAGE_KEY = "vantiq:intake-draft:v1";
 
 type Status = "idle" | "submitting" | "error" | "success";
 
@@ -113,7 +118,9 @@ export function ProjectIntake() {
     const frame = requestAnimationFrame(() => {
       if (editedBeforeRestoreRef.current) return;
       try {
-        const raw = window.localStorage.getItem(DRAFT_STORAGE_KEY);
+        const raw =
+          window.localStorage.getItem(DRAFT_STORAGE_KEY) ??
+          window.localStorage.getItem(LEGACY_DRAFT_STORAGE_KEY);
         if (!raw) return;
         const parsed = JSON.parse(raw) as Partial<FormState> & {
           savedAt?: unknown;
@@ -355,7 +362,7 @@ export function ProjectIntake() {
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `vantiq-brief-${result.briefId}.txt`;
+      anchor.download = `arkyon-brief-${result.briefId}.txt`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
@@ -409,7 +416,7 @@ export function ProjectIntake() {
               target="_blank"
               rel="noreferrer noopener"
               onClick={() => track(AnalyticsEvent.MeetingClick)}
-              className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-press"
+              className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-medium ink-on-accent transition-colors duration-150 hover:bg-accent-press"
             >
               Book a Call
               <span className="sr-only"> (opens in a new tab)</span>
@@ -801,7 +808,7 @@ export function ProjectIntake() {
           type="button"
           onClick={goNext}
           disabled={status === "submitting"}
-          className="inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-press disabled:opacity-60"
+          className="inline-flex min-h-11 items-center rounded-md bg-accent px-6 py-2.5 text-sm font-medium ink-on-accent transition-colors hover:bg-accent-press disabled:opacity-60"
         >
           {status === "submitting"
             ? "Submitting…"
