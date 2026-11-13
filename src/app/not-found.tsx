@@ -12,7 +12,7 @@ export default function NotFound() {
       <GridLines opacity={0.4} />
       <div className="container-x relative py-10">
         <div className="grain mx-auto max-w-2xl rounded-xl border border-line bg-surface p-6 font-mono text-sm sm:p-8">
-          <p className="text-critical">$ vantiq route --resolve</p>
+          <p className="text-critical">$ arkyon route --resolve</p>
           <p className="mt-3 text-faint">
             <span className="text-critical">404</span> — route not found.
           </p>
@@ -21,7 +21,7 @@ export default function NotFound() {
             logged; no action needed on your side.
           </p>
           <p className="mt-4 border-t border-line pt-4 text-faint">
-            $ vantiq search --site <span className="animate-pulse">▊</span>
+            $ arkyon search --site <span className="animate-pulse">▊</span>
           </p>
         </div>
 

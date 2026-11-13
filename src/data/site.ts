@@ -1,15 +1,12 @@
 import type { LinkItem } from "@/types/content";
 
 /**
- * PLACEHOLDER BRAND DATA.
+ * BRAND DATA — single source of truth.
  *
- * The brand/legal entity form and any real contact channels must be supplied
- * before launch — see LAUNCH-CHECKLIST.md §1. Contact values are env-driven so
- * launch configuration never requires a code change.
- *
- * ⚠ The name below is a placeholder. "Vantiq" is also an existing enterprise AI
- * vendor, so shipping under it unmodified carries a trademark and credibility
- * risk. Set `NEXT_PUBLIC_BRAND_NAME` at deploy time to replace it everywhere.
+ * The public brand is `ARKYON` (owner decision, 2026-11). The legal entity form
+ * is deliberately NOT modelled here: it is unconfirmed, and inventing one would
+ * publish an unverified fact. Contact values stay env-driven so launch
+ * configuration never requires a code change.
  *
  * "Everywhere" means every user-facing string in `src/`: this module is the only
  * source for the name in application code, `brand.test.ts` fails if a literal
@@ -17,20 +14,26 @@ import type { LinkItem } from "@/types/content";
  * leave a stale suffix on page titles. It does not include files that are not
  * application copy — `LICENSE` names the copyright holder, and the E2E suite
  * asserts the site title against this config. `next.config.ts` prints a build
- * warning when a production build still has the placeholder in place.
+ * warning when a production build still has the pre-rebrand placeholder in
+ * place.
+ *
+ * The previous placeholder ("VANTIQ SYSTEMS") shared this module's mechanics;
+ * it was retired on 2026-11 because it collided with an existing enterprise AI
+ * vendor and because the owner confirmed `ARKYON` as the public name. Dated
+ * historical references survive only in `docs/rebrand/2026-11/` and regression
+ * fixtures.
  *
  * Three forms exist, each with exactly one role. Using the right one
- * deliberately is what keeps them from drifting into accidental variants, which
- * is what the audit found (three capitalizations across ten hard-coded files):
+ * deliberately is what keeps them from drifting into accidental variants:
  *
  *   name       — the lockup: logo, copyright line, structured data, image alt
  *   proseName  — the brand inside a sentence, where all-caps reads as shouting
- *   shortName  — tight spaces: the " — VANTIQ" suffix on page titles
+ *   shortName  — tight spaces: the " — ARKYON" suffix on page titles
  *
  * `src/lib/__tests__/brand.test.ts` fails if a literal brand string appears
  * anywhere in `src/` outside this module.
  */
-const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "VANTIQ SYSTEMS";
+const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || "ARKYON";
 
 /**
  * Title-cases the tail of a brand name for use in a sentence.

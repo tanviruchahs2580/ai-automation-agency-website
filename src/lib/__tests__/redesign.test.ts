@@ -19,7 +19,7 @@ describe("i18n helpers", () => {
 describe("softwareJsonLd", () => {
   it("describes interactive tools as free web applications", () => {
     const json = softwareJsonLd({
-      name: "VANTIQ ROI Calculator",
+      name: "ARKYON ROI Calculator",
       description: "Estimate automation returns.",
       path: "/roi-calculator",
     });

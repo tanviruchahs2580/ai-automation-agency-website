@@ -16,13 +16,13 @@
  *  - `trackWith()` takes its dependencies as an argument, so the gating is
  *    unit-tested without a browser.
  *
- * To add a provider: assign the dispatch function to `window.__vantiqAnalytics`
+ * To add a provider: assign the dispatch function to `window.__arkyonAnalytics`
  * from whatever loader the provider needs (a `<Script>` in the layout, say).
  * Nothing here has to change, and the CSP in `next.config.ts` is where the
  * provider's origin gets allow-listed.
  */
 
-import { CONSENT_KEY } from "@/lib/consent";
+import { readConsent } from "@/lib/consent";
 
 export const AnalyticsEvent = {
   CtaClick: "cta_click",
@@ -79,7 +79,7 @@ export function trackWith(
 declare global {
   interface Window {
     /** Provider hook point. Unset until a provider is chosen. */
-    __vantiqAnalytics?: AnalyticsDispatch;
+    __arkyonAnalytics?: AnalyticsDispatch;
   }
 }
 
@@ -92,8 +92,10 @@ export function track(event: AnalyticsEventName, params?: AnalyticsParams): void
   try {
     trackWith(
       {
-        consent: window.localStorage.getItem(CONSENT_KEY),
-        dispatch: window.__vantiqAnalytics ?? null,
+        // readConsent() (not a raw key read) so a choice recorded under the
+        // pre-rename legacy key still gates correctly after the 2026-11 rename.
+        consent: readConsent(),
+        dispatch: window.__arkyonAnalytics ?? null,
         onUnconfigured:
           process.env.NODE_ENV === "development"
             ? (name, payload) => console.debug("[analytics]", name, payload ?? {})
