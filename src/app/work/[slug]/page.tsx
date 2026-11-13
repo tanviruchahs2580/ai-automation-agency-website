@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { CtaSection } from "@/components/layout/CtaSection";
+import { Button } from "@/components/ui/Button";
 import { ExampleBadge } from "@/components/ui/ExampleBadge";
 import { Reveal } from "@/components/ui/Reveal";
 import { QuoteRail } from "@/components/scenes/QuoteRail";
@@ -103,8 +104,15 @@ export default async function CaseStudyPage({
           { name: study.title, path: `/work/${study.slug}` },
         ]}
         /* Driven by the record, not hard-coded, so a verified engagement would
-           not be labelled an example. */
-        actions={study.isExampleArchitecture ? <ExampleBadge /> : undefined}
+           not be labelled an example. The contextual CTA matches the other
+           detail templates (the 2026-11 design review flagged work detail as
+           the only page family offering no in-hero next step). */
+        actions={
+          <>
+            {study.isExampleArchitecture && <ExampleBadge />}
+            <Button href="/start-a-project">Discuss This Architecture</Button>
+          </>
+        }
       />
 
       <article className="container-x section-y max-w-5xl">

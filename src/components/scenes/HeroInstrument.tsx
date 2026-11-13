@@ -137,7 +137,10 @@ export function HeroInstrument() {
                 </svg>
               )}
               <div className="flex items-center gap-3 rounded-lg border border-line bg-surface2 px-3 py-2.5">
-                <StatusDot tone={layer.id === "workers" ? "accent" : "signal"} pulse={live} />
+                {/* Every live row carries the same signal dot: the 2026-11
+                    design review flagged the old per-row accent switch as an
+                    unexplained warning state. One hue = one meaning. */}
+                <StatusDot tone="signal" pulse={live} />
                 <div className="min-w-0">
                   {/* line-clamp (wrapping) rather than truncate (nowrap): a
                       nowrap line sets this card's min-content width to the

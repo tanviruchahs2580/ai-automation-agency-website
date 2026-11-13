@@ -70,7 +70,7 @@ export default async function IndustryPage({
   return (
     <>
       <PageHero
-        eyebrow={`Industry — ${industry.title}`}
+        eyebrow="Industry"
         title={`AI engineering for ${industry.title.toLowerCase()}.`}
         lead={industry.summary}
         breadcrumbs={[

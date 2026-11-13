@@ -54,7 +54,7 @@ export default async function ServiceDetailPage({
       <JsonLd data={faqJsonLd(service.faq)} />
 
       <PageHero
-        eyebrow={`Service — ${service.title}`}
+        eyebrow="Service"
         title={service.title}
         lead={service.summary}
         breadcrumbs={[
@@ -128,7 +128,7 @@ export default async function ServiceDetailPage({
           <div className="space-y-16">
             <Reveal>
               <section id="problem" className="scroll-mt-28">
-                <p className="eyebrow mb-3">Why it exists</p>
+                <p className="eyebrow mb-3">The problem</p>
                 <h2 className="h-section">{service.problem}</h2>
                 <p className="eyebrow mb-4 mt-8">Deliverables</p>
                 <ul className="space-y-3">
