@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 /** Current keys; DRAFT_KEY mirrors ProjectIntake (shared one-home rule). */
 const DRAFT_KEY = "arkyon:intake-draft:v1";
-const LEGACY_DRAFT_KEY = "vantiq:intake-draft:v1";
+const LEGACY_DRAFT_STORAGE_KEY = "vantiq:intake-draft:v1";
 const SEEN_KEY = "arkyon:exit-intent-seen";
 const DWELL_MS = 90_000;
 
@@ -78,7 +78,7 @@ export function ExitIntentSave() {
       if (Date.now() - mountTime < DWELL_MS) return;
       if (!armed || readSession(SEEN_KEY)) return;
       // Either key means a restorable draft exists (legacy = pre-rename draft).
-      if (!readLocal(DRAFT_KEY) && !readLocal(LEGACY_DRAFT_KEY)) return;
+      if (!readLocal(DRAFT_KEY) && !readLocal(LEGACY_DRAFT_STORAGE_KEY)) return;
       armed = false;
       writeSession(SEEN_KEY, "1");
       restoreFocusRef.current =
@@ -137,7 +137,7 @@ export function ExitIntentSave() {
           onClick={() => {
             // Clear both eras: a surviving legacy draft would re-arm the prompt.
             removeLocal(DRAFT_KEY);
-            removeLocal(LEGACY_DRAFT_KEY);
+            removeLocal(LEGACY_DRAFT_STORAGE_KEY);
             window.location.reload();
           }}
           className="btn btn-quiet flex-1"

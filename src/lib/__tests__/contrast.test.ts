@@ -187,16 +187,11 @@ function backgroundFills(selector: string, tokens: TokenMap): Array<{ fill: Rgb;
   return results;
 }
 
-/** Label colour for text on an accent fill, from the .ink-on-accent rules. */
-function inkOnAccent(tokens: TokenMap, themeName: "dark" | "light"): Rgb {
-  const ruleRegex = /(\[data-theme="light"\]\s*)?\.ink-on-accent\s*\{([^}]*)\}/g;
-  for (const rule of CSS.matchAll(ruleRegex)) {
-    const isLightRule = Boolean(rule[1]);
-    if (isLightRule !== (themeName === "light")) continue;
-    const declaration = /color:\s*([^;]+);/.exec(rule[2]!);
-    if (declaration) return parseColourValue(declaration[1]!.trim(), tokens);
-  }
-  throw new Error(".ink-on-accent rule not found for theme " + themeName);
+/** Label colour for text on an accent fill — the theme's ink-on-accent token. */
+function inkOnAccent(tokens: TokenMap): Rgb {
+  const value = tokens.get("--color-ink-on-accent");
+  if (!value) throw new Error("--color-ink-on-accent token not found");
+  return parseColourValue(value, tokens);
 }
 
 /* ---------- assertions ---------- */
@@ -211,9 +206,18 @@ describe("primary button contrast (WCAG AA, ink-on-copper label)", () => {
 
   for (const { themeName, tokens } of rulesByTheme) {
     it(`${themeName} theme: label clears 4.5:1 on the resting and hover fills`, () => {
-      const fills = backgroundFills("btn-primary", tokens).filter((rule) =>
-        rule.label.includes("data-theme") === (themeName === "light"),
-      );
+      /*
+        The base .btn-primary rules are unsuffixed and read theme tokens, so
+        they apply in BOTH themes — that is the point of tokenising the fill.
+        Light-only overrides would join them under the light token set; dark
+        evaluation excludes light-scoped rules. (There are currently no
+        light-only .btn-primary rules at all.)
+      */
+      const allRules = backgroundFills("btn-primary", tokens);
+      const fills =
+        themeName === "light"
+          ? allRules
+          : allRules.filter((rule) => !rule.label.includes("data-theme"));
 
       /*
         Assert *which* rules were found, not merely that some were: the base
@@ -229,7 +233,7 @@ describe("primary button contrast (WCAG AA, ink-on-copper label)", () => {
         `${themeName} .btn-primary fills: ${selectors.join(" | ")}`,
       ).toBeGreaterThanOrEqual(2);
 
-      const label = inkOnAccent(tokens, themeName);
+      const label = inkOnAccent(tokens);
       for (const { fill, label: desc } of fills) {
         const ratio = contrast(label, fill);
         expect(ratio, `${desc} label ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(

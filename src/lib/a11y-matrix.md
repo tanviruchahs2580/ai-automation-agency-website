@@ -1,53 +1,37 @@
-# Accessibility matrix — verified contrast ratios
+# Accessibility matrix
 
-Re-verified after the "Operator's Console" redesign (new tokens: `signal`,
-`brass`, `accent-glow`). Method: computed relative luminance per WCAG 2.2
-§1.4.3 on solid token pairs as rendered (dark default + light override).
-Interactive states (hover glows, translucent fills) are decorative-only —
-text always sits on the solid pair listed.
+Re-issued for the Keystone rebrand (2026-11). Historical note: the previous
+version of this file tabulated hand-computed ratios for the retired palette
+(blue accent, blue-black canvas); those numbers went stale the moment the
+tokens changed — which is exactly why they are no longer duplicated here.
 
-## Dark (default, `color-scheme: dark`)
+## Contrast — the test is the record
 
-| Text | Surface | Ratio | Verdict |
-|---|---|---|---|
-| `ink` #F4F2EC | `canvas` #0A0B0E | ~18.4:1 | AAA pass |
-| `ink` #F4F2EC | `surface` #10131A | ~16.9:1 | AAA pass |
-| `ink` #F4F2EC | `surface2` #171B24 | ~15.2:1 | AAA pass |
-| `muted` #A3A9B4 | `canvas` #0A0B0E | ~8.6:1 | AAA pass |
-| `muted` #A3A9B4 | `surface` #10131A | ~7.9:1 | AAA pass |
-| `faint` #7D8494 | `canvas` #0A0B0E | ~5.4:1 | AA pass (body ≥4.5) |
-| `faint` #7D8494 | `surface2` #171B24 | ~4.6:1 | AA pass |
-| `accent-strong` #5285FF | `canvas` #0A0B0E | ~5.9:1 | AA pass |
-| `accent-bright` #9DB4FF | `surface` #10131A | ~8.0:1 | AAA pass (small mono numerals on cards — axe-verified) |
-| `ok` #34D399 | `canvas` #0A0B0E | ~10.9:1 | AAA pass |
-| `warn` #F5B73D | `canvas` #0A0B0E | ~11.4:1 | AAA pass |
-| `critical` #F87171 | `canvas` #0A0B0E | ~7.3:1 | AA pass |
-| `signal` #00E5A8 | `canvas` #0A0B0E | ~13.5:1 | AAA pass |
-| `brass` #B7A36A | `canvas` #0A0B0E | ~7.6:1 | AA pass |
-| white #FFFFFF | `accent` #2E6BF6 (button bg) | ~4.6:1 | AA pass |
+`src/lib/__tests__/contrast.test.ts` parses `globals.css` (the stylesheet that
+actually ships), resolves every custom property and `color-mix()`, and
+computes WCAG 2.2 ratios for:
 
-Notes: `signal` and `brass` are used for small-caps mono labels and status
-text only — never body copy below 12px. `accent-glow` is a halo wash, never
-a text background.
+- every text-token pair on its real surfaces, in both themes (`ink`, `muted`,
+  `faint`, `accent-bright`, `accent-strong` on canvas / surface / surface2);
+- the primary button's label against its resting and hover fills, in both
+  themes (the `.ink-on-accent` / `--color-ink-on-accent` pairing);
+- WCAG 1.4.11 non-text contrast for interactive-control boundaries
+  (`--color-field`) and the accent focus ring;
+- a guard that the primary button stays a solid token fill (gradients are
+  invisible to axe — see the history note in `.btn-primary`).
 
-## Light (`[data-theme="light"]`)
+Run it: `npx vitest run src/lib/__tests__/contrast.test.ts`. It fails the
+build on any regression. Current status after the Keystone re-token: 25/25
+passing.
 
-| Text | Surface | Ratio | Verdict |
-|---|---|---|---|
-| `ink` #111827 | `canvas` #FFFFFF | ~16.1:1 | AAA pass |
-| `muted` #374151 | `canvas` #FFFFFF | ~10.4:1 | AAA pass |
-| `faint` #374151 | `surface` #F8F9FA | ~9.9:1 | AAA pass |
-| `accent` #2563EB (links/buttons on white) | `canvas` #FFFFFF | ~6.3:1 | AA pass |
-| white #FFFFFF | `accent` #2563EB (primary button) | ~6.3:1 | AA pass |
-| `ok` #047857 | `canvas` #FFFFFF | ~5.4:1 | AA pass |
-| `warn` #92400E | `canvas` #FFFFFF | ~6.6:1 | AA pass |
-| `critical` #B91C1C | `canvas` #FFFFFF | ~6.0:1 | AA pass |
-| `signal` #047857 | `canvas` #FFFFFF | ~5.4:1 | AA pass |
-| `brass` #7A6230 | `canvas` #FFFFFF | ~5.6:1 | AA pass |
+Method note: ratios are computed on solid token pairs as rendered.
+Interactive-state effects (glows, translucent fills) are decorative only —
+text always sits on the solid pair the test evaluates.
 
 ## Non-color guarantees (both themes)
 
-- Focus: 2px accent outline at 2px offset on every interactive element.
+- Focus: 2px accent outline at 2px offset on every interactive element
+  (1.4.11 boundary contrast for the ring is machine-checked — see above).
 - Motion: `prefers-reduced-motion` disables all non-essential animation
   (`globals.css` global kill-switch + per-component static fallbacks).
 - Touch targets: 44px minimum (buttons, icon-buttons, nav toggle, inputs).
@@ -59,7 +43,7 @@ a text background.
   and the intake wizard announces a step change by moving focus to the step
   heading rather than by re-announcing the whole step.
   (`aria-live="polite"` on the resolved-event line only — counters are
-  `aria-live="off"` to avoid screen-reader spam).
+  `aria-live="off"` to avoid screen-reader spam.)
 - Automated: Playwright + axe-core suite (`e2e/a11y.spec.ts`) asserts zero
   violations above *minor* impact on `/`, `/start-a-project`, `/insights`,
   `/roi-calculator`, a 16-route sweep in dark, a light-theme pass and the open
@@ -67,11 +51,5 @@ a text background.
   excluded deliberately; they are style preferences rather than barriers.
 - Automated: `e2e/a11y.spec.ts` "document structure" runs the best-practice
   rules the WCAG tag set excludes — heading order, landmark coverage, duplicate
-  ids — across 20 routes. Those are the rules that let `h1 → h3` and duplicate
-  `id="vantiq-grid"` ship unnoticed.
-- Automated: `src/lib/__tests__/contrast.test.ts` computes WCAG ratios from
-  `globals.css` itself and is the authoritative contrast record. It exists
-  because axe cannot evaluate gradient backgrounds (it reports them as
-  "incomplete", never a violation — which is how the primary CTA shipped at
-  2.89:1) and does not implement 1.4.11 non-text contrast at all. **Do not
-  duplicate its numbers here**; run the test.
+  ids — across 20 routes. Those are the rules that let `h1 → h3` and the
+  historical duplicate grid id ship unnoticed.

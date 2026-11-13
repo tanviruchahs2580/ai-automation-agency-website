@@ -50,6 +50,8 @@ export function chipFor(slug: string, index = 0): { icon: IconName; hue: ChipHue
   return (
     bySlug[slug] ?? {
       icon: "layers" as IconName,
+      // Single accent hue until a genuinely semantic second hue exists (the
+      // index param is kept for call-site compatibility, not for rotation).
       hue: fallbackHues[index % fallbackHues.length],
     }
   );

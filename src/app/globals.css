@@ -100,6 +100,8 @@
   --color-brass: #b7a36a; /* considered / reviewed / curated ONLY */
   --color-accent-glow: rgba(224, 135, 74, 0.16); /* halo, max 1 per viewport */
   --color-grid-line: rgba(244, 240, 234, 0.04);
+  /* Label colour on any accent fill (see .ink-on-accent / .btn-primary). */
+  --color-ink-on-accent: #140d08;
 
   /* Radius scale — restrained enterprise geometry */
   --radius-md: 0.65rem;
@@ -188,6 +190,7 @@
   --color-brass: #7a6230;
   --color-accent-glow: rgba(180, 84, 24, 0.12);
   --color-grid-line: rgba(28, 20, 12, 0.045);
+  --color-ink-on-accent: #fffaf4;
 }
 
 @layer base {
@@ -619,13 +622,9 @@ a.card-surface:hover,
 
 /* Key phrase — the one copper phrase in a headline. Solid colour, not a
    gradient: a two-stop text gradient is decoration with no information, and
-   the Keystone identity signals with one hue. #eda06b on canvas ≈ 8.0:1 and
-   on paper the light-theme stop ≈ 6.6:1 — passes AA at any heading size. */
+   the Keystone identity signals with one hue. The accent-strong token clears
+   AA in both themes (computed by contrast.test.ts). */
 .text-key {
-  color: var(--color-accent-strong);
-}
-
-[data-theme="light"] .text-key {
   color: var(--color-accent-strong);
 }
 
@@ -1030,20 +1029,19 @@ a.card-surface:hover,
 .btn-primary {
   /*
     Keystone primary: a solid copper fill with a near-black warm-ink label —
-    the identity's signature control. Ink-on-copper measures ~6.2:1
-    (#140d08 on #e0874a), comfortably clearing WCAG AA (4.5:1) with room for
-    the hover state, unlike the previous white-on-blue pairing whose 4.62:1
-    was the tightest pass on the site.
+    the identity's signature control. The pairing clears WCAG AA (4.5:1) with
+    room for the hover state, unlike the previous white-on-blue pairing whose
+    4.62:1 was the tightest pass on the site. Exact ratios live in exactly one
+    place — `src/lib/__tests__/contrast.test.ts`, which parses this stylesheet
+    and computes them — not in prose, where they go stale.
 
     A solid fill, not a gradient: axe cannot evaluate gradient backgrounds
     (it reports them as "incomplete", never as a violation), and the previous
     gradient demonstrably shipped a 2.89:1 state before the contrast tests
-    caught it. A single token fill is checkable by construction. Verified by
-    `src/lib/__tests__/contrast.test.ts`, which parses this rule out of the
-    stylesheet and asserts the ratio.
+    caught it. A single token fill is checkable by construction.
   */
   background: var(--color-accent);
-  color: #140d08;
+  color: var(--color-ink-on-accent);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1),
@@ -1053,7 +1051,7 @@ a.card-surface:hover,
 .btn-primary:hover {
   /* Darkens rather than brightens — brightening erodes the ink-label ratio.
      The hover affordance is carried by the accent glow ring and the deeper
-     fill (#c96f33 keeps ~5.5:1 against the same ink label). */
+     fill. */
   background: var(--color-accent-press);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
@@ -1062,27 +1060,17 @@ a.card-surface:hover,
     0 0 0 4px var(--color-accent-glow);
 }
 
-[data-theme="light"] .btn-primary {
-  background: var(--color-accent);
-  color: #fffaf4;
-}
-
-[data-theme="light"] .btn-primary:hover {
-  background: var(--color-accent-press);
-}
+/* No light-theme overrides remain: the base rules read theme tokens, so the
+   cascade re-maps fill and label per theme (checked by contrast.test.ts). */
 
 /* Label colour for text sitting directly on an accent fill.
-   The copper fill pairs with a near-black warm ink in dark theme (~6.2:1) and
-   with warm paper white in light theme (~4.7:1) — a fixed `text-white` cannot
-   straddle both themes, so every accent-filled control labels itself with this
-   class instead. Mirrors .btn-primary; kept as a separate utility for call
-   sites that size themselves with Tailwind rather than taking .btn. */
+   The copper fill pairs with a near-black warm ink in dark theme and with
+   warm paper white in light theme — a fixed `text-white` cannot straddle both
+   themes, so every accent-filled control labels itself with this class or
+   takes .btn-primary (which uses the same token). Values live in the
+   --color-ink-on-accent token; ratios are computed by contrast.test.ts. */
 .ink-on-accent {
-  color: #140d08;
-}
-
-[data-theme="light"] .ink-on-accent {
-  color: #fffaf4;
+  color: var(--color-ink-on-accent);
 }
 
 .btn-quiet {
