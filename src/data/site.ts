@@ -280,6 +280,9 @@ export const footerColumns: Array<{ heading: string; links: LinkItem[] }> = [
     })),
   {
     heading: "Industries",
+    // Every industry, not just the six curated into the header dropdown: the
+    // other six were reachable only via the index page and sitemap, which the
+    // 2026-11 route audit flagged as a discoverability gap.
     links: [
       { label: "All industries", href: "/industries" },
       {
@@ -294,6 +297,15 @@ export const footerColumns: Array<{ heading: string; links: LinkItem[] }> = [
         href: "/industries/logistics",
       },
       { label: "SaaS & Technology", href: "/industries/saas-technology" },
+      { label: "Agriculture", href: "/industries/agriculture" },
+      { label: "Education", href: "/industries/education" },
+      { label: "Real Estate", href: "/industries/real-estate" },
+      {
+        label: "Professional Services",
+        href: "/industries/professional-services",
+      },
+      { label: "Government & Public Sector", href: "/industries/government" },
+      { label: "Energy & Utilities", href: "/industries/energy" },
     ],
   },
   {

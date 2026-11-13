@@ -47,13 +47,19 @@ function warnOnProductionMisconfiguration(phase: string) {
     );
   }
 
-  if (!process.env.NEXT_PUBLIC_BRAND_NAME?.trim()) {
+  if (
+    process.env.NEXT_PUBLIC_BRAND_NAME?.trim() &&
+    process.env.NEXT_PUBLIC_BRAND_NAME.trim() !== "ARKYON"
+  ) {
+    // ARKYON is the owner-confirmed public brand and the shipped default, so
+    // an unset variable is the correct state. What deserves a signal now is
+    // the opposite: an override renaming the site to a brand the owner has
+    // not confirmed.
     warnOnce(
       "brand",
-      "\n[config] NEXT_PUBLIC_BRAND_NAME is not set, so the placeholder brand " +
-        "name is being published. The placeholder also collides with an existing " +
-        "enterprise AI vendor — see the brand note in src/data/site.ts and " +
-        "LAUNCH-CHECKLIST.md §1.\n",
+      "\n[config] NEXT_PUBLIC_BRAND_NAME is set to a value other than ARKYON, " +
+        "so this build publishes a brand the owner has not confirmed — see " +
+        "the brand note in src/data/site.ts.\n",
     );
   }
 }

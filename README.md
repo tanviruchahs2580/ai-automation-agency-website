@@ -1,10 +1,10 @@
-# VANTIQ SYSTEMS — Enterprise AI Engineering & Automation Website
+# ARKYON — Enterprise AI Engineering & Automation Website
 
-Production website for VANTIQ SYSTEMS, an AI Engineering & Automation company:
+Production website for ARKYON, an AI Engineering & Automation company:
 solutions, services, industries, interactive AI readiness assessment, ROI
 calculator and project intake.
 
-Design language: **"Operator's Console"** — see `DESIGN-SYSTEM.md` (tokens,
+Design language: **"Keystone"** (warm ink + copper; formerly "Operator's Console") — see `DESIGN-SYSTEM.md` (tokens,
 components, motion, budgets) and `BRAND-GUIDE.md` (positioning, voice, copy
 rules). Accessibility matrix: `src/lib/a11y-matrix.md`. Locale strategy:
 `src/lib/i18n.md`. Redesign launch delta: `LAUNCH-CHECKLIST-UPDATE.md`.

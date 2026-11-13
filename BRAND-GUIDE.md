@@ -1,22 +1,35 @@
-# VANTIQ Systems — Brand Guide
+# ARKYON — Brand Guide
 
 Positioning, voice, and copy rules. Enforced in every string on the site.
 Companion: `DESIGN-SYSTEM.md` (visual system).
 
+> Renamed from the retired placeholder ("VANTIQ Systems") on 2026-11 when the
+> owner confirmed `ARKYON` as the public brand. The name lives in exactly one
+> place: `siteConfig` in `src/data/site.ts`; `brand.test.ts` keeps it that way.
+
 ## 1. Positioning
 
-> **VANTIQ Systems engineers the autonomous operations layer for enterprises
-> that cannot afford guesswork.**
+> **ARKYON researches, engineers and operates intelligent systems that take
+> practical business problems to production — with governance built in from
+> the first architecture.**
 
-- **Category:** AI Engineering & Automation (not "AI tools", "chatbots", or
-  "consulting").
-- **Audience:** Heads of Ops / CTOs / VP Eng at $50M–$5B companies in
-  regulated or mission-critical industries.
+- **Category:** Applied AI R&D and intelligent-systems engineering (not "AI
+  tools", "chatbots", "prompt consulting", or a reseller of model APIs).
+- **Audience:** Founders and CEOs with costly operational problems; CTOs /
+  CIOs / architects; COOs and process owners; teams building AI-enabled
+  products, including in regulated or mission-critical settings.
 - **Wedge:** "We don't sell AI. We engineer the systems that make AI
   trustworthy enough to run your operations."
+- **Identity:** the keystone — the engineered piece that makes an unstable
+  assembly hold. One copper accent on warm ink; the mark is an arch with its
+  keystone seated at the apex. Green is a status signal only, never décor.
 
 Eight-second test: after 8 seconds on the homepage a visitor must be able to
 say *"they build trustworthy AI systems that run business operations."*
+
+Public-name rule: the brand is exactly `ARKYON` in lockups, titles, metadata
+and prose — no "ARKYON Systems/AI/Labs" suffixes, no legal-entity claims (the
+legal entity is unconfirmed and is not modelled anywhere).
 
 ## 2. Voice (all five, always)
 
