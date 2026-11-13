@@ -1,0 +1,17 @@
+{
+  "companyName": "Release Verification (honeypot sink)",
+  "companySize": "51 – 250",
+  "industry": "Software",
+  "country": "Testland",
+  "problem": "Synthetic release-verification payload exercising the live validation path end to end with zero notification side effects by design.",
+  "currentWorkflow": "Synthetic workflow description for verification.",
+  "existingSoftware": "Email and spreadsheets.",
+  "desiredOutcome": "Confirmation that the deployed intake pipeline validates, receives and receipts correctly.",
+  "budgetRange": "Not sure yet",
+  "timeline": "Exploring options",
+  "contactName": "Release Verification",
+  "contactEmail": "verification@example.com",
+  "contactRole": "QA",
+  "consent": true,
+  "companyWebsite": "https://honeypot.example/synthetic"
+}
