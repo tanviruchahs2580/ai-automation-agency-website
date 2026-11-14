@@ -64,32 +64,29 @@
 }
 
 @theme {
-  /* Design tokens — "Keystone" warm-ink system (ARKYON, 2026-11).
-     Copper is the single signal accent: the wedge that completes an arch.
-     Green stays strictly semantic (live/verified), never decorative. */
-  --color-canvas: #0f0d0c;
-  --color-surface: #171412;
-  --color-surface2: #221d1a;
-  --color-line: rgba(244, 240, 234, 0.09);
-  --color-line-strong: rgba(244, 240, 234, 0.16);
-  --color-ink: #f4f0ea;
-  --color-muted: #a8a19a;
-  --color-faint: #8d867e; /* WCAG AA: >=4.5:1 on all surface tokens */
-  --color-accent: #e0874a;
-  --color-accent-strong: #eda06b;
-  --color-accent-bright: #f2b98b; /* small text on dark surfaces (AA ≥4.5) */
+  /* Design tokens — "Architectural Night" v5 (ARKYON, 2026-11).
+     Deep navy/charcoal base, one orange brand accent, green status-only.
+     Supersedes Keystone v4 warm-ink values per the owner-approved target
+     reference (docs/redesign/). Roles and component contracts unchanged. */
+  --color-canvas: #06101b;
+  --color-surface: #0b1927;
+  --color-surface2: #102234;
+  --color-line: rgba(167, 190, 214, 0.18);
+  --color-line-strong: rgba(167, 190, 214, 0.32);
+  --color-ink: #f5f7fa;
+  --color-muted: #b7c2cf;
+  --color-faint: #8f9cac; /* WCAG AA: >=4.5:1 on all surface tokens */
+  --color-accent: #f58a1f;
+  --color-accent-strong: #ffa13a;
+  --color-accent-bright: #ffb966; /* small text on dark surfaces (AA ≥4.5) */
   /* Pressed/hover fill for solid accent surfaces. Deliberately DARKER than
-     --color-accent, not lighter: the primary button pairs a near-black warm
-     ink label (#140d08) with the copper fill (#e0874a ≈ 6.2:1); any lighter
-     hover fill reduces that margin. See .btn-primary and the
-     `hover:bg-accent-press` utilities. */
-  --color-accent-press: #c96f33;
+     --color-accent, not lighter: the primary button pairs a near-black ink
+     label with the orange fill (7.6:1); the pressed #d96f0d keeps 5.6:1. */
+  --color-accent-press: #d96f0d;
   /* Boundary of *interactive controls only*. WCAG 1.4.11 requires 3:1 against
-     the adjacent colours to identify a control, which a 9%-alpha hairline
-     cannot reach (it composites to ~1.2:1 on the field fill). This token
-     composites to ≥3:1 against both the field fill and the page background, and
-     is never used for decorative rules. */
-  --color-field: rgba(244, 240, 234, 0.4);
+     the adjacent colours to identify a control. Composites to ≥3:1 against
+     both the field fill and the page background; never used for decoration. */
+  --color-field: rgba(245, 247, 250, 0.55);
   --color-ok: #34d399;
   --color-warn: #f5b73d;
   --color-critical: #f87171;
@@ -98,10 +95,10 @@
   /* Signature tokens — see DESIGN-SYSTEM.md §2 for usage rules */
   --color-signal: #00e5a8; /* live / verified / running ONLY */
   --color-brass: #b7a36a; /* considered / reviewed / curated ONLY */
-  --color-accent-glow: rgba(224, 135, 74, 0.16); /* halo, max 1 per viewport */
-  --color-grid-line: rgba(244, 240, 234, 0.04);
+  --color-accent-glow: rgba(245, 138, 31, 0.16); /* halo, max 1 per viewport */
+  --color-grid-line: rgba(167, 190, 214, 0.05);
   /* Label colour on any accent fill (see .ink-on-accent / .btn-primary). */
-  --color-ink-on-accent: #140d08;
+  --color-ink-on-accent: #17120c;
 
   /* Radius scale — restrained enterprise geometry */
   --radius-md: 0.65rem;
@@ -161,35 +158,31 @@
 
 /* ---------- Light theme tokens (fully designed, not inverted) ---------- */
 [data-theme="light"] {
-  /* Warm paper, not clinical white: the Keystone identity reads as engineered
-     material (ink on paper), not as a SaaS dashboard. */
-  --color-canvas: #faf7f2;
-  --color-surface: #f2ede5;
-  --color-surface2: #e6dfd4;
-  --color-line: rgba(28, 20, 12, 0.1);
-  --color-line-strong: rgba(28, 20, 12, 0.18);
-  --color-ink: #1c1611;
-  --color-muted: #4d453c;
-  /* Distinct from --color-muted (two-level text hierarchy). #645b50 measures
-     6.28:1 on canvas / 5.77:1 on surface / 5.13:1 on surface2. */
-  --color-faint: #645b50;
-  --color-accent: #b45418;
-  --color-accent-strong: #93430f;
-  --color-accent-bright: #93430f;
-  --color-accent-press: #8f3e10;
-  /* Warm paper surfaces are darker than the old clinical grey, so the control
-     boundary needs more ink: 0.45 composites to 2.86:1 on canvas (fails WCAG
-     1.4.11); 0.6 measures 4.77:1 on canvas / 4.41:1 on surface2. Enforced by
-     contrast.test.ts. */
-  --color-field: rgba(28, 20, 12, 0.6);
+  /* Cool architectural paper pairing the navy identity: light stays a
+     deliberate design, not an inversion. */
+  --color-canvas: #f2f5f9;
+  --color-surface: #fbfcfe;
+  --color-surface2: #e3eaf2;
+  --color-line: rgba(13, 27, 42, 0.1);
+  --color-line-strong: rgba(13, 27, 42, 0.2);
+  --color-ink: #0d1b2a;
+  --color-muted: #3e4e61;
+  /* Distinct from --color-muted (two-level text hierarchy). #546476 measures
+     5.9:1 on canvas / 5.3:1 on surface / 4.99:1 on surface2. */
+  --color-faint: #546476;
+  --color-accent: #c2410c;
+  --color-accent-strong: #9a3412;
+  --color-accent-bright: #9a3412;
+  --color-accent-press: #a03a08;
+  --color-field: rgba(13, 27, 42, 0.6);
   --color-ok: #047857;
   --color-warn: #92400e;
   --color-critical: #b91c1c;
   --color-info: #0369a1;
   --color-signal: #047857;
   --color-brass: #7a6230;
-  --color-accent-glow: rgba(180, 84, 24, 0.12);
-  --color-grid-line: rgba(28, 20, 12, 0.045);
+  --color-accent-glow: rgba(194, 65, 12, 0.12);
+  --color-grid-line: rgba(13, 27, 42, 0.05);
   --color-ink-on-accent: #fffaf4;
 }
 
@@ -255,18 +248,18 @@
     background:
       radial-gradient(
         64rem 30rem at 50% -10%,
-        rgba(224, 135, 74, 0.055),
+        rgba(64, 128, 200, 0.09),
         transparent 62%
       ),
       radial-gradient(
-        44rem 22rem at 108% 4%,
-        rgba(183, 163, 106, 0.03),
+        44rem 22rem at 108% 6%,
+        rgba(245, 138, 31, 0.045),
         transparent 58%
       ),
       linear-gradient(
         to bottom,
         transparent 82%,
-        rgba(15, 13, 12, 0.5) 100%
+        rgba(4, 10, 17, 0.5) 100%
       );
   }
 
@@ -274,29 +267,29 @@
     background:
       radial-gradient(
         64rem 30rem at 50% -10%,
-        rgba(180, 84, 24, 0.05),
+        rgba(64, 128, 200, 0.08),
         transparent 62%
       ),
       radial-gradient(
-        44rem 22rem at 108% 4%,
-        rgba(122, 98, 48, 0.025),
+        44rem 22rem at 108% 6%,
+        rgba(194, 65, 12, 0.03),
         transparent 58%
       ),
       linear-gradient(
         to bottom,
         transparent 86%,
-        rgba(250, 247, 242, 0.7) 100%
+        rgba(226, 233, 241, 0.7) 100%
       );
   }
 
   ::selection {
-    background: rgba(224, 135, 74, 0.35);
+    background: rgba(245, 138, 31, 0.35);
     color: #fff;
   }
 
   [data-theme="light"] ::selection {
-    background: rgba(180, 84, 24, 0.22);
-    color: #1c1611;
+    background: rgba(194, 65, 12, 0.22);
+    color: #0d1b2a;
   }
 
   :focus-visible {
@@ -545,17 +538,17 @@ a.card-surface:hover,
   background:
     radial-gradient(
       42rem 22rem at 12% -6%,
-      rgba(224, 135, 74, 0.09),
+      rgba(64, 128, 200, 0.1),
       transparent 62%
     ),
     radial-gradient(
       34rem 20rem at 88% 8%,
-      rgba(183, 163, 106, 0.05),
+      rgba(245, 138, 31, 0.05),
       transparent 60%
     ),
     radial-gradient(
       50rem 26rem at 55% 110%,
-      rgba(224, 135, 74, 0.06),
+      rgba(64, 128, 200, 0.07),
       transparent 65%
     );
   -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
@@ -566,12 +559,12 @@ a.card-surface:hover,
   background:
     radial-gradient(
       42rem 22rem at 12% -6%,
-      rgba(180, 84, 24, 0.07),
+      rgba(64, 128, 200, 0.08),
       transparent 62%
     ),
     radial-gradient(
       34rem 20rem at 88% 8%,
-      rgba(122, 98, 48, 0.05),
+      rgba(194, 65, 12, 0.04),
       transparent 60%
     );
 }
@@ -611,7 +604,7 @@ a.card-surface:hover,
   transition: opacity var(--duration-base) var(--ease-out-soft);
   background: radial-gradient(
     15rem circle at var(--mx, 50%) var(--my, 50%),
-    rgba(237, 160, 107, 0.14),
+    rgba(255, 161, 58, 0.14),
     transparent 68%
   );
 }
@@ -1016,7 +1009,7 @@ a.card-surface:hover,
   gap: 0.5rem;
   min-height: 44px;
   padding: 0.625rem 1.25rem;
-  border-radius: var(--radius-md);
+  border-radius: 999px; /* Architectural Night: pill CTAs per the target reference */
   font-size: 0.875rem;
   font-weight: 500;
   transition:
@@ -1028,12 +1021,11 @@ a.card-surface:hover,
 
 .btn-primary {
   /*
-    Keystone primary: a solid copper fill with a near-black warm-ink label —
-    the identity's signature control. The pairing clears WCAG AA (4.5:1) with
-    room for the hover state, unlike the previous white-on-blue pairing whose
-    4.62:1 was the tightest pass on the site. Exact ratios live in exactly one
-    place — `src/lib/__tests__/contrast.test.ts`, which parses this stylesheet
-    and computes them — not in prose, where they go stale.
+    Architectural Night primary: a solid orange fill with a near-black ink
+    label — the identity's signature control (7.6:1; pressed 5.6:1). Exact
+    ratios live in exactly one place — `src/lib/__tests__/contrast.test.ts`,
+    which parses this stylesheet and computes them — not in prose, where they
+    go stale.
 
     A solid fill, not a gradient: axe cannot evaluate gradient backgrounds
     (it reports them as "incomplete", never as a violation), and the previous

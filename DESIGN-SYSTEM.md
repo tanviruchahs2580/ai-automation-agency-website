@@ -1,22 +1,22 @@
-# ARKYON — Design System ("Keystone")
+# ARKYON — Design System ("Architectural Night")
 
-Version 4.0 · Status: active · Owner: frontend team.
+Version 5.0 · Status: active · Owner: frontend team.
 Single source of truth for tokens, components, motion, and usage rules.
 Companion: `BRAND-GUIDE.md` (voice, positioning, copy rules).
 
-> v4 ("Keystone", 2026-11) re-brands and re-tones v3 ("Mission Control"): the
-> structure, motion system, components and budgets carry over; the palette,
-> mark and signal language change. Warm-ink canvas replaces blue-black
-> graphite; **one copper accent** replaces the blue+green pair (green survives
-> strictly as the live/verified status hue); the tri-colour gradient headline
-> is retired for a single solid copper key phrase; the mark is an arch with
-> its keystone seated at the apex. Every change is a token or utility; no
-> one-off magic numbers in components. Budgets unchanged (§7).
+> v5 ("Architectural Night", 2026-11) supersedes the Keystone warm-ink palette
+> per the owner-approved target reference (`docs/redesign/`): deep
+> navy/charcoal base (#06101b family), one orange accent (#f58a1f family),
+> cool muted text, blue atmospheric fields, pill CTAs, and a photographic
+> architectural hero + Proven Approach banner. Structure, motion system,
+> components, budgets, feature contracts and the approved logo carry over
+> unchanged. Every change is a token or utility; no one-off magic numbers.
 
-> Design language in three sentences: **"Keystone" treats the site like an
-> engineered drawing set — warm ink, hairline precision, one copper signal.**
-> Type carries the identity; color is reserved for state, never decoration.
-> Every page earns one screen-shot-able signature moment and nothing more.
+> Design language in three sentences: **"Architectural Night" presents ARKYON
+> as a composed, premium engineering firm — deep navy surfaces, warm white
+> type, one controlled orange signal over cinematic architecture.** Type
+> carries the identity; color is reserved for state, never decoration. Every
+> page earns one screen-shot-able signature moment and nothing more.
 
 ## 1. Principles (ranked — use to resolve conflicts)
 
@@ -37,25 +37,26 @@ Semantic set (preserved): `canvas, surface, surface2, line,
 line-strong, ink, muted, faint, accent, accent-strong, ok, warn,
 critical, info`.
 
-Keystone values (dark theme; light theme re-maps every token — warm paper
-`#faf7f2`, deep copper `#b45418` — it is fully designed, not inverted):
+Architectural Night values (dark theme; light theme re-maps every token —
+cool paper `#f2f5f9`, navy ink `#0d1b2a`, deep orange `#c2410c` — it is fully
+designed, not inverted):
 
 | Token | Value (dark) | Rule |
 |---|---|---|
-| `--color-canvas` | `#0f0d0c` | Warm near-black; **not** blue-black graphite. |
-| `--color-accent` | `#e0874a` | **Copper — the one signal accent.** Fills, marks, key phrases, CTA fills. |
-| `--color-accent-press` | `#c96f33` | Pressed/hover fill; darkens (never lightens) to protect the ink label ratio. |
-| `--color-accent-bright` | `#f2b98b` | Small copper text on dark surfaces (AA ≥4.5:1). |
-| `--color-ink` | `#f4f0ea` | Warm paper-white text. |
-| `--color-faint` | `#8d867e` | Tertiary text; ≥4.5:1 on every surface token (enforced by `contrast.test.ts`). |
+| `--color-canvas` | `#06101b` | Deep navy-black; blue is atmosphere, not an accent. |
+| `--color-accent` | `#f58a1f` | **Orange — the one brand accent.** CTA fills, key phrase, icon emphasis. |
+| `--color-accent-press` | `#d96f0d` | Pressed/hover fill; darkens (never lightens) to protect the ink label ratio. |
+| `--color-accent-bright` | `#ffb966` | Small orange text on dark surfaces (AA ≥4.5:1). |
+| `--color-ink` | `#f5f7fa` | Warm white primary text. |
+| `--color-faint` | `#8f9cac` | Tertiary text; ≥4.5:1 on every surface token (enforced by `contrast.test.ts`). |
 | `--color-signal` | `#00e5a8` | **Live / verified / running states ONLY.** Never decoration. |
 | `--color-brass` | `#b7a36a` | "Considered" states: pull-quotes, engineering notes, reviewed badges. |
-| `--color-accent-glow` | `rgba(224,135,74,.16)` | Halo behind hero numerals / wordmark, **max 1 per viewport**. |
-| `--color-grid-line` | `rgba(244,240,234,.04)` | Background grid (`<GridLines />`). |
+| `--color-accent-glow` | `rgba(245,138,31,.16)` | Halo, **max 1 per viewport**. |
+| `--color-grid-line` | `rgba(167,190,214,.05)` | Background grid (`<GridLines />`). |
 
 `.ink-on-accent` — the label colour for text on an accent fill (near-black
-warm ink `#140d08` in dark theme, warm white `#fffaf4` in light). A fixed
-`text-white` cannot straddle both themes against copper; every accent-filled
+ink `#17120c` in dark theme, warm white `#fffaf4` in light). A fixed
+`text-white` cannot straddle both themes against orange; every accent-filled
 control labels itself with this class or takes `.btn-primary`.
 
 Card borders use `--color-line` / `--color-line-strong`, not a dedicated
@@ -70,12 +71,12 @@ computed against WCAG 2.2 ratios; the numbers are never duplicated into prose.
 | `.aurora-bleed` | Copper + brass radial mesh, masked vignette | Ambient only, ≤8% perceptual; light theme dims further |
 | `.grain` / `::after` | 2–3% `feTurbulence` data-URI noise | Kills flat-digital feel; never over text-heavy prose |
 | `.spotlight` + `--mx/--my` | Cursor-following radial glow (`<Spotlight />` sets vars) | Interactive cards only; touch + reduced-motion skip |
-| `.text-key` | **Solid** `accent-strong` copper phrase | The one key phrase per headline. No text gradients — a two-stop gradient is decoration, and axe cannot evaluate one |
-| `.chip` + `data-hue` | 44px icon chip | **Single-hue copper on cards** (2026-11 review: a five-hue rotation was undecodable to visitors). The hue field remains for genuinely semantic state use |
+| `.text-key` | **Solid** `accent-strong` orange phrase | The one key phrase per headline. No text gradients — a two-stop gradient is decoration, and axe cannot evaluate one |
+| `.chip` + `data-hue` | 44px icon chip | **Single-hue orange on cards** (2026-11 review: a five-hue rotation was undecodable to visitors). The hue field remains for genuinely semantic state use |
 | `.marquee` / `.marquee-track` | 36s edge-masked loop, pause on hover | Reduced-motion static (explicit gate + global gate) |
 | `.diagram-live-path` | Signal dash-flow on one SVG path | Decorative paths only; explicit reduced-motion gate |
 | `.text-hero` | `clamp(2.5rem, 4.2vw + 1rem, 4.25rem)` display | Landing hero H1 only |
-| `.gauge-track` / `.gauge-band` | Range-band bars for illustrative metrics | Bands show ranges, never single animated numbers; band gradient stays within the copper ramp |
+| `.gauge-track` / `.gauge-band` | Range-band bars for illustrative metrics | Bands show ranges, never single animated numbers; band gradient stays within the orange ramp |
 | `.field-shake` | 220ms inline validation shake | Errors only, with `critical` color pairing |
 
 ## 3. Typography
@@ -122,7 +123,7 @@ uses the editorial serif.
 
 ## 5. Components (`src/components/ui/`)
 
-**Button** — three variants only: `primary` (solid copper fill, theme-aware
+**Button** — three variants only: `primary` (solid orange fill, theme-aware
 ink label via the shared pairing; solid by design — a gradient label
 background is invisible to axe, and the previous gradient demonstrably shipped
 a 2.89:1 state before the contrast tests caught it), `quiet` (1px `faint`
