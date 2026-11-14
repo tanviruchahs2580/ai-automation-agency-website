@@ -172,9 +172,7 @@
 }
 
 .industryItem:focus-visible,
-.serviceCard:focus-visible,
-.approachAction:focus-visible,
-.approachLink:focus-visible {
+.serviceCard:focus-visible {
   outline: 2px solid var(--color-accent-bright);
   outline-offset: 3px;
 }
@@ -266,110 +264,140 @@
   opacity: 1;
 }
 
+/* Proven-approach banner — owner reference (2026-11-14): photographic dusk
+   skyline, dark left gradient, dotted mono eyebrow, orange bar + two-line
+   heading with the orange key word. The whole panel is one link to /approach
+   (the reference shows no separate CTA; route access is preserved). */
+.approachSection {
+  margin-top: clamp(2rem, 4vw, 3.25rem);
+}
+
 .approach {
   position: relative;
   display: flex;
-  min-height: 15.5rem;
+  min-height: clamp(12rem, 24vw, 15.5rem);
   align-items: center;
   isolation: isolate;
   overflow: hidden;
-  margin-top: clamp(2rem, 4vw, 3.25rem);
   border: 1px solid var(--color-line-strong);
   border-radius: 1.35rem;
   background: var(--color-surface);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.approach:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+  transform: translateY(-2px);
+}
+
+.approach:focus-visible {
+  outline: 2px solid var(--color-accent-bright);
+  outline-offset: 3px;
 }
 
 .approachImage {
-  object-position: 78% 55%;
+  object-position: 72% 58%;
 }
 
 .approachOverlay {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(90deg, rgba(4, 10, 17, 0.98) 0%, rgba(4, 10, 17, 0.88) 42%, rgba(4, 10, 17, 0.36) 74%, rgba(4, 10, 17, 0.12) 100%);
+  background: linear-gradient(90deg, rgba(4, 10, 17, 0.97) 0%, rgba(4, 10, 17, 0.86) 38%, rgba(4, 10, 17, 0.3) 72%, rgba(4, 10, 17, 0.05) 100%);
 }
 
 .approachContent {
-  max-width: 37rem;
-  padding: 2.1rem 2.35rem;
+  padding: 2.2rem 2.5rem;
 }
 
 .approachEyebrow {
-  margin-bottom: 0.7rem;
-  color: var(--color-accent-bright);
+  /* Aligned with the heading TEXT (bar width + gap), per the owner reference —
+     the 2026-11-14 audit flagged the eyebrow sitting on the bar's edge. */
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 0.95rem;
+  padding-inline-start: calc(3px + 1rem);
+  color: #cdd7e2;
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.24em;
   line-height: 1.5;
   text-transform: uppercase;
 }
 
-.approachContent h2 {
-  max-width: 17ch;
+.approachDot {
+  color: var(--color-accent);
+  font-size: 0.6rem;
+}
+
+.approachHeading {
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
   margin: 0;
+}
+
+.approachBar {
+  width: 3px;
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+
+.approachHeadingText {
   color: #f5f7fa;
   font-family: var(--font-display, Arial, sans-serif);
-  font-size: clamp(1.65rem, 3vw, 2.65rem);
+  font-size: clamp(1.55rem, 2.9vw, 2.5rem);
   font-weight: 650;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  letter-spacing: -0.03em;
+  line-height: 1.14;
   text-wrap: balance;
 }
 
-.approachContent p:not(.approachEyebrow) {
-  max-width: 31ch;
-  margin: 0.85rem 0 0;
-  color: var(--color-muted);
-  line-height: 1.6;
-}
-
-.approachLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: 1.15rem;
-  color: var(--color-accent-bright);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.approachLink:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.approachAction {
-  position: absolute;
-  right: 1.4rem;
-  bottom: 1.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.2rem;
-  height: 3.2rem;
-  border: 1px solid var(--color-line-strong);
-  border-radius: 999px;
-  color: var(--color-accent-bright);
-  background: rgba(4, 10, 17, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
-}
-
-.approachAction:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent-bright);
-  transform: translateY(-2px);
+.approachAccent {
+  color: #ffa13a;
 }
 
 /* ---- Responsive composition (spec §4) ---- */
 
-/* Very narrow phones: two-column service grid protects label legibility. */
-@media (max-width: 360px) {
+/* Phones and narrow tablets: two-column service grid protects label
+   legibility (the 2026-11-14 audit measured 3-line titles at 390px). */
+@media (max-width: 430px) {
   .serviceGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Banner small-screen handling — the audit's P1: without this, the eyebrow
+   clipped ("IMP") and the heading clipped mid-word at 320–430px. */
+@media (max-width: 480px) {
+  .approachContent {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .approachHeading {
+    gap: 0.75rem;
+  }
+
+  .approachEyebrow {
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
+    letter-spacing: 0.18em;
+    font-size: 0.64rem;
+  }
+
+  .approachHeadingText {
+    font-size: 1.3rem;
+  }
+
+  /* Small phones: let the heading wrap freely instead of forcing the
+     reference's two-line break (which clipped "More Automated Future"). */
+  .approachBr {
+    display: none;
   }
 }
 
@@ -427,17 +455,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .serviceCard,
-  .approachAction,
   .serviceArrow,
-  .industryItem {
+  .industryItem,
+  .approach {
     transition: none;
   }
 
-  .serviceCard:hover {
-    transform: none;
-  }
-
-  .approachAction:hover {
+  .serviceCard:hover,
+  .approach:hover {
     transform: none;
   }
 }
