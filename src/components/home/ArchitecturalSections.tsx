@@ -280,29 +280,42 @@ function ServiceGrid() {
 
 function ProvenApproach() {
   return (
-    <section className={styles.approach} aria-labelledby="ark-approach-heading">
-      <Image
-        src="/images/arkyon-hero-architecture.webp"
-        alt=""
-        fill
-        sizes="(max-width: 768px) 100vw, 78rem"
-        className={styles.approachImage}
-      />
-      <div className={styles.approachOverlay} aria-hidden="true" />
-      <div className={styles.approachContent}>
-        <p className={styles.approachEyebrow}>Proven approach</p>
-        <h2 id="ark-approach-heading">From idea to impact with confidence.</h2>
-        <p>A structured, transparent and collaborative process.</p>
-        <Link href="/approach" className={styles.approachLink}>
-          Learn More <span aria-hidden="true">→</span>
-        </Link>
-      </div>
+    <section className={styles.approachSection} aria-labelledby="ark-approach-heading">
+      {/*
+        Whole-panel link to /approach: the owner's redesign reference shows no
+        separate CTA, so the banner itself is the single, semantically valid
+        link — preserving the route access the previous Learn More afforded.
+      */}
       <Link
         href="/approach"
-        className={styles.approachAction}
-        aria-label="Explore the approach in detail"
+        className={styles.approach}
+        aria-labelledby="ark-approach-heading"
       >
-        <span aria-hidden="true">↗</span>
+        <Image
+          src="/images/arkyon-approach-skyline.webp"
+          alt=""
+          fill
+          sizes="(max-width: 768px) 100vw, 78rem"
+          className={styles.approachImage}
+        />
+        <div className={styles.approachOverlay} aria-hidden="true" />
+        <div className={styles.approachContent}>
+          <p className={styles.approachEyebrow}>
+            Innovation
+            <span className={styles.approachDot} aria-hidden="true">•</span>
+            Intelligence
+            <span className={styles.approachDot} aria-hidden="true">•</span>
+            Impact
+          </p>
+          <h2 id="ark-approach-heading" className={styles.approachHeading}>
+            <span className={styles.approachBar} aria-hidden="true" />
+            <span className={styles.approachHeadingText}>
+              Building a <span className={styles.approachAccent}>Smarter,</span>
+              <br className={styles.approachBr} />{" "}
+              More Automated Future
+            </span>
+          </h2>
+        </div>
       </Link>
     </section>
   );
