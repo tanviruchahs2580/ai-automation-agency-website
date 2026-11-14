@@ -157,6 +157,11 @@ export function Wordmark({
       className="group relative flex items-center gap-2.5"
       aria-label={`${siteConfig.name} — home`}
     >
+      {/* The wordmark is drawn as SVG paths (no text nodes), so the brand name
+          would otherwise exist only in this link's aria-label. The sr-only
+          span keeps the name in the page's real text content for screen
+          readers and find-in-page. */}
+      <span className="sr-only">{siteConfig.name}</span>
       {mode === "footer" ? (
         /* Stacked lockup: the footer brand column is one grid track wide, so
            the horizontal lockup would overlap the next column — the balanced
