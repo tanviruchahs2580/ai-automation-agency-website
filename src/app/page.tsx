@@ -1,19 +1,6 @@
 import { siteConfig } from "@/data/site";
-import { disclaimers } from "@/data/disclaimers";
-import { Hero } from "@/components/home/Hero";
-import { TrustStrip } from "@/components/home/TrustStrip";
-import { WhatWeSolve } from "@/components/home/WhatWeSolve";
-import { ServiceRows } from "@/components/home/ServiceRows";
-import { MetricsPulse } from "@/components/scenes/MetricsPulse";
-import { IndustriesGrid } from "@/components/home/IndustriesGrid";
-import { CaseStudiesPreview } from "@/components/home/CaseStudiesPreview";
-import { TrustGovernance } from "@/components/home/TrustGovernance";
-import { CtaSection } from "@/components/layout/CtaSection";
-import { ArchitectureLandscape } from "@/components/scenes/ArchitectureLandscape";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { Button } from "@/components/ui/Button";
-import { Magnetic } from "@/components/ui/Magnetic";
 import { ScrollDepthTracker } from "@/components/ui/ScrollDepthTracker";
+import { ArchitecturalSections } from "@/components/home/ArchitecturalSections";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -24,148 +11,22 @@ export const metadata = buildMetadata({
 });
 
 /**
-/**
- * Illustrative ranges stay static text: count-up on a range endpoint would
- * misrepresent the number (honesty wins over motion). The gauge bands carry
- * the visual momentum instead.
+ * Homepage — "Architectural Night" composition (owner-approved reference):
+ * header → architectural hero → industry strip → six grouped services →
+ * Proven Approach banner → footer.
  *
- * Labels say "model" explicitly. The section lead promises "Built on your
- * numbers — not our marketing", so a label reading "Manual triage reduction in
- * 90 days" or "Typical first-year return" asserted typical client outcomes the
- * site cannot evidence; these are outputs of the calculator's model.
- *
- * Band positions are percentages of each metric's own scale, not the printed
- * value: "3–6×" cannot share an axis with "60–80%", so the multiplier maps
- * 0–8× onto 0–100% (3× ≈ 37%, 6× = 75%).
+ * Homepage teasers from the previous composition (trust strip, problem grid,
+ * service rows, industries grid, case-study preview, trust/governance, ROI
+ * teaser, final CTA) are intentionally absent: each one's content remains
+ * available on its dedicated route (docs/redesign/DECISIONS.md records the
+ * mapping). ScrollDepthTracker stays mounted — FC-21 requires the home
+ * scroll-depth events.
  */
-const roiTeaserMetrics = [
-  { value: "60–80%", label: "Triage effort removed — 90-day model", lo: 60, hi: 80 },
-  { value: "40–60%", label: "Incident MTTR removed — one-quarter model", lo: 40, hi: 60 },
-  { value: "3–6×", label: "First-year return on automated hours — model", lo: 37, hi: 75 },
-];
-
-/*
-  Imported directly, not through `next/dynamic`.
-
-  The dynamic import carried a `loading` fallback, and that fallback is what
-  made Next.js emit this scene's entire subtree inside a `<div hidden id="S:0">`
-  container that an inline `$RC(...)` call reveals. Two consequences, both
-  measured: with JavaScript disabled the architecture scene — layer buttons and
-  detail panel — was permanently invisible on `/` and `/technology`, and the
-  route could not be crawled for its layer content. It also bought nothing: the
-  chunk was counted in first-load JavaScript either way, so the "code-split per
-  the performance budget" note was describing a split that did not defer a
-  fetch. A normal import renders it in the HTML and the budget is unchanged.
-*/
-
 export default function HomePage() {
   return (
     <>
       <ScrollDepthTracker />
-
-      {/* 01 · HERO — signature moment: HeroInstrument */}
-      <Hero />
-
-      {/* 02 · TRUST STRIP */}
-      <TrustStrip />
-
-      {/* 03 · WHAT WE SOLVE */}
-      <WhatWeSolve />
-
-      {/* 04 · ARCHITECTURE — signature moment: ArchitectureLandscape */}
-      <section className="section-y" aria-labelledby="arch-heading">
-        <div className="container-x">
-          <SectionHeader
-            eyebrow="System architecture"
-            title="We don't just add AI. We engineer the system around it."
-            lead="Models change monthly. A well-architected system keeps working regardless. Select any layer to see what it guarantees."
-            id="arch-heading"
-            index="03"
-          />
-          <div className="mt-12">
-            <ArchitectureLandscape />
-          </div>
-        </div>
-      </section>
-
-      {/* 05 · SERVICES — interactive rows */}
-      <ServiceRows />
-
-      {/* 06 · INDUSTRIES */}
-      <IndustriesGrid compact />
-
-      {/* 07 · CASE STUDIES */}
-      <CaseStudiesPreview />
-
-      {/* 08 · TRUST & GOVERNANCE — enterprise trust layer (IA §8/§9) */}
-      <TrustGovernance />
-
-      {/* 09 · ROI TEASER — gauge bands + live-pulsed estimate ranges */}
-      <section
-        className="section-y border-t border-line bg-surface/30"
-        aria-labelledby="roi-heading"
-      >
-        <div className="container-x grid items-center gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <SectionHeader
-              eyebrow="ROI calculator"
-              title="Estimate what manual work really costs you."
-              lead="Built on your numbers — not our marketing. Every output is labeled an estimate because it is one."
-              id="roi-heading"
-              index="08"
-            />
-            <dl className="mt-8 grid gap-4 sm:grid-cols-3">
-              {roiTeaserMetrics.map((metric) => (
-                <div
-                  key={metric.label}
-                  className="rounded-lg border border-line bg-canvas p-4"
-                >
-                  <dt className="text-xs leading-snug text-muted">
-                    {metric.label}
-                  </dt>
-                  <dd className="font-display mt-1 text-2xl font-bold tracking-tight">
-                    <MetricsPulse>{metric.value}</MetricsPulse>
-                    <div
-                      className="gauge-track mt-3"
-                      role="img"
-                      aria-label={`${metric.label}: illustrative band ${metric.value}`}
-                    >
-                      <div
-                        className="gauge-band"
-                        style={{ left: `${metric.lo}%`, width: `${metric.hi - metric.lo}%` }}
-                      />
-                    </div>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            <p className="mono-label mt-4 uppercase text-faint">
-              {disclaimers.modelRangesLabel}
-            </p>
-          </div>
-          <div className="lg:col-span-5">
-            <div className="card-surface grain p-8 text-center">
-              <p className="eyebrow">Three inputs · One minute</p>
-              <p className="mt-3 text-lg font-medium">
-                Start with industry, team size, and hours lost to manual ops.
-              </p>
-              <div className="mt-6 inline-flex">
-                <Magnetic>
-                  <Button href="/roi-calculator" dataCtaId="home-roi-primary-a">
-                    Calculate My Estimate
-                  </Button>
-                </Magnetic>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 10 · FINAL CTA */}
-      <CtaSection
-        primaryCtaId="home-final-primary-a"
-        secondaryCtaId="home-final-secondary-a"
-      />
+      <ArchitecturalSections />
     </>
   );
 }

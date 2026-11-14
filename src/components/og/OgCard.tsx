@@ -17,9 +17,9 @@ import { siteConfig } from "@/data/site";
  */
 
 /* Keystone palette, inlined (Satori has no CSS custom properties). */
-const INK = "#f4f0ea";
-const MUTED = "#a8a19a";
-const ACCENT = "#e0874a";
+const INK = "#f5f7fa";
+const MUTED = "#b7c2cf";
+const ACCENT = "#f58a1f";
 
 /**
  * Headline size by character count. A fixed 76px looked right for the site
@@ -58,9 +58,9 @@ export function OgCard({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        backgroundColor: "#0f0d0c",
+        backgroundColor: "#06101b",
         backgroundImage:
-          "radial-gradient(700px 340px at 12% -10%, rgba(224,135,74,0.2), transparent 65%), radial-gradient(560px 300px at 92% 12%, rgba(183,163,106,0.1), transparent 60%)",
+          "radial-gradient(700px 340px at 12% -10%, rgba(64,140,220,0.16), transparent 65%), radial-gradient(560px 300px at 92% 12%, rgba(245,138,31,0.08), transparent 60%)",
         color: INK,
         padding: 72,
         fontFamily: "sans-serif",
@@ -145,7 +145,7 @@ export function OgCard({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-end",
-          borderTop: "2px solid rgba(244,240,234,0.12)",
+          borderTop: "2px solid rgba(167,190,214,0.18)",
           paddingTop: 28,
         }}
       >
