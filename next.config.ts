@@ -65,9 +65,26 @@ function warnOnProductionMisconfiguration(phase: string) {
 }
 
 const securityHeaders = [
-  { key: "X-DNS-Prefetch-Control", value: "on" },
+  /*
+    `on` was the default choice for prefetching, but the site loads nothing from
+    a third-party origin — no CDN, no fonts, no analytics — so prefetching has
+    nothing to resolve and the header only tells the browser it may prerender
+    arbitrary DNS names a link points at. `off` removes that without any cost,
+    and it is transmitted rather than merely omitted so every response states
+    the policy explicitly.
+  */
+  { key: "X-DNS-Prefetch-Control", value: "off" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
+  /*
+    The legacy XSS auditor is removed from every current browser. Where it still
+    exists it is a liability: its heuristics have been used to *introduce*
+    reflected-XSS gadgets by stripping page fragments, and it can be steered into
+    blocking attacker-chosen content. `0` turns it off explicitly; CSP is the
+    real control. The header is sent anyway because a proxy or an old client
+    stack may still honour it.
+  */
+  { key: "X-XSS-Protection", value: "0" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
   /*
@@ -77,6 +94,15 @@ const securityHeaders = [
   */
   { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
   { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+  /*
+    Guarantees no cross-origin resource is embedded without its own opt-in. Safe
+    here because the site loads nothing from another origin — measured: zero
+    remote `src`/`href` subresources across the rendered documents, and the only
+    absolute URLs are the canonical/RSS links in metadata, which are not fetched.
+    If a third-party embed is ever added it must carry `Cross-Origin-Resource-Policy`
+    or this header will block it, which is the intended trade.
+  */
+  { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
   { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
   { key: "Origin-Agent-Cluster", value: "?1" },
   {
@@ -96,6 +122,13 @@ const securityHeaders = [
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
+      /*
+        `upgrade-insecure-requests` is deliberately absent. It is ignored in a
+        report-only policy — the browser says so in the console, which the
+        console-cleanliness test caught — so adding it here would be decoration
+        that changes nothing. It belongs in the enforcing policy, in the same
+        change that sets CSP_MODE=enforce.
+      */
     ].join("; "),
   },
 ];
@@ -108,8 +141,16 @@ const securityHeaders = [
  * enforcing a policy containing `'unsafe-inline'` buys little while risking a
  * broken first paint. Setting `CSP_MODE=enforce` promotes the same policy to an
  * enforcing header — a configuration change rather than the code edit
- * LAUNCH-CHECKLIST.md §3 previously required. Watch the console for reports
- * before flipping it, and prefer a nonce-based `script-src` first.
+ * LAUNCH-CHECKLIST.md §3 previously required.
+ *
+ * This is observation with **no reporter**: neither `report-to` nor `report-uri`
+ * is set, so violations surface only in the browser's own console. That is a
+ * real limitation rather than a detail — nobody is notified, and only someone
+ * with devtools open sees anything. Adding a collector means sending every
+ * blocked-request URL to a third party, which is a privacy decision the owner
+ * has not made, so it is deferred rather than forgotten. Until then, "watch the
+ * console before flipping it" means exactly that, and prefer a nonce-based
+ * `script-src` first.
  */
 function cspHeaders(): typeof securityHeaders {
   const mode = process.env.CSP_MODE?.trim().toLowerCase();

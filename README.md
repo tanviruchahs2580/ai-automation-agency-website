@@ -49,9 +49,13 @@ Copy `.env.example` to `.env` and set:
 
 ## Operations notes
 
-- The intake endpoint `POST /api/project-brief` rate limits per client IP read
-  from `x-forwarded-for`. Deploy behind a proxy or platform that overwrites
-  this header (Vercel, Nginx, Cloudflare) so it cannot be spoofed.
+- The intake endpoint `POST /api/project-brief` resolves client addresses using
+  a deployment-specific trust chain: Vercel uses `x-vercel-forwarded-for`,
+  Cloudflare uses `cf-connecting-ip`, and nginx uses `x-real-ip` only when
+  `CLIENT_IP_SOURCE=nginx` is set and nginx overwrites that header from the
+  connection. Other Node deployments use only the right-most `x-forwarded-for`
+  value, so they must sit behind a trusted proxy that appends/rewrites that
+  value; do not expose a bare Node listener directly to untrusted traffic.
 - Brief delivery is configuration-gated: set `RESEND_API_KEY` and
   `BRIEF_NOTIFICATION_EMAIL` in the host environment and accepted briefs are
   emailed automatically (`src/lib/brief-notification.ts`, plain fetch, no SDK).

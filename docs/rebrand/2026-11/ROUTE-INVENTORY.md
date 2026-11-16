@@ -7,7 +7,13 @@ Source: `src/app` tree + `sitemap.ts` + live prod sitemap (51 locs, matches). Al
 - Static pages: **17** · Dynamic detail pages: **34** (solutions 6, services 7, industries 12, insights 6, work 3) · **Indexable total: 51**
 - Utility/SEO endpoints: sitemap.xml, robots.txt, manifest.webmanifest, feed.xml, root + per-slug opengraph-image (34+1), favicon.ico/icon.svg/icon.png/apple-icon.png
 - API: `POST /api/project-brief` (1)
-- Redirects: `/path/` → `/path` 308 via `src/proxy.ts` (Next 16 middleware). No next.config redirects.
+- Redirects: `/path/` → `/path` with 308. This is Next.js core's own trailing-slash
+  canonicalisation (`trailingSlash: false`, the default) — **not** application code.
+  `src/proxy.ts` used to exist and was believed to do this; it was removed on
+  2026-11-15 after measurement showed Next performs the redirect with the file
+  deleted, while the file's own `NextResponse.redirect` produced a Location equal
+  to the slashed input (a self-redirect) that Next's earlier normalisation masked.
+  No next.config redirects.
 
 ## Static pages
 

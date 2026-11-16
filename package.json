@@ -4,7 +4,8 @@
   "private": true,
   "description": "Enterprise AI engineering & automation company website",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.9.0",
+    "npm": ">=11.17.0"
   },
   "scripts": {
     "dev": "next dev",
@@ -16,12 +17,13 @@
     "test:e2e": "playwright test",
     "test:watch": "vitest",
     "check:budget": "node scripts/check-budget.mjs",
+    "check:runtime": "node scripts/check-runtime.mjs",
     "check:rendered": "node scripts/check-rendered-html.mjs",
     "check:deps": "npm audit --omit=dev --audit-level=high",
     "check:rtl": "node scripts/check-rtl.mjs",
     "check:journey": "node scripts/user-journey.mjs",
     "check:vitals": "node scripts/measure-vitals.mjs",
-    "verify": "npm run lint && npm run typecheck && npm run test && npm run build && npm run check:rendered && npm run check:budget"
+    "verify": "npm run check:runtime && npm run lint && npm run typecheck && npm run test && npm run build && npm run check:rendered && npm run check:budget"
   },
   "dependencies": {
     "framer-motion": "^12.23.0",
@@ -44,7 +46,8 @@
     "vitest": "^5.0.5"
   },
   "allowScripts": {
-    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true,
+    "fsevents@2.3.2": true,
     "unrs-resolver@1.12.2": true
   }
 }

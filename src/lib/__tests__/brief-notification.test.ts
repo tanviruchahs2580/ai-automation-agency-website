@@ -134,4 +134,52 @@ describe("sendBriefNotification", () => {
     );
     expect(result).toEqual({ sent: false, reason: "network-error" });
   });
+
+  it("uses the default deadline when the test override is invalid", async () => {
+    const fetchImpl = fetchMock();
+    const result = await sendBriefNotification(
+      "PB-TEST-0007",
+      validBrief,
+      configuredEnv,
+      fetchImpl as unknown as typeof fetch,
+      Number.POSITIVE_INFINITY,
+    );
+
+    expect(result).toEqual({ sent: true });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(fetchImpl.mock.calls[0][1]?.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it("aborts a stalled provider and still reports a receipt-level failure", async () => {
+    /*
+      The provider promise never settles on its own, so the only way this test
+      finishes is the abort. The timeout is shortened because AbortSignal.timeout
+      uses a platform timer that fake timers cannot advance.
+    */
+    let abortedSignal: AbortSignal | null | undefined;
+    const stalling = vi.fn((_url: string, init?: RequestInit) => {
+      const signal = init?.signal ?? null;
+      abortedSignal = signal;
+      return new Promise<Response>((_resolve, reject) => {
+        signal?.addEventListener("abort", () => {
+          reject(signal.reason ?? new DOMException("aborted", "AbortError"));
+        });
+      });
+    });
+
+    const startedAt = Date.now();
+    const result = await sendBriefNotification(
+      "PB-TEST-0006",
+      validBrief,
+      configuredEnv,
+      stalling as unknown as typeof fetch,
+      20,
+    );
+    const elapsed = Date.now() - startedAt;
+
+    expect(abortedSignal).toBeInstanceOf(AbortSignal);
+    expect(abortedSignal?.aborted).toBe(true);
+    expect(result).toEqual({ sent: false, reason: "network-error" });
+    expect(elapsed).toBeLessThan(5_000);
+  });
 });

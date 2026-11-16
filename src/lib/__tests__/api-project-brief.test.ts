@@ -122,6 +122,33 @@ describe("POST /api/project-brief", () => {
     expect(sendBriefNotification).not.toHaveBeenCalled();
   });
 
+  it("never names the honeypot in a validation error, whatever type fills it", async () => {
+    /*
+      A *string* in the honeypot takes the silent-receipt path above. A
+      non-string (number, null, array, object, boolean) still fails the type
+      check, and Zod's flattened fieldErrors would then name `companyWebsite` —
+      telling a script precisely which hidden field it tripped. Measured before
+      the fix: every value below produced `issues.companyWebsite`.
+    */
+    for (const value of [0, null, [], {}, true, ["spam.example"]]) {
+      const response = await post({
+        ...validBrief,
+        // A real field is invalid too, so the assertion below proves the
+        // scrubbing removed one key rather than emptying the whole map.
+        contactEmail: "not-an-email",
+        companyWebsite: value,
+      });
+
+      const label = JSON.stringify(value) ?? String(value);
+      expect(response.status, label).toBe(422);
+      const json = (await response.json()) as { issues: Record<string, string[]> };
+      expect(Object.keys(json.issues), label).not.toContain("companyWebsite");
+      expect(Object.keys(json.issues), label).toContain("contactEmail");
+      expect(JSON.stringify(json), label).not.toContain("companyWebsite");
+    }
+    expect(sendBriefNotification).not.toHaveBeenCalled();
+  });
+
   it("rate limits a single client address after five requests", async () => {
     const ip = "203.0.113.77";
     const statuses: number[] = [];
@@ -136,6 +163,51 @@ describe("POST /api/project-brief", () => {
     for (const body of [validBrief, "not json", { ...validBrief, contactEmail: "x" }]) {
       const response = await post(body);
       expect(response.headers.get("cache-control"), String(response.status)).toBe("no-store");
+    }
+  });
+
+  it("rejects a cross-site post without spending the visitor's rate limit", async () => {
+    /*
+      The endpoint sets no cookie and holds no session, so the usual CSRF risk
+      (reading or acting as the visitor) does not apply. What does: the limiter
+      is keyed on the caller's address, so a third-party page could post here
+      from a visitor's browser and burn their five submissions, locking them out
+      of the form they were filling in. The check therefore runs *before* the
+      limiter — the second half of this test is what proves that ordering.
+    */
+    const ip = "203.0.113.90";
+
+    const blocked = await post(validBrief, { "Sec-Fetch-Site": "cross-site" }, ip);
+    expect(blocked.status).toBe(403);
+    expect(blocked.headers.get("cache-control")).toBe("no-store");
+    expect(sendBriefNotification).not.toHaveBeenCalled();
+
+    // A cross-site flood must leave the address's allowance untouched.
+    for (let i = 0; i < 20; i += 1) {
+      await post(validBrief, { "Sec-Fetch-Site": "cross-site" }, ip);
+    }
+    expect((await post(validBrief, { "Sec-Fetch-Site": "same-origin" }, ip)).status).toBe(200);
+  });
+
+  it("accepts same-origin, same-site and header-less posts", async () => {
+    // No header = not a browser (server-to-server, curl, the journey harness).
+    for (const secFetchSite of ["same-origin", "same-site", "none", undefined]) {
+      const headers: Record<string, string> =
+        secFetchSite === undefined ? {} : { "Sec-Fetch-Site": secFetchSite };
+      const response = await post(validBrief, headers);
+      expect(response.status, String(secFetchSite)).toBe(200);
+    }
+  });
+
+  it("fails closed on an unrecognised or duplicated Sec-Fetch-Site", async () => {
+    /*
+      `Headers.get` concatenates repeated fields, so two headers yield
+      "same-origin, cross-site". Comparing against "cross-site" would let that
+      through; the allowlist does not.
+    */
+    for (const value of ["cross-site-x", "same-origin, cross-site", ""]) {
+      const response = await post(validBrief, { "Sec-Fetch-Site": value });
+      expect(response.status, value).toBe(403);
     }
   });
 });

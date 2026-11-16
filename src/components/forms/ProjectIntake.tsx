@@ -12,6 +12,7 @@ import {
   timelines,
 } from "@/lib/intake";
 import { contact } from "@/data/site";
+import { isDraftRestorable } from "@/lib/draft";
 import { siteConfig } from "@/data/site";
 import { AnalyticsEvent, track } from "@/lib/analytics";
 import { Icon } from "@/components/ui/Icon";
@@ -125,6 +126,18 @@ export function ProjectIntake() {
         const parsed = JSON.parse(raw) as Partial<FormState> & {
           savedAt?: unknown;
         };
+        /*
+          The draft holds personal data (name, email, problem statement) on a
+          machine we do not control. It was written with a `savedAt` that only
+          ever fed the "restored from…" label, so it never aged out — the
+          privacy page's retention statement did not hold for this copy. An
+          expired or malformed draft is treated as absent and removed.
+        */
+        if (!isDraftRestorable(parsed.savedAt)) {
+          window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+          window.localStorage.removeItem(LEGACY_DRAFT_STORAGE_KEY);
+          return;
+        }
         const merged: FormState = {
           ...initialForm,
           ...parsed,
@@ -195,9 +208,21 @@ export function ProjectIntake() {
     setDraftRestored(false);
   };
 
+  /**
+   * Erase the stored draft — every key that can hold one.
+   *
+   * The restore path above already knows there are two: a visitor who used the
+   * site before the rename still has `vantiq:intake-draft:v1` in their storage,
+   * and it holds the same personal data (name, email, problem statement). This
+   * removed only the current key, so "Start fresh" left the legacy copy behind
+   * and the next mount rehydrated it from the `??` fallback — the visitor asked
+   * to erase their data and it came back on reload. Any key this component can
+   * read must be one it can delete.
+   */
   const clearDraft = () => {
     try {
       window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_DRAFT_STORAGE_KEY);
     } catch {
       /* ignore */
     }

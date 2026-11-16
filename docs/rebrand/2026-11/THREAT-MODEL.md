@@ -23,8 +23,8 @@ Scope: the public website + its one write endpoint. No auth, no user accounts, n
 
 | Abuse case | Control | Status |
 |---|---|---|
-| Spam/automated submissions | Fixed-window rate limit 5/min/IP (`rate-limit.ts`, bounded map, sweep at 4096); honeypot field `companyWebsite` returns a success-shaped receipt with **no notification and no log** | VERIFIED (unit tests + e2e) |
-| IP spoofing to evade rate limit | `resolveClientAddress` trusts only proxy-attested headers (`x-vercel-forwarded-for` → `cf-connecting-ip` → `true-client-ip` → `x-real-ip` → right-most XFF); `unknown` fails closed | VERIFIED (12 unit tests) |
+| Spam/automated submissions | Fixed-window rate limit 5/min/IP (`rate-limit.ts`, bounded at 10k keys). Only expired buckets are reclaimed; when the cap is full of live state, the *new* key is refused, so a flood cannot reset an active block or a partially used counter. Honeypot field `companyWebsite` returns a success-shaped receipt with **no notification and no log** | VERIFIED (unit tests + e2e) |
+| IP spoofing to evade rate limit | `resolveClientAddress` reads one platform-attested header, chosen by `detectClientPlatform()` (`x-vercel-forwarded-for` on Vercel, `cf-connecting-ip` on Cloudflare, `x-real-ip` via `CLIENT_IP_SOURCE=nginx`); on a bare Node host only the **right-most** XFF entry is read, and only if it parses — an unparseable trusted hop yields `unknown` rather than falling back to a client-written entry. Addresses are canonicalised (every IPv6 spelling, IPv4-mapped, NAT64/6to4 unwrapped) and bucketed on /64 | VERIFIED (unit tests + live probe) |
 | Oversized payloads | Declared content-length + actual byte cap (64 KiB) → 413 | VERIFIED (unit tests) |
 | Injection (content/header) | Zod schema bounds-before-sanitize, control-char stripping, 4000-char field caps; XML-escaping on RSS; React auto-escaping everywhere else | VERIFIED (tests) |
 | Enumeration/probing | Rate limit applies to all responses; errors are generic (`role="alert"` fallback copy); no internal validation details leak | VERIFIED |
@@ -32,11 +32,15 @@ Scope: the public website + its one write endpoint. No auth, no user accounts, n
 | Clickjacking | `X-Frame-Options: DENY` + `frame-ancestors 'none'` | VERIFIED (headers) |
 | Mixed content / downgrade | HSTS 2y includeSubDomains preload | VERIFIED (headers) |
 | Secret leakage | `.env*` gitignored; `check:deps` clean; no `NEXT_PUBLIC_` around secrets (grep-verified); no secrets in client bundle | VERIFIED |
-| Dependency compromise | `npm audit --omit=dev --audit-level=high` in CI + locally: **0 vulnerabilities** (2026-11-13); lockfile pinned; no postinstall scripts beyond allowlisted esbuild/unrs-resolver | VERIFIED |
+| Dependency compromise | `npm audit --omit=dev --audit-level=high` in CI + locally; lockfile pinned; no install scripts beyond the `allowScripts` entries (fsevents: macOS-only optional dev watcher compiled locally via `node-gyp` — never installed on Linux CI; unrs-resolver: platform binding verified/installed by its postinstall). `.npmrc` sets `strict-allow-scripts=true`; toolchain floors are declared in `engines` (node ≥22.9.0, npm ≥11.17.0) and re-checked by `check:runtime`; both CI jobs pin and assert npm 11.17.0 before `npm ci` because Node 22's bundled npm 10.9.9 does not recognize the policy — the CI install itself is therefore a clean Node 22 install under the enforcing npm. | VERIFIED (policy source + CI pin + `check:runtime` gate; the PR's CI run supplies the executed clean-install evidence) |
 | Malicious external content | CSP `default-src 'self'`; no third-party origins; no user-generated content surfaces | VERIFIED |
-| Open redirects | No redirect functionality exists (proxy.ts only 308-normalizes trailing slashes on same-origin paths) | VERIFIED |
+| Open redirects | No application redirect code exists. Trailing-slash normalisation is Next.js core's, same-origin only, and the former `src/proxy.ts` was removed on 2026-11-15 (measured: Next redirects with the file deleted) | VERIFIED |
 
 ## 4. Residual risks / owner dependencies
+
+Each residual below is owned by the site owner and must be re-confirmed at the
+next audit or by **2027-05-16**, whichever comes first; an unconfirmed item is
+re-opened as a finding rather than silently carried.
 
 1. **CSP is Report-Only** in production until the owner sets `CSP_MODE=enforce`. The policy exists and is tested in report mode only. Owner deployment decision (requires verifying no inline violation in Vercel's environment).
 2. **Email provider account compromise** would expose brief contents sent via Resend — mitigated by Resend-side auth; owner manages that account.
