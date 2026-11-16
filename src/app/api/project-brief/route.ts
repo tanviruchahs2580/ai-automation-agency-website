@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createRateLimiter } from "@/lib/rate-limit";
-import { resolveClientAddress } from "@/lib/client-ip";
+import { rateLimitKey, resolveClientAddress } from "@/lib/client-ip";
+import { isCrossSiteRequest } from "@/lib/request-origin";
 import { recommendedNextStep } from "@/lib/intake";
 import {
   MAX_BRIEF_BYTES,
@@ -17,14 +18,21 @@ import {
  * Server-side intake endpoint.
  *
  * Security measures, in the order they run:
- *   1. per-caller rate limit, keyed on a proxy-attested address (see
- *      `resolveClientAddress` — the left-most `x-forwarded-for` entry is
- *      client-writable and is deliberately not trusted)
- *   2. transport-level body cap (`MAX_BRIEF_BYTES`) before any parsing, so an
- *      oversized payload is rejected without being buffered or scanned
- *   3. Zod schema validation with length bounds applied before sanitization
- *   4. honeypot rejection
- *   5. no secret exposure, no brief content in logs, no-store on the response
+ *   1. cross-site rejection (`Sec-Fetch-Site`), so a third-party page cannot
+ *      spend a visitor's rate-limit allowance — see `isCrossSiteRequest`
+ *   2. per-caller rate limit, keyed on a proxy-attested address, canonicalised
+ *      and reduced to an IPv6 /64 (see `resolveClientAddress` and
+ *      `rateLimitKey` — the left-most `x-forwarded-for` entry is client-writable
+ *      and is deliberately not trusted)
+ *   3. transport-level body cap (`MAX_BRIEF_BYTES`). The declared
+ *      `content-length` is checked first as a cheap early exit, but it is
+ *      advisory: a chunked or lying client is only stopped by the re-check on
+ *      the bytes actually received, which happens after the body has been
+ *      buffered. Bounded by (2), so this is a memory-efficiency limit, not an
+ *      availability control.
+ *   4. Zod schema validation with length bounds applied before sanitization
+ *   5. honeypot rejection
+ *   6. no secret exposure, no brief content in logs, no-store on the response
  *
  * Delivery: when RESEND_API_KEY + BRIEF_NOTIFICATION_EMAIL are set in the
  * host environment, every accepted brief is emailed to that inbox. Without
@@ -46,8 +54,42 @@ function failure(error: string, status: number, extra?: object, headers?: Header
   return NextResponse.json({ ok: false, error, ...extra }, { status, headers });
 }
 
+/**
+ * Field errors with the honeypot removed.
+ *
+ * `companyWebsite` accepts any string so that a bot filling it receives an
+ * ordinary receipt instead of a message naming the trap. A non-string value
+ * (a number, `null`, an array) still fails the type check, and Zod's flattened
+ * map would name the field — handing back the exact hint the string path is
+ * careful not to give. The trap is dropped here so no error body ever mentions
+ * it, whichever type it was filled with.
+ */
+function publicFieldErrors(fieldErrors: Record<string, string[] | undefined>) {
+  return Object.fromEntries(
+    Object.entries(fieldErrors).filter(([field]) => field !== "companyWebsite"),
+  );
+}
+
 export async function POST(request: Request) {
-  const ip = resolveClientAddress(request.headers);
+  /*
+    Reject cross-site posts before anything else, including the rate limit.
+
+    Order matters: the limiter is keyed on the caller's address, so checking it
+    first would let any third-party page consume a visitor's submission budget
+    and lock them out of the form they were filling in. Rejecting first means a
+    cross-site request costs nothing.
+  */
+  if (isCrossSiteRequest(request.headers)) {
+    return failure("Cross-site requests are not accepted.", 403, undefined, NO_STORE);
+  }
+
+  /*
+    Keyed on the /64 prefix for IPv6, not the full address: one host is routinely
+    handed a whole /64 and rotates its own interface identifier (RFC 4941), so a
+    per-address bucket would be bypassable by a single machine without forging
+    anything. See `rateLimitKey`.
+  */
+  const ip = rateLimitKey(resolveClientAddress(request.headers));
 
   const limit = limiter.check(ip);
   if (!limit.allowed) {
@@ -88,7 +130,7 @@ export async function POST(request: Request) {
   const parsed = projectBriefSchema.safeParse(body);
   if (!parsed.success) {
     return failure("Validation failed. Please review your answers.", 422, {
-      issues: z.flattenError(parsed.error).fieldErrors,
+      issues: publicFieldErrors(z.flattenError(parsed.error).fieldErrors),
     }, NO_STORE);
   }
 
