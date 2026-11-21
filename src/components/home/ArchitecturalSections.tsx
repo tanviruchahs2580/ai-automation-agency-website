@@ -2,6 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ProcessTimeline } from "@/components/home/ProcessTimeline";
+import {
+  CaseStudiesPreview,
+  InsightsPreview,
+  ProofBand,
+  SolutionsBento,
+  TechnologyMarquee,
+} from "@/components/home/HomeDepthSections";
+import { HeroParallax } from "@/components/ui/HeroParallax";
 import styles from "./ArchitecturalSections.module.css";
 
 /**
@@ -198,9 +207,15 @@ export function ArchitecturalSections() {
             id="ark-services-heading"
           />
           <ServiceGrid />
-          <ProvenApproach />
         </div>
       </section>
+      <SolutionsBento />
+      <ProvenApproach />
+      <ProofBand />
+      <CaseStudiesPreview />
+      <ProcessTimeline />
+      <InsightsPreview />
+      <TechnologyMarquee />
     </div>
   );
 }
@@ -208,14 +223,16 @@ export function ArchitecturalSections() {
 function ArchitecturalHero() {
   return (
     <section className={styles.hero} aria-labelledby="ark-home-heading">
-      <Image
-        src="/images/arkyon-hero-architecture.webp"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className={styles.heroImage}
-      />
+      <HeroParallax className={styles.heroLayer}>
+        <Image
+          src="/images/arkyon-hero-architecture.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className={styles.heroImage}
+        />
+      </HeroParallax>
       <div className={styles.heroOverlay} aria-hidden="true" />
       <div className={`${styles.container} ${styles.heroContent}`}>
         <p className={styles.eyebrow}>
@@ -280,43 +297,48 @@ function ServiceGrid() {
 
 function ProvenApproach() {
   return (
-    <section className={styles.approachSection} aria-labelledby="ark-approach-heading">
+    <section
+      className={styles.approachSection}
+      aria-labelledby="ark-approach-heading"
+    >
       {/*
         Whole-panel link to /approach: the owner's redesign reference shows no
         separate CTA, so the banner itself is the single, semantically valid
         link — preserving the route access the previous Learn More afforded.
       */}
-      <Link
-        href="/approach"
-        className={styles.approach}
-        aria-labelledby="ark-approach-heading"
-      >
-        <Image
-          src="/images/arkyon-approach-skyline.webp"
-          alt=""
-          fill
-          sizes="(max-width: 768px) 100vw, 78rem"
-          className={styles.approachImage}
-        />
-        <div className={styles.approachOverlay} aria-hidden="true" />
-        <div className={styles.approachContent}>
-          <p className={styles.approachEyebrow}>
-            Innovation
-            <span className={styles.approachDot} aria-hidden="true">•</span>
-            Intelligence
-            <span className={styles.approachDot} aria-hidden="true">•</span>
-            Impact
-          </p>
-          <h2 id="ark-approach-heading" className={styles.approachHeading}>
-            <span className={styles.approachBar} aria-hidden="true" />
-            <span className={styles.approachHeadingText}>
-              Building a <span className={styles.approachAccent}>Smarter,</span>
-              <br className={styles.approachBr} />{" "}
-              More Automated Future
-            </span>
-          </h2>
-        </div>
-      </Link>
+      <div className={styles.container}>
+        <Link
+          href="/approach"
+          className={styles.approach}
+          aria-labelledby="ark-approach-heading"
+        >
+          <Image
+            src="/images/arkyon-approach-skyline.webp"
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 78rem"
+            className={styles.approachImage}
+          />
+          <div className={styles.approachOverlay} aria-hidden="true" />
+          <div className={styles.approachContent}>
+            <p className={styles.approachEyebrow}>
+              Innovation
+              <span className={styles.approachDot} aria-hidden="true">•</span>
+              Intelligence
+              <span className={styles.approachDot} aria-hidden="true">•</span>
+              Impact
+            </p>
+            <h2 id="ark-approach-heading" className={styles.approachHeading}>
+              <span className={styles.approachBar} aria-hidden="true" />
+              <span className={styles.approachHeadingText}>
+                Building a <span className={styles.approachAccent}>Smarter,</span>
+                <br className={styles.approachBr} />{" "}
+                More Automated Future
+              </span>
+            </h2>
+          </div>
+        </Link>
+      </div>
     </section>
   );
 }

@@ -11,6 +11,12 @@ interface PageHeroProps {
   lead: string;
   breadcrumbs: Array<{ name: string; path: string }>;
   actions?: ReactNode;
+  /**
+   * Optional inventory stats rendered as a hairline-separated band under the
+   * lead. Values must be verifiable counts from the data layer (never invented
+   * client claims); each stat may link to the index route it counts.
+   */
+  stats?: Array<{ value: string; label: string; href?: string }>;
 }
 
 /**
@@ -41,6 +47,7 @@ export function PageHero({
   lead,
   breadcrumbs,
   actions,
+  stats,
 }: PageHeroProps) {
   /*
     Suppressed when the eyebrow merely restates the final crumb. On the index
@@ -58,7 +65,7 @@ export function PageHero({
   const echo = last !== undefined && eyebrowHead === last;
 
   return (
-    <section className="relative overflow-hidden border-b border-line">
+    <section className="hero-depth relative overflow-hidden border-b border-line">
       <GridLines opacity={0.5} />
       <div
         className="aurora-bleed pointer-events-none absolute inset-0"
@@ -95,6 +102,35 @@ export function PageHero({
             {lead}
           </p>
           {actions && <div className="mt-7 flex flex-wrap gap-3">{actions}</div>}
+          {stats && stats.length > 0 && (
+            <dl className="stat-band mt-10 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              {stats.map((stat) => {
+                /* The value's typography lives on the <dd> and the link sits
+                   INSIDE it: wrapping <dd> in an <a> would make the anchor the
+                   dd's parent, which axe flags (dlitem/definition-list) and
+                   which is invalid HTML inside a <dl>. */
+                return (
+                  <div key={stat.label}>
+                    <dt className="mono-label uppercase text-faint">
+                      {stat.label}
+                    </dt>
+                    <dd className="mt-1.5 tabular font-display text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+                      {stat.href ? (
+                        <Link
+                          href={stat.href}
+                          className="transition-colors hover:text-accent-bright"
+                        >
+                          {stat.value}
+                        </Link>
+                      ) : (
+                        stat.value
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          )}
         </Reveal>
       </div>
     </section>

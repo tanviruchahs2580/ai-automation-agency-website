@@ -11,6 +11,8 @@ import {
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { OpportunityFinder } from "@/components/home/OpportunityFinder";
 import { solutions } from "@/data/solutions";
+import { industries } from "@/data/industries";
+import { caseStudies } from "@/data/case-studies";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -32,6 +34,19 @@ export default function SolutionsPage() {
           { name: "Solutions", path: "/solutions" },
         ]}
         actions={<Button href="/start-a-project">Start a Project</Button>}
+        stats={[
+          { value: String(solutions.length), label: "Solutions" },
+          {
+            value: String(industries.length),
+            label: "Industries covered",
+            href: "/industries",
+          },
+          {
+            value: String(caseStudies.length),
+            label: "Reference architectures",
+            href: "/work",
+          },
+        ]}
       />
 
       <section className="section-y" aria-labelledby="solutions-heading">
@@ -64,6 +79,9 @@ export default function SolutionsPage() {
                       description={solution.summary}
                       meta={solution.meta}
                       href={`/solutions/${solution.slug}`}
+                      /* Lead solution carries the featured treatment so the
+                         grid reads as composed, not tiled (2026-11-16). */
+                      featured={i === 0}
                     />
                   </Spotlight>
                 </RevealStaggerItem>
@@ -74,7 +92,7 @@ export default function SolutionsPage() {
       </section>
 
       <section
-        className="section-y border-t border-line bg-surface/30"
+        className="section-y section-alt"
         aria-labelledby="finder-heading"
       >
         <div className="container-x">
