@@ -80,6 +80,7 @@ export function CapabilityCard({
   index,
   icon,
   hue = "accent",
+  featured = false,
 }: {
   eyebrow: string;
   title: string;
@@ -89,6 +90,13 @@ export function CapabilityCard({
   index?: string;
   icon?: IconName;
   hue?: ChipHue;
+  /**
+   * Featured treatment for the lead item of an index grid: a longer
+   * description window and an accent-tinted surface so the grid reads as
+   * composed rather than tiled. Purely presentational — same fields, same
+   * link target.
+   */
+  featured?: boolean;
 }) {
   const body = (
     <>
@@ -109,14 +117,32 @@ export function CapabilityCard({
           <Eyebrow>{eyebrow}</Eyebrow>
         </div>
       )}
-      <h3 className="h-card mt-3">{title}</h3>
-      <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-muted">
+      <h3
+        className={cn(
+          "mt-3",
+          featured
+            ? "font-display text-2xl font-semibold tracking-tight"
+            : "h-card",
+        )}
+      >
+        {title}
+      </h3>
+      <p
+        className={cn(
+          "mt-3 flex-1 leading-relaxed text-muted",
+          featured ? "text-base" : "line-clamp-3 text-sm",
+        )}
+      >
         {description}
       </p>
       {meta && <Meta>{meta}</Meta>}
     </>
   );
-  const cls = cn(shell, "group p-6");
+  const cls = cn(
+    shell,
+    "group p-6",
+    featured && "border-line-strong bg-surface2/60",
+  );
   return href ? (
     <Link href={href} className={cls}>
       {body}

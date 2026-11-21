@@ -9,6 +9,8 @@ import {
   RevealStaggerItem,
 } from "@/components/ui/RevealStagger";
 import { services } from "@/data/services";
+import { industries } from "@/data/industries";
+import { processPhases } from "@/data/architecture";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -30,6 +32,19 @@ export default function ServicesPage() {
           { name: "Services", path: "/services" },
         ]}
         actions={<Button href="/start-a-project">Start a Project</Button>}
+        stats={[
+          { value: String(services.length), label: "Services" },
+          {
+            value: String(processPhases.length),
+            label: "Delivery phases",
+            href: "/approach",
+          },
+          {
+            value: String(industries.length),
+            label: "Industries covered",
+            href: "/industries",
+          },
+        ]}
       />
 
       <section className="section-y" aria-labelledby="services-heading">
@@ -64,6 +79,8 @@ export default function ServicesPage() {
                       description={service.summary}
                       meta={service.capabilities.slice(0, 2).join(" · ")}
                       href={`/services/${service.slug}`}
+                      /* Lead service carries the featured treatment (2026-11-16). */
+                      featured={i === 0}
                     />
                   </Spotlight>
                 </RevealStaggerItem>

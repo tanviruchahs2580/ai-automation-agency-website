@@ -36,6 +36,16 @@
   object-position: 66% center;
 }
 
+/* Parallax layer — oversized by the exact drift range the HeroParallax
+   component animates (0 → 48px). -6% of the ~800px hero ≈ 48px of slack top
+   and bottom, so the photograph never exposes an edge mid-drift. The layer
+   carries the z-index; the image inside keeps its own (harmless, nested). */
+.heroLayer {
+  position: absolute;
+  inset: -6% 0;
+  z-index: -2;
+}
+
 .heroOverlay {
   position: absolute;
   z-index: -1;
@@ -269,7 +279,9 @@
    heading with the orange key word. The whole panel is one link to /approach
    (the reference shows no separate CTA; route access is preserved). */
 .approachSection {
-  margin-top: clamp(2rem, 4vw, 3.25rem);
+  /* Standalone band since the 2026-11-16 elevation moved the banner out of the
+     services section: vertical padding of its own, not a margin inside one. */
+  padding-block: clamp(1.5rem, 3vw, 2.5rem) clamp(2.5rem, 5vw, 4rem);
 }
 
 .approach {

@@ -25,6 +25,10 @@ export default function InsightsPage() {
           { name: "Insights", path: "/insights" },
         ]}
         actions={<Button href="/start-a-project">Start a Project</Button>}
+        stats={[
+          { value: String(insights.length), label: "Articles" },
+          { value: String(insightCategories.length), label: "Categories" },
+        ]}
       />
 
       <section className="section-y" aria-labelledby="insights-heading">

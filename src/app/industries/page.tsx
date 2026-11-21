@@ -30,6 +30,19 @@ export default function IndustriesPage() {
           { name: "Industries", path: "/industries" },
         ]}
         actions={<Button href="/start-a-project">Start a Project</Button>}
+        stats={[
+          { value: String(industries.length), label: "Industries" },
+          {
+            value: String(
+              industries.reduce(
+                (sum, industry) =>
+                  sum + industry.useCases.length + industry.opportunities.length,
+                0,
+              ),
+            ),
+            label: "Use cases documented",
+          },
+        ]}
       />
 
       <section className="section-y" aria-labelledby="industries-heading">

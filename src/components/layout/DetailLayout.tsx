@@ -20,7 +20,7 @@ export function DetailLayout({
         aria-label="On this page"
         className="hidden lg:col-span-2 lg:block"
       >
-        <ol className="sticky top-28 space-y-1">
+        <ol className="sticky top-28 space-y-1 border-s border-line ps-3">
           {nav.map((item, i) => (
             <li key={item.href}>
               <a

@@ -31,6 +31,24 @@ export default function WorkPage() {
           { name: "Work", path: "/work" },
         ]}
         actions={<Button href="/start-a-project">Start a Project</Button>}
+        stats={[
+          {
+            value: String(caseStudies.length),
+            label: "Reference architectures",
+          },
+          {
+            value: String(
+              caseStudies.reduce((sum, s) => sum + s.architecture.length, 0),
+            ),
+            label: "Architecture layers",
+          },
+          {
+            value: String(
+              caseStudies.reduce((sum, s) => sum + s.security.length, 0),
+            ),
+            label: "Security controls",
+          },
+        ]}
       />
 
       <section className="section-y" aria-labelledby="work-heading">

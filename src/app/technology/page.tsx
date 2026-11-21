@@ -8,6 +8,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { architectureLayers } from "@/data/architecture";
+import { technologyCategories } from "@/data/technology";
 import { buildMetadata } from "@/lib/seo";
 import { capitalize, countWord } from "@/lib/text";
 
@@ -56,6 +57,22 @@ export default function TechnologyPage() {
         actions={
           <Button href="/start-a-project">Talk to an AI Engineer</Button>
         }
+        stats={[
+          {
+            value: String(technologyCategories.length),
+            label: "Stack categories",
+          },
+          {
+            value: String(
+              technologyCategories.reduce(
+                (sum, category) => sum + category.items.length,
+                0,
+              ),
+            ),
+            label: "Capabilities mapped",
+          },
+          { value: String(architectureLayers.length), label: "Stack layers" },
+        ]}
       />
 
       <section className="section-y" aria-labelledby="stack-heading">
